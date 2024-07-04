@@ -1,0 +1,83 @@
+module App.RoleManager.UserRole.UserRole where
+
+import DA.Set qualified as Set (fromList, singleton)
+
+import DA.List (delete)
+import Interface.RoleManager.UserRole.UserRole qualified as UserRole (I, View(..), AddPermission(..), RemovePermission(..), SetPermissions(..), userRoleKey, createReference, disclosureUpdateReference)
+import Interface.RoleManager.UserRole.Factory qualified as UserRoleFactory (I, View(..), Create(..))
+
+import Interface.RoleManager.UserRole.Permission
+
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I, View(..), flattenObservers)
+import Daml.Finance.Util.Disclosure(addObserversImpl, removeObserversImpl, setObserversImpl)
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap)
+
+
+type T = UserRole
+
+template UserRole
+  with
+    id : Id
+    operator: Party
+    description : Text
+    permissions : [Permission]
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance UserRole.I for UserRole where
+      view = UserRole.View with operator, id, description, permissions
+
+      getKey = UserRole.userRoleKey this
+      
+      addPermission UserRole.AddPermission{permission} = do 
+        assertMsg "This Role already contains this permission" (notElem permission permissions)
+
+        toInterfaceContractId <$> create this with permissions = permissions ++ [permission]
+        
+      removePermission UserRole.RemovePermission{permission} = do
+          assertMsg "This Role only has 1 permission, you can not delete it" (length permissions > 1)
+          assertMsg "This Role does not contain that permission" (elem permission permissions)
+
+          let newPermissions = delete permission permissions
+          toInterfaceContractId <$> create this with permissions = newPermissions
+      
+      setPermissions UserRole.SetPermissions{permissions} = do
+        toInterfaceContractId <$> create this with permissions
+
+
+    interface instance Disclosure.I for UserRole where
+      view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
+      setObservers = setObserversImpl this . Some . UserRole.disclosureUpdateReference $
+        UserRole.userRoleKey this
+      addObservers = addObserversImpl this . Some . UserRole.disclosureUpdateReference $
+        UserRole.userRoleKey this
+      removeObservers = removeObserversImpl this . Some . UserRole.disclosureUpdateReference $
+        UserRole.userRoleKey this
+
+template Factory
+  with
+    operator : Party
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance UserRoleFactory.I for Factory where
+      view = UserRoleFactory.View with operator
+      
+      create' UserRoleFactory.Create {userRole; description; observers; permissions} =
+        do
+          cid <- toInterfaceContractId <$> create UserRole with
+            operator = userRole.operator
+            permissions = permissions
+            id = userRole.id; observers; description
+          UserRole.createReference userRole.operator cid
+          pure cid
+
+    interface instance Disclosure.I for Factory where
+      view = Disclosure.View with disclosureControllers = Set.singleton operator; observers
+      setObservers = setObserversImpl @Factory @Disclosure.I this None
+      addObservers = addObserversImpl @Factory @Disclosure.I this None
+      removeObservers = removeObserversImpl @Factory @Disclosure.I this None

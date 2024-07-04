@@ -1,0 +1,100 @@
+module App.RoleManager.Util where
+
+import Interface.RoleManager.UserRole.Permission
+import Interface.Common.Types (UserRoleKey(..))
+import Interface.RoleManager.UserRole.UserRole qualified as UserRole (R, Remove(..), AddPermission(..), RemovePermission(..), SetPermissions(..), SetCid(..))
+import Interface.RoleManager.UserRole.Factory qualified as UserRole (Factory(..), Create(..))
+import App.Util qualified as UserUtil (hasPermission)
+import App.Credential.Credential
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap, Id)
+
+data CreateUserRole = CreateUserRole
+  with
+    operator : Party
+    user : Party
+    id : Id
+    description : Text
+    permissions : [Permission]
+    observers : PartiesMap
+    permission : Permission
+    userRoleFactoryCid: ContractId UserRole.Factory 
+
+createUserRoleAux : CreateUserRole -> Update (UserRoleKey)
+createUserRoleAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the creation of a user role" permission
+  let userRole = UserRoleKey with operator = request.operator, id = request.id
+  exercise request.userRoleFactoryCid UserRole.Create with userRole; description = request.description; permissions= request.permissions; observers = request.observers
+  pure userRole
+
+data DeleteUserRole = DeleteUserRole
+  with
+    operator : Party
+    user : Party
+    userRole : UserRoleKey
+    permission : Permission
+    userRoleFactoryCid: ContractId UserRole.Factory 
+
+deleteUserRoleAux : DeleteUserRole -> Update ()
+deleteUserRoleAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the deletion of a user role" permission
+  (_, ref) <- fetchByKey @UserRole.R request.userRole
+  exercise ref.cid UserRole.Remove
+
+data AddPermissionToUserRole = AddPermissionToUserRole 
+  with
+    operator : Party
+    user : Party
+    userRole : UserRoleKey
+    addPermission : Permission
+    permission : Permission
+
+addPermissionToUserRoleAux : AddPermissionToUserRole  -> Update ()
+addPermissionToUserRoleAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to add a permission into a user role" permission
+  (refCid, ref) <- fetchByKey @UserRole.R request.userRole
+  cid <- exercise ref.cid UserRole.AddPermission with permission = request.addPermission
+  exercise refCid UserRole.SetCid with newCid = cid
+  pure()
+
+data RemovePermissionInUserRole  = RemovePermissionInUserRole
+  with
+    operator : Party
+    user : Party
+    userRole : UserRoleKey
+    removePermission : Permission
+    permission : Permission
+
+removePermissionInUserRoleAux : RemovePermissionInUserRole  -> Update ()
+removePermissionInUserRoleAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to remove a permission from a user role" permission
+  (refCid, ref) <- fetchByKey @UserRole.R request.userRole
+  cid <- exercise ref.cid UserRole.RemovePermission with permission = request.removePermission
+  exercise refCid UserRole.SetCid with newCid = cid
+  pure()
+
+data UpdateUserRole  = UpdateUserRole
+  with
+    operator : Party
+    user : Party
+    userRole : UserRoleKey
+    permissions : [Permission]
+    permission : Permission
+
+updateUserRoleAux : UpdateUserRole  -> Update ()
+updateUserRoleAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to update a user role" permission
+  (refCid, ref) <- fetchByKey @UserRole.R request.userRole
+  cid <- exercise ref.cid UserRole.SetPermissions with permissions = request.permissions
+  exercise refCid UserRole.SetCid with newCid = cid
+  pure()

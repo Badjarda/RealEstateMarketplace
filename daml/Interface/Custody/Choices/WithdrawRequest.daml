@@ -1,0 +1,25 @@
+module Interface.Custody.Choices.WithdrawRequest where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+
+type I = WithdrawRequest
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    user : Party
+    holdingCid : ContractId Holding.I
+  deriving (Eq, Show)
+
+interface WithdrawRequest where
+  viewtype View
+
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t WithdrawRequest, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation WithdrawRequest
+instance HasToInterface WithdrawRequest Removable.I where _toInterface = asRemovable

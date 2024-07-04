@@ -1,0 +1,227 @@
+module App.ProfileManager.Util where
+
+import Interface.Common.Util (fetchAndRemove)
+import Interface.RoleManager.UserRole.Permission
+import Interface.Common.Types (UserProfileKey(..))
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+import Interface.ProfileManager.Choices.RequestCreateUserProfile qualified as RequestCreateUserProfile (I, View(..))
+import Interface.ProfileManager.UserProfile.Factory qualified as UserRole (Create(..))
+import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(R(..), SetUsername(..), SetFirstName(..), SetLastName(..), SetFullName(..), SetContactMail(..), SetBirthday(..), SetGender(..), SetNationality(..), SetCellphoneNumber(..), SetTaxId(..), SetSocialSecurityId(..), SetCid(..))
+
+import App.Util qualified as UserUtil (hasPermission)
+import App.ProfileManager.Model
+import App.Credential.Credential
+import Interface.ProfileManager.UserProfile.Factory qualified as UserProfile(Factory(..), Create(..))
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap, Id)
+
+
+data CreateUserProfileRequest = CreateUserProfileRequest
+  with
+    operator: Party
+    user: Party
+    id: Id
+    username: Text
+    firstName: Text
+    lastName: Text
+    fullName: Text
+    birthday: Date
+    gender: Optional Gender
+    nationality: Nationality
+    contactMail: Text
+    cellphoneNumber: Optional Int
+    taxId: Int
+    socialSecurityId: Int
+    observers: PartiesMap
+    permission: Permission
+
+requestCreateUserProfileAux : CreateUserProfileRequest -> Update (ContractId RequestCreateUserProfile.I)
+requestCreateUserProfileAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the creation of a user role" permission 
+  toInterfaceContractId <$> create RequestCreateUserProfile with 
+    operator = request.operator
+    user = request.user
+    id = request.id
+    username = request.username
+    firstName = request.firstName
+    lastName = request.lastName
+    fullName = request.fullName
+    birthday = request.birthday
+    gender = request.gender
+    nationality = request.nationality
+    contactMail = request.contactMail
+    cellphoneNumber = request.cellphoneNumber
+    taxId = request.taxId
+    socialSecurityId = request.socialSecurityId
+    observers = request.observers
+
+data CreateUserProfile = CreateUserProfile
+  with
+    operator : Party
+    user : Party
+    createUserProfileRequest: ContractId RequestCreateUserProfile.I
+    userProfileFactoryCid: ContractId UserProfile.Factory 
+
+createUserProfileAux : CreateUserProfile -> Update (UserProfileKey)
+createUserProfileAux request = do
+  RequestCreateUserProfile.View{id,username,firstName,lastName,fullName,birthday,gender,nationality,contactMail,cellphoneNumber,taxId,socialSecurityId,observers} <- view <$> fetchAndRemove request.createUserProfileRequest
+  let userProfile = UserProfileKey with operator = request.operator, user = request.user, id = id
+  exercise request.userProfileFactoryCid UserProfile.Create with userProfileKey = userProfile, ..
+  pure userProfile
+
+data UpdateUsernameRequest = UpdateUsernameRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newUsername: Text
+
+updateUsernameAux: UpdateUsernameRequest -> Update ()
+updateUsernameAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetUsername with newUsername = request.newUsername
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateFullNameRequest = UpdateFullNameRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newFullName: Text
+
+updateFullNameAux: UpdateFullNameRequest -> Update ()
+updateFullNameAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetFullName with newFullName = request.newFullName
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateFirstNameRequest = UpdateFirstNameRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newFirstName: Text
+
+updateFirstNameAux: UpdateFirstNameRequest -> Update ()
+updateFirstNameAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetFirstName with newFirstName = request.newFirstName
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateLastNameRequest = UpdateLastNameRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newLastName: Text
+
+updateLastNameAux: UpdateLastNameRequest -> Update ()
+updateLastNameAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetLastName with newLastName = request.newLastName
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateBirthdayRequest = UpdateBirthdayRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newBirthday: Date
+
+updateBirthdayAux: UpdateBirthdayRequest -> Update ()
+updateBirthdayAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetBirthday with newBirthday = request.newBirthday
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateGenderRequest = UpdateGenderRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newGender: Optional Gender
+
+updateGenderAux: UpdateGenderRequest -> Update ()
+updateGenderAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetGender with newGender = request.newGender
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateNationalityRequest = UpdateNationalityRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newNationality: Nationality
+
+updateNationalityAux: UpdateNationalityRequest -> Update ()
+updateNationalityAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetNationality with newNationality = request.newNationality
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateContactMailRequest = UpdateContactMailRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newContactMail: Text
+
+updateContactMailAux: UpdateContactMailRequest -> Update ()
+updateContactMailAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetContactMail with newContactMail = request.newContactMail
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateCellphoneNumberRequest = UpdateCellphoneNumberRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newCellphoneNumber: Optional Int
+
+updateCellphoneNumberAux: UpdateCellphoneNumberRequest -> Update ()
+updateCellphoneNumberAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetCellphoneNumber with newCellphoneNumber = request.newCellphoneNumber
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateTaxIdRequest = UpdateTaxIdRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newTaxId: Int
+
+updateTaxIdAux: UpdateTaxIdRequest -> Update ()
+updateTaxIdAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetTaxId with newTaxId = request.newTaxId
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateSocialSecurityIdRequest = UpdateSocialSecurityIdRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newSocialSecurityId: Int
+
+updateSocialSecurityIdAux: UpdateSocialSecurityIdRequest -> Update ()
+updateSocialSecurityIdAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetSocialSecurityId with newSocialSecurityId = request.newSocialSecurityId
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+

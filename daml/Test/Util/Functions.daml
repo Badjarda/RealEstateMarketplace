@@ -1,0 +1,10 @@
+module Test.Util.Functions where
+
+import DA.Text (words)
+import DA.List (head,last)
+
+-- Helper function to split full name into first name and last name
+splitFullName : Text -> (Text, Text)
+splitFullName fullName = (head (words fullName), last (words fullName))
+  
+

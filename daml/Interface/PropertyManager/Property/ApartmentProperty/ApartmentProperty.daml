@@ -1,0 +1,387 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
+module Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty where
+import Interface.Common.Types (PropertyKey(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, Parties,InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (AddObservers(..), I, RemoveObservers(..), flattenObservers)
+import Daml.Finance.Interface.Util.InterfaceKey (createReferenceHelper, disclosureUpdateReferenceHelper, exerciseInterfaceByKeyHelper)
+import Daml.Finance.Interface.Util.InterfaceKey qualified as InterfaceKey (HasInterfaceKey(..))
+
+type I = ApartmentProperty
+
+type R = Reference
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    grossArea: Decimal
+    usableArea: Decimal
+    bedrooms: Int
+    bathrooms: Int
+    floor: Int
+    parkingSpaces: Int
+    elevator: Bool
+    buildDate: Date
+    installedEquipment: Text
+    additionalInformation: Text --Other relevant informations
+    description: Text
+  deriving (Eq, Show)
+
+toKey : View -> PropertyKey
+toKey v = PropertyKey with operator = v.operator, user = v.user, id = v.id
+
+propertyKey : (HasToInterface i ApartmentProperty) => i -> PropertyKey
+propertyKey = toKey . view . toInterface @ApartmentProperty
+
+
+interface ApartmentProperty requires Disclosure.I where
+  viewtype V
+
+  getKey : PropertyKey
+
+  getApartmentInstrumentKey : GetApartmentInstrumentKey -> Update(InstrumentKey)
+  setApartmentInstrumentKey : SetApartmentInstrumentKey -> Update(ContractId ApartmentProperty)
+
+  getApartmentPropertyAddress : GetApartmentPropertyAddress -> Update(Text)
+  setApartmentPropertyAddress : SetApartmentPropertyAddress -> Update(ContractId ApartmentProperty)
+
+  getApartmentPropertyPostalCode : GetApartmentPropertyPostalCode -> Update(Text)
+  setApartmentPropertyPostalCode : SetApartmentPropertyPostalCode -> Update(ContractId ApartmentProperty)
+
+  getApartmentPropertyDistrict : GetApartmentPropertyDistrict -> Update(Text)
+  setApartmentPropertyDistrict : SetApartmentPropertyDistrict -> Update(ContractId ApartmentProperty)
+
+  getApartmentPropertyCounty : GetApartmentPropertyCounty -> Update(Text)
+  setApartmentPropertyCounty : SetApartmentPropertyCounty -> Update(ContractId ApartmentProperty)
+
+  getApartmentGrossArea : GetApartmentGrossArea -> Update(Decimal)
+  setApartmentGrossArea : SetApartmentGrossArea -> Update(ContractId ApartmentProperty)
+
+  getApartmentUsableArea : GetApartmentUsableArea -> Update(Decimal)
+  setApartmentUsableArea : SetApartmentUsableArea -> Update(ContractId ApartmentProperty)
+
+  getApartmentBedrooms : GetApartmentBedrooms -> Update(Int)
+  setApartmentBedrooms : SetApartmentBedrooms -> Update(ContractId ApartmentProperty)
+
+  getApartmentBathrooms : GetApartmentBathrooms -> Update(Int)
+  setApartmentBathrooms : SetApartmentBathrooms -> Update(ContractId ApartmentProperty)
+
+  getApartmentFloor : GetApartmentFloor -> Update(Int)
+  setApartmentFloor : SetApartmentFloor -> Update(ContractId ApartmentProperty)
+
+  getApartmentParkingSpaces : GetApartmentParkingSpaces -> Update(Int)
+  setApartmentParkingSpaces : SetApartmentParkingSpaces -> Update(ContractId ApartmentProperty)
+
+  getApartmentElevator : GetApartmentElevator -> Update(Bool)
+  setApartmentElevator : SetApartmentElevator -> Update(ContractId ApartmentProperty)
+
+  getApartmentBuildDate : GetApartmentBuildDate -> Update(Date)
+  setApartmentBuildDate : SetApartmentBuildDate -> Update(ContractId ApartmentProperty)
+
+  getApartmentInstalledEquipment : GetApartmentInstalledEquipment -> Update(Text)
+  setApartmentInstalledEquipment : SetApartmentInstalledEquipment -> Update(ContractId ApartmentProperty)
+
+  getApartmentAdditionalInformation : GetApartmentAdditionalInformation -> Update(Text)
+  setApartmentAdditionalInformation : SetApartmentAdditionalInformation -> Update(ContractId ApartmentProperty)
+
+  getApartmentDescription : GetApartmentDescription -> Update(Text)
+  setApartmentDescription : SetApartmentDescription -> Update(ContractId ApartmentProperty)
+
+  nonconsuming choice GetView : View
+    with
+      viewer : Party
+    controller viewer
+    do
+      pure $ view this
+
+  nonconsuming choice GetApartmentInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      getApartmentInstrumentKey this arg
+
+  choice SetApartmentInstrumentKey: ContractId ApartmentProperty
+    with
+      newApartmentInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      setApartmentInstrumentKey this arg
+
+  nonconsuming choice GetApartmentPropertyAddress : Text
+    controller signatory this
+    do
+      getApartmentPropertyAddress this arg
+
+  choice SetApartmentPropertyAddress : ContractId ApartmentProperty
+    with
+      newApartmentPropertyAddress : Text
+    controller signatory this
+    do
+      setApartmentPropertyAddress this arg
+
+  nonconsuming choice GetApartmentPropertyPostalCode : Text
+    controller signatory this
+    do
+      getApartmentPropertyPostalCode this arg
+
+  choice SetApartmentPropertyPostalCode : ContractId ApartmentProperty
+    with
+      newApartmentPropertyPostalCode : Text
+    controller signatory this
+    do
+      setApartmentPropertyPostalCode this arg
+  
+  nonconsuming choice GetApartmentPropertyDistrict : Text
+    controller signatory this
+    do
+      getApartmentPropertyDistrict this arg
+
+  choice SetApartmentPropertyDistrict : ContractId ApartmentProperty
+    with
+      newApartmentPropertyDistrict : Text
+    controller signatory this
+    do
+      setApartmentPropertyDistrict this arg
+
+  nonconsuming choice GetApartmentPropertyCounty : Text
+    controller signatory this
+    do
+      getApartmentPropertyCounty this arg
+
+  choice SetApartmentPropertyCounty : ContractId ApartmentProperty
+    with
+      newApartmentPropertyCounty : Text
+    controller signatory this
+    do
+      setApartmentPropertyCounty this arg
+      
+  nonconsuming choice GetApartmentGrossArea : Decimal
+    controller signatory this
+    do
+      getApartmentGrossArea this arg
+
+  choice SetApartmentGrossArea : ContractId ApartmentProperty
+    with
+      newApartmentGrossArea : Decimal
+    controller signatory this
+    do
+      setApartmentGrossArea this arg
+
+  nonconsuming choice GetApartmentUsableArea : Decimal
+    controller signatory this
+    do
+      getApartmentUsableArea this arg
+
+  choice SetApartmentUsableArea : ContractId ApartmentProperty
+    with
+      newApartmentUsableArea : Decimal
+    controller signatory this
+    do
+      setApartmentUsableArea this arg
+
+  nonconsuming choice GetApartmentBedrooms : Int
+    controller signatory this
+    do
+      getApartmentBedrooms this arg
+
+  choice SetApartmentBedrooms : ContractId ApartmentProperty
+    with
+      newApartmentBedrooms : Int
+    controller signatory this
+    do
+      setApartmentBedrooms this arg
+
+  nonconsuming choice GetApartmentBathrooms : Int
+    controller signatory this
+    do
+      getApartmentBathrooms this arg
+
+  choice SetApartmentBathrooms : ContractId ApartmentProperty
+    with
+      newApartmentBathrooms : Int
+    controller signatory this
+    do
+      setApartmentBathrooms this arg
+
+  nonconsuming choice GetApartmentFloor : Int
+    controller signatory this
+    do
+      getApartmentFloor this arg
+
+  choice SetApartmentFloor : ContractId ApartmentProperty
+    with
+      newApartmentFloor : Int
+    controller signatory this
+    do
+      setApartmentFloor this arg
+
+  nonconsuming choice GetApartmentParkingSpaces : Int
+    controller signatory this
+    do
+      getApartmentParkingSpaces this arg
+
+  choice SetApartmentParkingSpaces : ContractId ApartmentProperty
+    with
+      newApartmentParkingSpaces : Int
+    controller signatory this
+    do
+      setApartmentParkingSpaces this arg
+
+  nonconsuming choice GetApartmentElevator : Bool
+    controller signatory this
+    do
+      getApartmentElevator this arg
+
+  choice SetApartmentElevator : ContractId ApartmentProperty
+    with
+      newApartmentElevator : Bool
+    controller signatory this
+    do
+      setApartmentElevator this arg
+  
+  nonconsuming choice GetApartmentBuildDate : Date
+    controller signatory this
+    do
+      getApartmentBuildDate this arg
+
+  choice SetApartmentBuildDate : ContractId ApartmentProperty
+    with
+      newApartmentBuildDate : Date
+    controller signatory this
+    do
+      setApartmentBuildDate this arg
+  
+  nonconsuming choice GetApartmentInstalledEquipment : Text
+    controller signatory this
+    do
+      getApartmentInstalledEquipment this arg
+
+  choice SetApartmentInstalledEquipment : ContractId ApartmentProperty
+    with
+      newApartmentInstalledEquipment : Text
+    controller signatory this
+    do
+      setApartmentInstalledEquipment this arg
+  
+  nonconsuming choice GetApartmentAdditionalInformation : Text
+    controller signatory this
+    do
+      getApartmentAdditionalInformation this arg
+
+  choice SetApartmentAdditionalInformation : ContractId ApartmentProperty
+    with
+      newApartmentAdditionalInformation : Text
+    controller signatory this
+    do
+      setApartmentAdditionalInformation this arg
+
+  nonconsuming choice GetApartmentDescription : Text
+    controller signatory this
+    do
+      getApartmentDescription this arg
+
+  choice SetApartmentDescription : ContractId ApartmentProperty
+    with
+      newApartmentDescription : Text
+    controller signatory this
+    do
+      setApartmentDescription this arg
+      
+  choice Remove : ()
+    controller signatory this
+    do
+      (refCid, _) <- fetchByKey @Reference $ getKey this
+      archive refCid
+
+
+template Reference
+  with
+    apartmentPropertyView : View
+    cid : ContractId ApartmentProperty
+    observers : PartiesMap
+  where
+    signatory apartmentPropertyView.operator
+    observer Disclosure.flattenObservers observers, apartmentPropertyView.user
+
+    key toKey apartmentPropertyView : PropertyKey
+    maintainer key.operator
+
+    nonconsuming choice GetCid : ContractId ApartmentProperty
+      with
+        viewer : Party
+      controller viewer
+      do
+        pure cid
+
+    choice SetCid : ContractId Reference
+      with
+        newCid : ContractId ApartmentProperty
+      controller signatory this
+      do
+        create this with cid = newCid
+
+    choice SetObservers : ContractId Reference
+      with
+        newObservers : PartiesMap
+      controller signatory this
+      do
+        create this with observers = newObservers
+
+disclose : (Text, Parties) -> Party -> Parties -> PropertyKey -> Update (ContractId ApartmentProperty)
+disclose observersToAdd actor disclosers apartmentProperty =
+  fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      apartmentProperty
+      actor
+      Disclosure.AddObservers with disclosers; observersToAdd
+
+undisclose : (Text, Parties) -> Party -> Parties -> PropertyKey ->
+  Update (Optional (ContractId ApartmentProperty))
+undisclose observersToRemove actor disclosers apartmentProperty =
+  fmap fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      apartmentProperty
+      actor
+      Disclosure.RemoveObservers with disclosers; observersToRemove
+
+exerciseInterfaceByKey : forall i c r.
+    ( HasInterfaceTypeRep i
+    , HasExercise i c r
+    )
+    => PropertyKey -- ^ The ApartmentProperty key.
+    -> Party      -- ^ The actor exercising.
+    -> c          -- ^ The choice arguments.
+    -> Update r
+exerciseInterfaceByKey k actor arg =
+  exerciseInterfaceByKeyHelper @Reference @GetCid @SetCid @SetObservers @GetView @i k actor arg
+
+-- | HIDE
+-- Create instance of HasInterfaceKey.
+instance InterfaceKey.HasInterfaceKey ApartmentProperty View PropertyKey Reference GetCid SetCid SetObservers
+  GetView where
+    createReference = Reference
+    getCid = GetCid
+    setCid = SetCid
+    setObservers = SetObservers
+    getView = GetView
+
+-- | HIDE
+-- Create Reference for the ApartmentProperty.
+createReference : Party -> ContractId ApartmentProperty -> Update (ContractId Reference)
+createReference = createReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView
+
+-- | HIDE
+-- Helper function to update the ApartmentProperty reference once observers are added to the ApartmentProperty.
+disclosureUpdateReference : PropertyKey -> PartiesMap -> ContractId ApartmentProperty ->
+  Update (ContractId Disclosure.I)
+disclosureUpdateReference =
+  disclosureUpdateReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView

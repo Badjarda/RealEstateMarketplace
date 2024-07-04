@@ -1,0 +1,71 @@
+module App.Issuance.Model where
+
+import DA.Set (fromList)
+
+import Interface.Issuance.Issuance qualified as Issuance (I, View(..), HasImplementation)
+import Interface.Issuance.Choices.IssueRequest qualified as IssueRequest (I, View(..), HasImplementation)
+import Interface.Issuance.Choices.DeIssueRequest qualified as DeIssueRequest (I, View(..), HasImplementation)
+import Interface.Common.Removable qualified as Removable (I, View(..))
+
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, Id, InstrumentQuantity)
+
+instance Issuance.HasImplementation Issuance
+
+template Issuance
+  with
+    operator : Party
+    user : Party
+    id : Id
+    description : Text
+    quantity : InstrumentQuantity
+  where
+    signatory operator, user
+
+    key (operator, id) : (Party, Id)
+    maintainer key._1
+
+    interface instance Removable.I for Issuance where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance Issuance.I for Issuance where
+      view = Issuance.View with operator; user; id; description; quantity
+      asRemovable = toInterface @Removable.I this
+
+instance IssueRequest.HasImplementation IssueRequest
+
+template IssueRequest
+  with
+    operator : Party
+    user : Party
+    issuanceId : Id
+    description : Text
+    quantity : InstrumentQuantity
+    account : AccountKey
+  where
+    signatory operator, user
+
+    interface instance Removable.I for IssueRequest where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance IssueRequest.I for IssueRequest where
+      view = IssueRequest.View with operator; user; issuanceId; description; quantity; account
+      asRemovable = toInterface @Removable.I this
+
+instance DeIssueRequest.HasImplementation DeIssueRequest
+
+template DeIssueRequest
+  with
+    operator : Party
+    user : Party
+    issuanceId : Id
+    holdingCid : ContractId Holding.I
+  where
+    signatory operator, user
+
+    interface instance Removable.I for DeIssueRequest where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance DeIssueRequest.I for DeIssueRequest where
+      view = DeIssueRequest.View with operator; user; issuanceId; holdingCid
+      asRemovable = toInterface @Removable.I this

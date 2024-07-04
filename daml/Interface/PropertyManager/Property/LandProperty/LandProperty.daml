@@ -1,0 +1,373 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
+module Interface.PropertyManager.Property.LandProperty.LandProperty where
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.Common (LandType, ViableConstructionTypes)
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, Parties, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (AddObservers(..), I, RemoveObservers(..), flattenObservers)
+import Daml.Finance.Interface.Util.InterfaceKey (createReferenceHelper, disclosureUpdateReferenceHelper, exerciseInterfaceByKeyHelper)
+import Daml.Finance.Interface.Util.InterfaceKey qualified as InterfaceKey (HasInterfaceKey(..))
+
+
+type I = LandProperty
+
+type R = Reference
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    landType: LandType
+    totalLandArea: Decimal
+    minimumSurfaceForSale: Decimal
+    buildableArea: Decimal
+    buildableFloors: Int
+    accessByRoad: Bool
+    installedEquipment: Text
+    viableConstructionTypes: [ViableConstructionTypes]
+    additionalInformation: Text
+    description: Text
+  deriving (Eq, Show)
+
+toKey : View -> PropertyKey
+toKey v = PropertyKey with operator = v.operator, user = v.user, id = v.id
+
+propertyKey : (HasToInterface i LandProperty) => i -> PropertyKey
+propertyKey = toKey . view . toInterface @LandProperty
+
+
+interface LandProperty requires Disclosure.I where
+  viewtype V
+
+  getKey : PropertyKey
+
+  getLandInstrumentKey : GetLandInstrumentKey -> Update(InstrumentKey)
+  setLandInstrumentKey : SetLandInstrumentKey -> Update(ContractId LandProperty)
+
+  getLandPropertyAddress : GetLandPropertyAddress -> Update(Text)
+  setLandPropertyAddress : SetLandPropertyAddress -> Update(ContractId LandProperty)
+
+  getLandPropertyPostalCode : GetLandPropertyPostalCode -> Update(Text)
+  setLandPropertyPostalCode : SetLandPropertyPostalCode -> Update(ContractId LandProperty)
+
+  getLandPropertyDistrict : GetLandPropertyDistrict -> Update(Text)
+  setLandPropertyDistrict : SetLandPropertyDistrict -> Update(ContractId LandProperty)
+
+  getLandPropertyCounty : GetLandPropertyCounty -> Update(Text)
+  setLandPropertyCounty : SetLandPropertyCounty -> Update(ContractId LandProperty)
+
+  getLandType : GetLandType -> Update(LandType)
+  setLandType : SetLandType -> Update(ContractId LandProperty)
+
+  getTotalLandArea : GetTotalLandArea -> Update(Decimal)
+  setTotalLandArea : SetTotalLandArea -> Update(ContractId LandProperty)
+
+  getLandMinimumSurfaceForSale : GetLandMinimumSurfaceForSale -> Update(Decimal)
+  setLandMinimumSurfaceForSale : SetLandMinimumSurfaceForSale -> Update(ContractId LandProperty)
+
+  getLandBuildableArea : GetLandBuildableArea -> Update(Decimal)
+  setLandBuildableArea : SetLandBuildableArea -> Update(ContractId LandProperty)
+
+  getLandBuildableFloors : GetLandBuildableFloors -> Update(Int)
+  setLandBuildableFloors : SetLandBuildableFloors -> Update(ContractId LandProperty)
+
+  getLandAccessByRoad : GetLandAccessByRoad -> Update(Bool)
+  setLandAccessByRoad : SetLandAccessByRoad -> Update(ContractId LandProperty)
+
+  getLandInstalledEquipment : GetLandInstalledEquipment -> Update(Text)
+  setLandInstalledEquipment : SetLandInstalledEquipment -> Update(ContractId LandProperty)
+
+  getLandViableConstructionTypes : GetLandViableConstructionTypes -> Update([ViableConstructionTypes])
+  setLandViableConstructionTypes : SetLandViableConstructionTypes -> Update(ContractId LandProperty)
+
+  getLandAdditionalInformation : GetLandAdditionalInformation -> Update(Text)
+  setLandAdditionalInformation : SetLandAdditionalInformation -> Update(ContractId LandProperty)
+
+  getLandDescription : GetLandDescription -> Update(Text)
+  setLandDescription : SetLandDescription -> Update(ContractId LandProperty)
+
+  nonconsuming choice GetView : View
+    with
+      viewer : Party
+    controller viewer
+    do
+      pure $ view this
+  
+  nonconsuming choice GetLandInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      getLandInstrumentKey this arg
+
+  choice SetLandInstrumentKey: ContractId LandProperty
+    with
+      newLandInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      setLandInstrumentKey this arg
+  
+  nonconsuming choice GetLandPropertyAddress : Text
+    controller signatory this
+    do
+      getLandPropertyAddress this arg
+
+  choice SetLandPropertyAddress : ContractId LandProperty
+    with
+      newLandPropertyAddress : Text
+    controller signatory this
+    do
+      setLandPropertyAddress this arg
+
+  nonconsuming choice GetLandPropertyPostalCode : Text
+    controller signatory this
+    do
+      getLandPropertyPostalCode this arg
+
+  choice SetLandPropertyPostalCode : ContractId LandProperty
+    with
+      newLandPropertyPostalCode : Text
+    controller signatory this
+    do
+      setLandPropertyPostalCode this arg
+  
+  nonconsuming choice GetLandPropertyDistrict : Text
+    controller signatory this
+    do
+      getLandPropertyDistrict this arg
+
+  choice SetLandPropertyDistrict : ContractId LandProperty
+    with
+      newLandPropertyDistrict : Text
+    controller signatory this
+    do
+      setLandPropertyDistrict this arg
+
+  nonconsuming choice GetLandPropertyCounty : Text
+    controller signatory this
+    do
+      getLandPropertyCounty this arg
+
+  choice SetLandPropertyCounty : ContractId LandProperty
+    with
+      newLandPropertyCounty : Text
+    controller signatory this
+    do
+      setLandPropertyCounty this arg
+
+  nonconsuming choice GetLandType : LandType
+    controller signatory this
+    do
+      getLandType this arg
+
+  choice SetLandType : ContractId LandProperty
+    with
+      newLandType : LandType
+    controller signatory this
+    do
+      setLandType this arg
+
+  nonconsuming choice GetTotalLandArea : Decimal
+    controller signatory this
+    do
+      getTotalLandArea this arg
+
+  choice SetTotalLandArea : ContractId LandProperty
+    with
+      newTotalLandArea : Decimal
+    controller signatory this
+    do
+      setTotalLandArea this arg
+
+  nonconsuming choice GetLandMinimumSurfaceForSale : Decimal
+    controller signatory this
+    do
+      getLandMinimumSurfaceForSale this arg
+
+  choice SetLandMinimumSurfaceForSale : ContractId LandProperty
+    with
+      newMinimumSurfaceForSale : Decimal
+    controller signatory this
+    do
+      setLandMinimumSurfaceForSale this arg
+
+  nonconsuming choice GetLandBuildableArea : Decimal
+    controller signatory this
+    do
+      getLandBuildableArea this arg
+
+  choice SetLandBuildableArea : ContractId LandProperty
+    with
+      newBuildableArea : Decimal
+    controller signatory this
+    do
+      setLandBuildableArea this arg
+
+  nonconsuming choice GetLandBuildableFloors : Int
+    controller signatory this
+    do
+      getLandBuildableFloors this arg
+
+  choice SetLandBuildableFloors : ContractId LandProperty
+    with
+      newBuildableFloors : Int
+    controller signatory this
+    do
+      setLandBuildableFloors this arg
+
+  nonconsuming choice GetLandAccessByRoad : Bool
+    controller signatory this
+    do
+      getLandAccessByRoad this arg
+
+  choice SetLandAccessByRoad : ContractId LandProperty
+    with
+      newLandAccessByRoad : Bool
+    controller signatory this
+    do
+      setLandAccessByRoad this arg
+  
+  nonconsuming choice GetLandInstalledEquipment : Text
+    controller signatory this
+    do
+      getLandInstalledEquipment this arg
+
+  choice SetLandInstalledEquipment : ContractId LandProperty
+    with
+      newLandInstalledEquipment : Text
+    controller signatory this
+    do
+      setLandInstalledEquipment this arg
+
+  nonconsuming choice GetLandViableConstructionTypes : [ViableConstructionTypes]
+    controller signatory this
+    do
+      getLandViableConstructionTypes this arg
+
+  choice SetLandViableConstructionTypes : ContractId LandProperty
+    with
+      newLandViableConstructionTypes: [ViableConstructionTypes]
+    controller signatory this
+    do
+      setLandViableConstructionTypes this arg
+  
+  nonconsuming choice GetLandAdditionalInformation : Text
+    controller signatory this
+    do
+      getLandAdditionalInformation this arg
+
+  choice SetLandAdditionalInformation : ContractId LandProperty
+    with
+      newLandAdditionalInformation : Text
+    controller signatory this
+    do
+      setLandAdditionalInformation this arg
+
+  nonconsuming choice GetLandDescription : Text
+    controller signatory this
+    do
+      getLandDescription this arg
+
+  choice SetLandDescription : ContractId LandProperty
+    with
+      newLandDescription : Text
+    controller signatory this
+    do
+      setLandDescription this arg
+      
+  choice Remove : ()
+    controller signatory this
+    do
+      (refCid, _) <- fetchByKey @Reference $ getKey this
+      archive refCid
+
+
+template Reference
+  with
+    landPropertyView : View
+    cid : ContractId LandProperty
+    observers : PartiesMap
+  where
+    signatory landPropertyView.operator
+    observer Disclosure.flattenObservers observers, landPropertyView.user
+
+    key toKey landPropertyView : PropertyKey
+    maintainer key.operator
+
+    nonconsuming choice GetCid : ContractId LandProperty
+      with
+        viewer : Party
+      controller viewer
+      do
+        pure cid
+
+    choice SetCid : ContractId Reference
+      with
+        newCid : ContractId LandProperty
+      controller signatory this
+      do
+        create this with cid = newCid
+
+    choice SetObservers : ContractId Reference
+      with
+        newObservers : PartiesMap
+      controller signatory this
+      do
+        create this with observers = newObservers
+
+disclose : (Text, Parties) -> Party -> Parties -> PropertyKey -> Update (ContractId LandProperty)
+disclose observersToAdd actor disclosers landProperty =
+  fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      landProperty
+      actor
+      Disclosure.AddObservers with disclosers; observersToAdd
+
+undisclose : (Text, Parties) -> Party -> Parties -> PropertyKey ->
+  Update (Optional (ContractId LandProperty))
+undisclose observersToRemove actor disclosers landProperty =
+  fmap fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      landProperty
+      actor
+      Disclosure.RemoveObservers with disclosers; observersToRemove
+
+exerciseInterfaceByKey : forall i c r.
+    ( HasInterfaceTypeRep i
+    , HasExercise i c r
+    )
+    => PropertyKey -- ^ The LandProperty key.
+    -> Party      -- ^ The actor exercising.
+    -> c          -- ^ The choice arguments.
+    -> Update r
+exerciseInterfaceByKey k actor arg =
+  exerciseInterfaceByKeyHelper @Reference @GetCid @SetCid @SetObservers @GetView @i k actor arg
+
+-- | HIDE
+-- Create instance of HasInterfaceKey.
+instance InterfaceKey.HasInterfaceKey LandProperty View PropertyKey Reference GetCid SetCid SetObservers
+  GetView where
+    createReference = Reference
+    getCid = GetCid
+    setCid = SetCid
+    setObservers = SetObservers
+    getView = GetView
+
+-- | HIDE
+-- Create Reference for the LandProperty.
+createReference : Party -> ContractId LandProperty -> Update (ContractId Reference)
+createReference = createReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView
+
+-- | HIDE
+-- Helper function to update the LandProperty reference once observers are added to the LandProperty.
+disclosureUpdateReference : PropertyKey -> PartiesMap -> ContractId LandProperty ->
+  Update (ContractId Disclosure.I)
+disclosureUpdateReference =
+  disclosureUpdateReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView

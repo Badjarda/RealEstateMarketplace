@@ -1,0 +1,320 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
+module Interface.ProfileManager.UserProfile.UserProfile where
+import Interface.Common.Types (UserProfileKey(..))
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, Parties)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (AddObservers(..), I, RemoveObservers(..), flattenObservers)
+import Daml.Finance.Interface.Util.InterfaceKey (createReferenceHelper, disclosureUpdateReferenceHelper, exerciseInterfaceByKeyHelper)
+import Daml.Finance.Interface.Util.InterfaceKey qualified as InterfaceKey (HasInterfaceKey(..))
+
+
+type I = UserProfile
+
+type R = Reference
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    username: Text
+    firstName: Text
+    lastName: Text
+    fullName: Text
+    birthday: Date
+    gender: Optional Gender
+    nationality: Nationality
+    contactMail: Text
+    cellphoneNumber: Optional Int
+    taxId: Int
+    socialSecurityId: Int
+  deriving (Eq, Show)
+
+toKey : View -> UserProfileKey
+toKey v = UserProfileKey with operator = v.operator, user = v.user, id = v.id
+
+userProfileKey : (HasToInterface i UserProfile) => i -> UserProfileKey
+userProfileKey = toKey . view . toInterface @UserProfile
+
+
+interface UserProfile requires Disclosure.I where
+  viewtype V
+
+  getKey : UserProfileKey
+
+  getUsername : GetUsername -> Update (Text)
+  setUsername : SetUsername -> Update (ContractId UserProfile)
+
+  getFirstName : GetFirstName -> Update (Text)
+  setFirstName : SetFirstName -> Update (ContractId UserProfile)
+
+  getLastName : GetLastName -> Update (Text)
+  setLastName : SetLastName -> Update (ContractId UserProfile)
+
+  getFullName : GetFullName -> Update (Text)
+  setFullName : SetFullName -> Update (ContractId UserProfile)
+
+  getBirthday : GetBirthday -> Update (Date)
+  setBirthday : SetBirthday -> Update (ContractId UserProfile)
+
+  getGender : GetGender -> Update (Optional Gender)
+  setGender : SetGender -> Update (ContractId UserProfile)
+
+  getNationality : GetNationality -> Update (Nationality)
+  setNationality : SetNationality -> Update (ContractId UserProfile)
+
+  getContactMail : GetContactMail -> Update (Text)
+  setContactMail : SetContactMail -> Update (ContractId UserProfile)
+
+  getCellphoneNumber : GetCellphoneNumber -> Update (Optional Int)
+  setCellphoneNumber : SetCellphoneNumber -> Update (ContractId UserProfile)
+
+  getTaxId : GetTaxId -> Update (Int)
+  setTaxId : SetTaxId -> Update (ContractId UserProfile)
+
+  getSocialSecurityId : GetSocialSecurityId -> Update (Int)
+  setSocialSecurityId : SetSocialSecurityId -> Update (ContractId UserProfile)
+
+  nonconsuming choice GetView : View
+    with
+      viewer : Party
+    controller viewer
+    do
+      pure $ view this
+
+   -- Username
+  nonconsuming choice GetUsername : Text
+    controller signatory this
+    do
+      getUsername this arg
+
+  choice SetUsername : ContractId UserProfile
+    with
+      newUsername : Text
+    controller signatory this
+    do
+      setUsername this arg
+
+  -- First Name
+  nonconsuming choice GetFirstName : Text
+    controller signatory this
+    do
+      getFirstName this arg
+
+  choice SetFirstName : ContractId UserProfile
+    with
+      newFirstName : Text
+    controller signatory this
+    do
+      setFirstName this arg
+
+  -- Last Name
+  nonconsuming choice GetLastName : Text
+    controller signatory this
+    do
+      getLastName this arg
+
+  choice SetLastName : ContractId UserProfile
+    with
+      newLastName : Text
+    controller signatory this
+    do
+      setLastName this arg
+
+  -- Full Name
+  nonconsuming choice GetFullName : Text
+    controller signatory this
+    do
+      getFullName this arg
+  
+  choice SetFullName : ContractId UserProfile
+    with
+      newFullName : Text
+    controller signatory this
+    do
+      setFullName this arg
+
+  -- Birthday
+  nonconsuming choice GetBirthday : Date
+    controller signatory this
+    do
+      getBirthday this arg
+
+  choice SetBirthday : ContractId UserProfile
+    with
+      newBirthday : Date
+    controller signatory this
+    do
+      setBirthday this arg
+
+  -- Gender
+  nonconsuming choice GetGender : Optional Gender
+    controller signatory this
+    do
+      getGender this arg
+
+  choice SetGender : ContractId UserProfile
+    with
+      newGender : Optional Gender
+    controller signatory this
+    do
+      setGender this arg
+
+  -- Nationality
+  nonconsuming choice GetNationality : Nationality
+    controller signatory this
+    do
+      getNationality this arg
+
+  choice SetNationality : ContractId UserProfile
+    with
+      newNationality : Nationality
+    controller signatory this
+    do
+      setNationality this arg
+
+  -- Contact Mail
+  nonconsuming choice GetContactMail : Text
+    controller signatory this
+    do
+      getContactMail this arg
+
+  choice SetContactMail : ContractId UserProfile
+    with
+      newContactMail : Text
+    controller signatory this
+    do
+      setContactMail this arg
+
+  -- Cellphone Number
+  nonconsuming choice GetCellphoneNumber : Optional Int
+    controller signatory this
+    do
+      getCellphoneNumber this arg
+
+  choice SetCellphoneNumber : ContractId UserProfile
+    with
+      newCellphoneNumber : Optional Int
+    controller signatory this
+    do
+      setCellphoneNumber this arg
+
+  -- Tax ID
+  nonconsuming choice GetTaxId : Int
+    controller signatory this
+    do
+      getTaxId this arg
+
+  choice SetTaxId : ContractId UserProfile
+    with
+      newTaxId : Int
+    controller signatory this
+    do
+      setTaxId this arg
+
+  -- Social Security ID
+  nonconsuming choice GetSocialSecurityId : Int
+    controller signatory this
+    do
+      getSocialSecurityId this arg
+
+  choice SetSocialSecurityId : ContractId UserProfile
+    with
+      newSocialSecurityId : Int
+    controller signatory this
+    do
+      setSocialSecurityId this arg
+      
+  choice Remove : ()
+    controller signatory this
+    do
+      (refCid, _) <- fetchByKey @Reference $ getKey this
+      archive refCid
+
+
+template Reference
+  with
+    userProfileView : View
+    cid : ContractId UserProfile
+    observers : PartiesMap
+  where
+    signatory userProfileView.operator
+    observer Disclosure.flattenObservers observers, userProfileView.user
+
+    key toKey userProfileView : UserProfileKey
+    maintainer key.operator
+
+    nonconsuming choice GetCid : ContractId UserProfile
+      with
+        viewer : Party
+      controller viewer
+      do
+        pure cid
+
+    choice SetCid : ContractId Reference
+      with
+        newCid : ContractId UserProfile
+      controller signatory this
+      do
+        create this with cid = newCid
+
+    choice SetObservers : ContractId Reference
+      with
+        newObservers : PartiesMap
+      controller signatory this
+      do
+        create this with observers = newObservers
+
+disclose : (Text, Parties) -> Party -> Parties -> UserProfileKey -> Update (ContractId UserProfile)
+disclose observersToAdd actor disclosers userProfile =
+  fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      userProfile
+      actor
+      Disclosure.AddObservers with disclosers; observersToAdd
+
+undisclose : (Text, Parties) -> Party -> Parties -> UserProfileKey ->
+  Update (Optional (ContractId UserProfile))
+undisclose observersToRemove actor disclosers userProfile =
+  fmap fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      userProfile
+      actor
+      Disclosure.RemoveObservers with disclosers; observersToRemove
+
+exerciseInterfaceByKey : forall i c r.
+    ( HasInterfaceTypeRep i
+    , HasExercise i c r
+    )
+    => UserProfileKey -- ^ The UserProfile key.
+    -> Party      -- ^ The actor exercising.
+    -> c          -- ^ The choice arguments.
+    -> Update r
+exerciseInterfaceByKey k actor arg =
+  exerciseInterfaceByKeyHelper @Reference @GetCid @SetCid @SetObservers @GetView @i k actor arg
+
+-- | HIDE
+-- Create instance of HasInterfaceKey.
+instance InterfaceKey.HasInterfaceKey UserProfile View UserProfileKey Reference GetCid SetCid SetObservers
+  GetView where
+    createReference = Reference
+    getCid = GetCid
+    setCid = SetCid
+    setObservers = SetObservers
+    getView = GetView
+
+-- | HIDE
+-- Create Reference for the UserRole.
+createReference : Party -> ContractId UserProfile -> Update (ContractId Reference)
+createReference = createReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView
+
+-- | HIDE
+-- Helper function to update the UserRole reference once observers are added to the UserRole.
+disclosureUpdateReference : UserProfileKey -> PartiesMap -> ContractId UserProfile ->
+  Update (ContractId Disclosure.I)
+disclosureUpdateReference =
+  disclosureUpdateReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView

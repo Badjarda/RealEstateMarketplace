@@ -1,0 +1,26 @@
+module Interface.Custody.Choices.DepositRequest where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, InstrumentQuantity)
+
+type I = DepositRequest
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    user : Party
+    quantity : InstrumentQuantity
+    account : AccountKey
+  deriving (Eq, Show)
+
+interface DepositRequest where
+  viewtype View
+
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t DepositRequest, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation DepositRequest
+instance HasToInterface DepositRequest Removable.I where _toInterface = asRemovable

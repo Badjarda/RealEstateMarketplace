@@ -1,0 +1,85 @@
+module Test.Util.Update.Service where
+
+import DA.Map (Map, fromList)
+import DA.Set (singleton)
+
+import Interface.PropertyManager.Service qualified as PropertyManager (I, Accept(..))
+import Interface.ProfileManager.Service qualified as ProfileManager (I, Accept(..))
+import Interface.Custody.Service qualified as Custody (I, Accept(..))
+import Interface.RoleManager.Service qualified as RoleManager (I, Accept(..))
+import Interface.Issuance.Service qualified as Issuance (I, Accept(..))
+
+import App.PropertyManager.Property.ApartmentProperty qualified as ApartmentProperty(Factory(..))
+import App.PropertyManager.Property.LandProperty qualified as LandProperty(Factory(..))
+import App.PropertyManager.Property.ResidenceProperty qualified as ResidenceProperty(Factory(..))
+import App.PropertyManager.Property.GarageProperty qualified as GarageProperty(Factory(..))
+import App.PropertyManager.Property.WarehouseProperty qualified as WarehouseProperty(Factory(..))
+import App.ProfileManager.UserProfile qualified as UserProfile(Factory(..))
+
+import Interface.Role.Operator qualified as IOperator(I, OfferUserRoleManagerService(..), OfferPropertyManagerService(..), OfferUserProfileManagerService(..), OfferCustodianService(..), OfferIssuanceService(..))
+
+import App.Role.Operator qualified as Operator(Role)
+import App.RoleManager.UserRole.UserRole qualified as UserRole (Factory(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id(..))
+import Daml.Finance.Interface.Holding.Factory qualified as HoldingFactory (getKey)
+import Daml.Finance.Interface.Holding.Factory (createFactory)
+import Daml.Finance.Settlement.Factory qualified as Settlement (Factory(..))
+import Daml.Finance.Settlement.Hierarchy qualified as Settlement (Hierarchy(..))
+import Daml.Finance.Settlement.RouteProvider.IntermediatedStatic qualified as RouteProvider (IntermediatedStatic(..))
+import Daml.Finance.Holding.Factory qualified as Holding (Factory(..))
+import Daml.Finance.Account.Account qualified as Account (Factory(..))
+import Daml.Finance.Lifecycle.Rule.Claim qualified as Claim (Rule(..))
+
+createIssuanceService : Party -> Party -> Update (ContractId Issuance.I)
+createIssuanceService operator user = do
+  organizationCid <- toInterfaceContractId @IOperator.I . fst <$> fetchByKey @Operator.Role (operator)
+  offerCid <-  exercise organizationCid IOperator.OfferIssuanceService with user
+  exercise offerCid Issuance.Accept
+
+createCustodyService : Party -> Party -> Party -> Map Text Settlement.Hierarchy -> Update (ContractId Custody.I)
+createCustodyService operator user public paths = do
+  let
+    publicObs = fromList [("Default", singleton public)]
+    observers = singleton user
+    operators = singleton operator
+  accountFactoryCid         <- toInterfaceContractId                                <$> create Account.Factory                    with provider=operator; observers = fromList [("Default", observers)]
+  holdingFactoryCid         <- createFactory Holding.Factory with provider=operator; observers = publicObs; id = Id ("Transferable" <> show user)
+  routeProviderCid          <- toInterfaceContractId                                <$> create RouteProvider.IntermediatedStatic  with provider=operator; observers; paths
+  settlementFactoryCid      <- toInterfaceContractId                                <$> create Settlement.Factory                 with provider=operator; observers
+  claimRuleCid              <- toInterfaceContractId                                <$> create Claim.Rule                         with provider=operator; claimers = singleton user; settlers = operators; routeProviderCid; settlementFactoryCid; netInstructions = False
+  
+  holdingFactory <- fetch holdingFactoryCid
+  let holdingFactoryKey = HoldingFactory.getKey holdingFactory 
+  
+  organizationCid <- toInterfaceContractId @IOperator.I . fst <$> fetchByKey @Operator.Role (operator)
+  offerCid <-  exercise organizationCid IOperator.OfferCustodianService with user, accountFactoryCid, holdingFactoryKey, claimRuleCid
+  exercise offerCid Custody.Accept
+
+createPropertyManagerService : Party -> Party -> Update (ContractId PropertyManager.I)
+createPropertyManagerService operator user = do
+  let observers = singleton operator
+  apartmentPropertyFactoryCid <- toInterfaceContractId <$> create ApartmentProperty.Factory with operator, observers =  fromList [("Default", observers)]
+  landPropertyFactoryCid <- toInterfaceContractId <$> create LandProperty.Factory with operator, observers =  fromList [("Default", observers)]
+  residencePropertyFactoryCid <- toInterfaceContractId <$> create ResidenceProperty.Factory with operator, observers =  fromList [("Default", observers)]
+  garagePropertyFactoryCid <- toInterfaceContractId <$> create GarageProperty.Factory with operator, observers =  fromList [("Default", observers)]
+  warehousePropertyFactoryCid <- toInterfaceContractId <$> create WarehouseProperty.Factory with operator, observers =  fromList [("Default", observers)]
+  operatorCid <- toInterfaceContractId @IOperator.I . fst <$> fetchByKey @Operator.Role operator
+  offerCid <-  exercise operatorCid IOperator.OfferPropertyManagerService with user, apartmentPropertyFactoryCid, landPropertyFactoryCid, residencePropertyFactoryCid, garagePropertyFactoryCid, warehousePropertyFactoryCid
+  exercise offerCid PropertyManager.Accept
+
+createProfileManagerService : Party -> Party -> Update (ContractId ProfileManager.I)
+createProfileManagerService operator user = do
+  let observers = singleton operator
+  userProfileFactoryCid <- toInterfaceContractId <$> create UserProfile.Factory with operator, observers =  fromList [("Default", observers)]
+  operatorCid <- toInterfaceContractId @IOperator.I . fst <$> fetchByKey @Operator.Role operator
+  offerCid <-  exercise operatorCid IOperator.OfferUserProfileManagerService with user, userProfileFactoryCid
+  exercise offerCid ProfileManager.Accept
+
+createRoleManagerService : Party -> Party -> Update (ContractId RoleManager.I)
+createRoleManagerService operator user = do
+  let observers = singleton operator
+  userRoleFactoryCid <- toInterfaceContractId <$> create UserRole.Factory with operator, observers =  fromList [("Default", observers)]
+  operatorCid <- toInterfaceContractId @IOperator.I . fst <$> fetchByKey @Operator.Role operator
+  offerCid <-  exercise operatorCid IOperator.OfferUserRoleManagerService with user, userRoleFactoryCid
+  exercise offerCid RoleManager.Accept

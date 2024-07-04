@@ -1,0 +1,65 @@
+module Interface.Role.User where
+
+import Interface.Common.Types (UserRoleKey(..))
+
+type I = Role
+
+type O = Offer
+
+type R = Request
+
+data View = View
+  with
+      operator: Party
+      user: Party
+  deriving (Eq, Show)
+
+data OView = OView
+  with
+    operator: Party
+    user: Party
+  deriving(Eq, Show)
+
+data RView = RView
+  with
+    operator: Party
+    user : Party
+  deriving(Eq, Show)
+
+interface Role where
+  viewtype View
+
+interface Offer where
+  viewtype OView
+
+  accept : Accept -> Update (ContractId Role)
+  decline : Decline -> Update ()
+
+  choice Accept : ContractId Role
+    controller (view this).user
+    do
+      accept this arg
+
+  choice Decline : ()
+    controller (view this).user
+    do
+      decline this arg
+
+interface Request where
+  viewtype RView
+  
+  approve : Approve -> Update (ContractId Role)
+  reject : Reject -> Update ()
+
+  choice Approve : ContractId Role
+    with
+      operator: Party
+      userRole : UserRoleKey
+    controller operator
+    do
+      approve this arg
+
+  choice Reject : ()
+    controller (view this).operator
+    do
+      reject this arg

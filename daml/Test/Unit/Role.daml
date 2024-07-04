@@ -1,0 +1,33 @@
+module Test.Unit.Role where
+
+import Daml.Script
+import Prelude hiding (Scenario)
+
+import Test.Util.Update.Role (createOperatorRole, createRoleUser)
+import Test.Util.Update.Workflow (createInitialUserRole)
+
+import Test.Types (Fixture(..))
+
+template Scenario
+  with
+    parties : [Party]
+  where
+    signatory parties
+
+    nonconsuming choice Setup : Fixture
+      controller parties
+      do
+        let [operator, user, public] = parties
+
+        createOperatorRole operator
+
+        userRole <- createInitialUserRole operator public
+        createRoleUser operator user userRole
+
+        pure Fixture with instruments = []; accounts = []; holdings = []; services = []; roles = []
+
+run : Script Fixture
+run = do
+  parties@[operator, user, public] <-
+    mapA allocateParty ["Operator", "User", "Public"]
+  submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup

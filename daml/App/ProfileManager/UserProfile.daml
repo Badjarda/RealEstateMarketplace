@@ -1,0 +1,143 @@
+module App.ProfileManager.UserProfile where
+
+import DA.Set qualified as Set (fromList, singleton)
+
+import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(I, View(..), GetUsername(..), SetUsername(..), GetFirstName(..), SetFirstName(..), GetLastName(..), SetLastName(..), GetFullName(..), SetFullName(..), GetContactMail(..), SetContactMail(..), GetBirthday(..), SetBirthday(..), GetGender(..), SetGender(..), GetNationality(..), SetNationality(..), GetCellphoneNumber(..), SetCellphoneNumber(..), GetTaxId(..), SetTaxId(..), GetSocialSecurityId(..), SetSocialSecurityId(..), userProfileKey, disclosureUpdateReference, createReference)
+import Interface.ProfileManager.UserProfile.Factory qualified as UserProfileFactory(I, View(..), Create(..))
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I, View(..), flattenObservers)
+import Daml.Finance.Util.Disclosure(addObserversImpl, removeObserversImpl, setObserversImpl)
+
+
+template UserProfile
+  with
+    operator: Party
+    user: Party
+    id: Id
+    username: Text
+    firstName: Text
+    lastName: Text
+    fullName: Text
+    birthday: Date
+    gender: Optional Gender
+    nationality: Nationality
+    contactMail: Text
+    cellphoneNumber: Optional Int
+    taxId: Int
+    socialSecurityId: Int
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers, user
+
+    key (operator, user) : (Party, Party)
+  
+    maintainer key._1
+
+    interface instance UserProfile.I for UserProfile where
+      view = UserProfile.View with ..
+
+      getKey = UserProfile.userProfileKey this
+
+      getUsername UserProfile.GetUsername{} = do 
+        pure username
+
+      setUsername UserProfile.SetUsername{newUsername} = do 
+        toInterfaceContractId <$> create this with username = newUsername
+
+      getFirstName UserProfile.GetFirstName{} = do 
+        pure firstName
+
+      setFirstName UserProfile.SetFirstName{newFirstName} = do 
+        toInterfaceContractId <$> create this with firstName = newFirstName
+
+      getLastName UserProfile.GetLastName{} = do 
+        pure lastName
+
+      setLastName UserProfile.SetLastName{newLastName} = do 
+        toInterfaceContractId <$> create this with lastName = newLastName
+
+      getFullName UserProfile.GetFullName{} = do 
+        pure fullName
+
+      setFullName UserProfile.SetFullName{newFullName} = do 
+        toInterfaceContractId <$> create this with fullName = newFullName
+
+      getBirthday UserProfile.GetBirthday{} = do 
+        pure birthday
+
+      setBirthday UserProfile.SetBirthday{newBirthday} = do 
+        toInterfaceContractId <$> create this with birthday = newBirthday
+
+      getGender UserProfile.GetGender{} = do 
+        pure gender
+
+      setGender UserProfile.SetGender{newGender} = do 
+        toInterfaceContractId <$> create this with gender = newGender
+
+      getNationality UserProfile.GetNationality{} = do 
+        pure nationality
+
+      setNationality UserProfile.SetNationality{newNationality} = do 
+        toInterfaceContractId <$> create this with nationality = newNationality
+
+      getContactMail UserProfile.GetContactMail{} = do 
+        pure contactMail
+
+      setContactMail UserProfile.SetContactMail{newContactMail} = do 
+        toInterfaceContractId <$> create this with contactMail = newContactMail
+      
+      getCellphoneNumber UserProfile.GetCellphoneNumber{} = do 
+        pure cellphoneNumber
+
+      setCellphoneNumber UserProfile.SetCellphoneNumber{newCellphoneNumber} = do 
+        toInterfaceContractId <$> create this with cellphoneNumber = newCellphoneNumber
+      
+      getTaxId UserProfile.GetTaxId{} = do 
+        pure taxId
+
+      setTaxId UserProfile.SetTaxId{newTaxId} = do 
+        toInterfaceContractId <$> create this with taxId = newTaxId
+      
+      getSocialSecurityId UserProfile.GetSocialSecurityId{} = do 
+        pure socialSecurityId
+
+      setSocialSecurityId UserProfile.SetSocialSecurityId{newSocialSecurityId} = do 
+        toInterfaceContractId <$> create this with socialSecurityId = newSocialSecurityId
+
+    interface instance Disclosure.I for UserProfile where
+      view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
+      setObservers = setObserversImpl this . Some . UserProfile.disclosureUpdateReference $
+        UserProfile.userProfileKey this
+      addObservers = addObserversImpl this . Some . UserProfile.disclosureUpdateReference $
+        UserProfile.userProfileKey this
+      removeObservers = removeObserversImpl this . Some . UserProfile.disclosureUpdateReference $
+        UserProfile.userProfileKey this
+
+template Factory
+  with
+    operator : Party
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance UserProfileFactory.I for Factory where
+      view = UserProfileFactory.View with operator
+      
+      create' UserProfileFactory.Create{userProfileKey, username, firstName, lastName, fullName, birthday, gender, nationality, contactMail, cellphoneNumber, taxId, socialSecurityId, observers} =
+        do
+          cid <- toInterfaceContractId <$> create UserProfile with
+            operator = userProfileKey.operator
+            user = userProfileKey.user
+            id = userProfileKey.id, ..
+          UserProfile.createReference userProfileKey.operator cid
+          pure cid
+
+    interface instance Disclosure.I for Factory where
+      view = Disclosure.View with disclosureControllers = Set.singleton operator; observers
+      setObservers = setObserversImpl @Factory @Disclosure.I this None
+      addObservers = addObserversImpl @Factory @Disclosure.I this None
+      removeObservers = removeObserversImpl @Factory @Disclosure.I this None

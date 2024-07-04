@@ -1,0 +1,29 @@
+module Interface.Base.Service where
+
+type I = Service
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    user : Party
+  deriving (Eq, Show)
+
+interface Service where
+  viewtype V
+
+  terminate : Update ()
+
+  choice Terminate : ()
+    with
+      actor : Party
+    controller actor
+    do
+      let v = view this
+      assert $ actor == v.operator || actor == v.user
+      terminate this
+
+type Implementation t = HasToInterface t Service
+class (Implementation t) => HasImplementation t
+instance HasImplementation Service

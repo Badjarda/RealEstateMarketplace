@@ -1,0 +1,41 @@
+module Interface.PropertyManager.Property.GarageProperty.Factory where
+
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.Common (GarageType)
+import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty (I)
+
+import Daml.Finance.Interface.Types.Common.Types (InstrumentKey, PartiesMap)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I)
+
+type I = Factory
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+  deriving (Eq, Show)
+
+interface Factory requires Disclosure.I where
+  viewtype V
+
+  create' : Create -> Update (ContractId GarageProperty.I)
+
+  nonconsuming choice Create : ContractId GarageProperty.I
+    with
+      instrument: InstrumentKey
+      propertyKey: PropertyKey
+      propertyAddress: Text
+      propertyPostalCode : Text
+      propertyDistrict : Text
+      propertyCounty : Text
+      garageArea: Decimal
+      garageType: GarageType
+      vehicleCapacity: Int
+      installedEquipment: Text
+      additionalInformation: Text
+      description: Text
+      observers : PartiesMap
+    controller propertyKey.operator, propertyKey.user
+    do
+      create' this arg

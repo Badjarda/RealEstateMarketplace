@@ -1,0 +1,169 @@
+module App.PropertyManager.Property.LandProperty where
+
+import DA.Set qualified as Set (fromList, singleton)
+
+import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(I, View(..), GetLandInstrumentKey(..), GetLandPropertyAddress(..), GetLandPropertyPostalCode(..), GetLandPropertyDistrict(..), GetLandPropertyCounty(..), GetLandType(..), GetTotalLandArea(..), GetLandMinimumSurfaceForSale(..), GetLandBuildableArea(..), GetLandBuildableFloors(..), GetLandAccessByRoad(..), GetLandInstalledEquipment(..), GetLandAdditionalInformation(..), GetLandViableConstructionTypes(..), GetLandDescription(..), SetLandInstrumentKey(..), SetLandPropertyAddress(..), SetLandPropertyPostalCode(..), SetLandPropertyDistrict(..), SetLandPropertyCounty(..), SetLandType(..), SetTotalLandArea(..), SetLandMinimumSurfaceForSale(..), SetLandBuildableArea(..), SetLandBuildableFloors(..), SetLandAccessByRoad(..), SetLandInstalledEquipment(..), SetLandAdditionalInformation(..), SetLandViableConstructionTypes(..), SetLandDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.LandProperty.Factory qualified as LandPropertyFactory(I, View(..), Create(..))
+import Interface.PropertyManager.Property.Common (LandType, ViableConstructionTypes)
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I, View(..), flattenObservers)
+import Daml.Finance.Util.Disclosure(addObserversImpl, removeObserversImpl, setObserversImpl)
+
+template LandProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    landType: LandType
+    totalLandArea: Decimal
+    minimumSurfaceForSale: Decimal
+    buildableArea: Decimal
+    buildableFloors: Int
+    accessByRoad: Bool
+    installedEquipment: Text
+    viableConstructionTypes: [ViableConstructionTypes]
+    additionalInformation: Text
+    description: Text
+    observers: PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, user) : (Party, Party)
+  
+    maintainer key._2
+
+    interface instance LandProperty.I for LandProperty where
+      view = LandProperty.View with ..
+
+      getKey = LandProperty.propertyKey this
+
+      getLandInstrumentKey LandProperty.GetLandInstrumentKey{} = do 
+        pure instrument
+
+      getLandPropertyAddress LandProperty.GetLandPropertyAddress{} = do 
+        pure propertyAddress
+      
+      getLandPropertyPostalCode LandProperty.GetLandPropertyPostalCode{} = do 
+        pure propertyPostalCode
+
+      getLandPropertyDistrict LandProperty.GetLandPropertyDistrict{} = do 
+        pure propertyDistrict
+
+      getLandPropertyCounty LandProperty.GetLandPropertyCounty{} = do 
+        pure propertyCounty
+
+      getLandType LandProperty.GetLandType{} = do 
+        pure landType
+
+      getTotalLandArea LandProperty.GetTotalLandArea{} = do 
+        pure totalLandArea
+
+      getLandMinimumSurfaceForSale LandProperty.GetLandMinimumSurfaceForSale{} = do 
+        pure minimumSurfaceForSale
+
+      getLandBuildableArea LandProperty.GetLandBuildableArea{} = do 
+        pure buildableArea
+
+      getLandBuildableFloors LandProperty.GetLandBuildableFloors{} = do 
+        pure buildableFloors
+
+      getLandAccessByRoad LandProperty.GetLandAccessByRoad{} = do 
+        pure accessByRoad
+
+      getLandInstalledEquipment LandProperty.GetLandInstalledEquipment{} = do 
+        pure installedEquipment
+
+      getLandAdditionalInformation LandProperty.GetLandAdditionalInformation{} = do 
+        pure additionalInformation
+
+      getLandViableConstructionTypes LandProperty.GetLandViableConstructionTypes{} = do 
+        pure viableConstructionTypes
+
+      getLandDescription LandProperty.GetLandDescription{} = do 
+        pure description 
+
+      setLandInstrumentKey LandProperty.SetLandInstrumentKey{newLandInstrumentKey} = do 
+        toInterfaceContractId <$> create this with instrument = newLandInstrumentKey
+
+      setLandPropertyAddress LandProperty.SetLandPropertyAddress{newLandPropertyAddress} = do 
+        toInterfaceContractId <$> create this with propertyAddress = newLandPropertyAddress
+      
+      setLandPropertyPostalCode LandProperty.SetLandPropertyPostalCode{newLandPropertyPostalCode} = do 
+        toInterfaceContractId <$> create this with propertyPostalCode = newLandPropertyPostalCode
+      
+      setLandPropertyDistrict LandProperty.SetLandPropertyDistrict{newLandPropertyDistrict} = do 
+        toInterfaceContractId <$> create this with propertyDistrict = newLandPropertyDistrict
+
+      setLandPropertyCounty LandProperty.SetLandPropertyCounty{newLandPropertyCounty} = do 
+        toInterfaceContractId <$> create this with propertyCounty = newLandPropertyCounty
+      
+      setLandType LandProperty.SetLandType{newLandType} = do 
+        toInterfaceContractId <$> create this with landType = newLandType
+      
+      setTotalLandArea LandProperty.SetTotalLandArea{newTotalLandArea} = do 
+        toInterfaceContractId <$> create this with totalLandArea = newTotalLandArea
+
+      setLandMinimumSurfaceForSale LandProperty.SetLandMinimumSurfaceForSale{newMinimumSurfaceForSale} = do 
+        toInterfaceContractId <$> create this with minimumSurfaceForSale = newMinimumSurfaceForSale
+
+      setLandBuildableArea LandProperty.SetLandBuildableArea{newBuildableArea} = do 
+        toInterfaceContractId <$> create this with buildableArea = newBuildableArea
+      
+      setLandBuildableFloors LandProperty.SetLandBuildableFloors{newBuildableFloors} = do 
+        toInterfaceContractId <$> create this with buildableFloors = newBuildableFloors
+      
+      setLandAccessByRoad LandProperty.SetLandAccessByRoad{newLandAccessByRoad} = do 
+        toInterfaceContractId <$> create this with accessByRoad = newLandAccessByRoad
+
+      setLandInstalledEquipment LandProperty.SetLandInstalledEquipment{newLandInstalledEquipment} = do 
+        toInterfaceContractId <$> create this with installedEquipment = newLandInstalledEquipment
+      
+      setLandAdditionalInformation LandProperty.SetLandAdditionalInformation{newLandAdditionalInformation} = do 
+        toInterfaceContractId <$> create this with additionalInformation = newLandAdditionalInformation
+      
+      setLandViableConstructionTypes LandProperty.SetLandViableConstructionTypes{newLandViableConstructionTypes} = do 
+        toInterfaceContractId <$> create this with viableConstructionTypes = newLandViableConstructionTypes
+      
+      setLandDescription LandProperty.SetLandDescription{newLandDescription} = do 
+        toInterfaceContractId <$> create this with description = newLandDescription
+
+    interface instance Disclosure.I for LandProperty where
+      view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
+      setObservers = setObserversImpl this . Some . LandProperty.disclosureUpdateReference $
+        LandProperty.propertyKey this
+      addObservers = addObserversImpl this . Some . LandProperty.disclosureUpdateReference $
+        LandProperty.propertyKey this
+      removeObservers = removeObserversImpl this . Some . LandProperty.disclosureUpdateReference $
+        LandProperty.propertyKey this
+
+template Factory
+  with
+    operator : Party
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance LandPropertyFactory.I for Factory where
+      view = LandPropertyFactory.View with operator
+      
+      create' LandPropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, landType, totalLandArea, minimumSurfaceForSale, buildableArea, buildableFloors, accessByRoad, installedEquipment, viableConstructionTypes, additionalInformation, description, observers} =
+        do
+          cid <- toInterfaceContractId <$> create LandProperty with
+            operator = propertyKey.operator
+            user = propertyKey.user
+            id = propertyKey.id, ..
+          LandProperty.createReference propertyKey.operator cid
+          pure cid
+
+    interface instance Disclosure.I for Factory where
+      view = Disclosure.View with disclosureControllers = Set.singleton operator; observers
+      setObservers = setObserversImpl @Factory @Disclosure.I this None
+      addObservers = addObserversImpl @Factory @Disclosure.I this None
+      removeObservers = removeObserversImpl @Factory @Disclosure.I this None

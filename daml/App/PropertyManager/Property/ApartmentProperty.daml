@@ -1,0 +1,175 @@
+module App.PropertyManager.Property.ApartmentProperty where
+
+import DA.Set qualified as Set (fromList, singleton)
+
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty(I, View(..), GetApartmentInstrumentKey(..), GetApartmentPropertyAddress(..), GetApartmentPropertyPostalCode(..), GetApartmentPropertyDistrict(..), GetApartmentPropertyCounty(..), GetApartmentGrossArea(..), GetApartmentUsableArea(..), GetApartmentBedrooms(..), GetApartmentBathrooms(..), GetApartmentBedrooms(..), GetApartmentFloor(..), GetApartmentParkingSpaces(..), GetApartmentElevator(..), GetApartmentBuildDate(..), GetApartmentInstalledEquipment(..), GetApartmentAdditionalInformation(..), GetApartmentBuildDate(..), GetApartmentDescription(..), SetApartmentInstrumentKey(..), SetApartmentPropertyAddress(..), SetApartmentPropertyPostalCode(..), SetApartmentPropertyDistrict(..), SetApartmentPropertyCounty(..), SetApartmentGrossArea(..), SetApartmentUsableArea(..), SetApartmentBedrooms(..), SetApartmentBathrooms(..), SetApartmentBedrooms(..), SetApartmentFloor(..), SetApartmentParkingSpaces(..), SetApartmentElevator(..), SetApartmentBuildDate(..), SetApartmentInstalledEquipment(..), SetApartmentAdditionalInformation(..), SetApartmentBuildDate(..), SetApartmentDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.ApartmentProperty.Factory qualified as ApartmentPropertyFactory(I, View(..), Create(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I, View(..), flattenObservers)
+import Daml.Finance.Util.Disclosure(addObserversImpl, removeObserversImpl, setObserversImpl)
+
+template ApartmentProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    grossArea: Decimal
+    usableArea: Decimal
+    bedrooms: Int
+    bathrooms: Int
+    floor: Int
+    parkingSpaces: Int
+    elevator: Bool
+    buildDate: Date
+    installedEquipment: Text
+    additionalInformation: Text --Other relevant informations
+    description: Text
+    observers: PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, user) : (Party, Party)
+  
+    maintainer key._2
+
+    interface instance ApartmentProperty.I for ApartmentProperty where
+      view = ApartmentProperty.View with ..
+
+      getKey = ApartmentProperty.propertyKey this
+
+      getApartmentInstrumentKey ApartmentProperty.GetApartmentInstrumentKey{} = do 
+        pure instrument
+
+      getApartmentPropertyAddress ApartmentProperty.GetApartmentPropertyAddress{} = do 
+        pure propertyAddress
+      
+      getApartmentPropertyPostalCode ApartmentProperty.GetApartmentPropertyPostalCode{} = do 
+        pure propertyPostalCode
+
+      getApartmentPropertyDistrict ApartmentProperty.GetApartmentPropertyDistrict{} = do 
+        pure propertyDistrict
+
+      getApartmentPropertyCounty ApartmentProperty.GetApartmentPropertyCounty{} = do 
+        pure propertyCounty
+
+      getApartmentGrossArea ApartmentProperty.GetApartmentGrossArea{} = do 
+        pure grossArea
+
+      getApartmentUsableArea ApartmentProperty.GetApartmentUsableArea{} = do 
+        pure usableArea
+
+      getApartmentBedrooms ApartmentProperty.GetApartmentBedrooms{} = do 
+        pure bedrooms
+
+      getApartmentBathrooms ApartmentProperty.GetApartmentBathrooms{} = do 
+        pure bathrooms 
+      
+      getApartmentFloor ApartmentProperty.GetApartmentFloor{} = do 
+        pure floor
+
+      getApartmentParkingSpaces ApartmentProperty.GetApartmentParkingSpaces{} = do 
+        pure parkingSpaces
+
+      getApartmentElevator ApartmentProperty.GetApartmentElevator{} = do 
+        pure elevator
+
+      getApartmentBuildDate ApartmentProperty.GetApartmentBuildDate{} = do 
+        pure buildDate
+
+      getApartmentInstalledEquipment ApartmentProperty.GetApartmentInstalledEquipment{} = do 
+        pure installedEquipment
+
+      getApartmentAdditionalInformation ApartmentProperty.GetApartmentAdditionalInformation{} = do 
+        pure additionalInformation
+
+      getApartmentDescription ApartmentProperty.GetApartmentDescription{} = do 
+        pure description 
+
+      setApartmentInstrumentKey ApartmentProperty.SetApartmentInstrumentKey{newApartmentInstrumentKey} = do 
+        toInterfaceContractId <$> create this with instrument = newApartmentInstrumentKey
+
+      setApartmentPropertyAddress ApartmentProperty.SetApartmentPropertyAddress{newApartmentPropertyAddress} = do 
+        toInterfaceContractId <$> create this with propertyAddress = newApartmentPropertyAddress
+      
+      setApartmentPropertyPostalCode ApartmentProperty.SetApartmentPropertyPostalCode{newApartmentPropertyPostalCode} = do 
+        toInterfaceContractId <$> create this with propertyPostalCode = newApartmentPropertyPostalCode
+      
+      setApartmentPropertyDistrict ApartmentProperty.SetApartmentPropertyDistrict{newApartmentPropertyDistrict} = do 
+        toInterfaceContractId <$> create this with propertyDistrict = newApartmentPropertyDistrict
+
+      setApartmentPropertyCounty ApartmentProperty.SetApartmentPropertyCounty{newApartmentPropertyCounty} = do 
+        toInterfaceContractId <$> create this with propertyCounty = newApartmentPropertyCounty
+      
+      setApartmentGrossArea ApartmentProperty.SetApartmentGrossArea{newApartmentGrossArea} = do 
+        toInterfaceContractId <$> create this with grossArea = newApartmentGrossArea
+      
+      setApartmentUsableArea ApartmentProperty.SetApartmentUsableArea{newApartmentUsableArea} = do 
+        toInterfaceContractId <$> create this with usableArea = newApartmentUsableArea
+
+      setApartmentBedrooms ApartmentProperty.SetApartmentBedrooms{newApartmentBedrooms} = do 
+        toInterfaceContractId <$> create this with bedrooms = newApartmentBedrooms
+      
+      setApartmentBathrooms ApartmentProperty.SetApartmentBathrooms{newApartmentBathrooms} = do 
+        toInterfaceContractId <$> create this with bathrooms = newApartmentBathrooms
+      
+      setApartmentFloor ApartmentProperty.SetApartmentFloor{newApartmentFloor} = do 
+        toInterfaceContractId <$> create this with floor = newApartmentFloor
+
+      setApartmentParkingSpaces ApartmentProperty.SetApartmentParkingSpaces{newApartmentParkingSpaces} = do 
+        toInterfaceContractId <$> create this with parkingSpaces = newApartmentParkingSpaces
+      
+      setApartmentElevator ApartmentProperty.SetApartmentElevator{newApartmentElevator} = do 
+        toInterfaceContractId <$> create this with elevator = newApartmentElevator
+      
+      setApartmentBuildDate ApartmentProperty.SetApartmentBuildDate{newApartmentBuildDate} = do 
+        toInterfaceContractId <$> create this with buildDate = newApartmentBuildDate
+
+      setApartmentInstalledEquipment ApartmentProperty.SetApartmentInstalledEquipment{newApartmentInstalledEquipment} = do 
+        toInterfaceContractId <$> create this with installedEquipment = newApartmentInstalledEquipment
+      
+      setApartmentAdditionalInformation ApartmentProperty.SetApartmentAdditionalInformation{newApartmentAdditionalInformation} = do 
+        toInterfaceContractId <$> create this with additionalInformation = newApartmentAdditionalInformation
+      
+      setApartmentDescription ApartmentProperty.SetApartmentDescription{newApartmentDescription} = do 
+        toInterfaceContractId <$> create this with description = newApartmentDescription
+
+    interface instance Disclosure.I for ApartmentProperty where
+      view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
+      setObservers = setObserversImpl this . Some . ApartmentProperty.disclosureUpdateReference $
+        ApartmentProperty.propertyKey this
+      addObservers = addObserversImpl this . Some . ApartmentProperty.disclosureUpdateReference $
+        ApartmentProperty.propertyKey this
+      removeObservers = removeObserversImpl this . Some . ApartmentProperty.disclosureUpdateReference $
+        ApartmentProperty.propertyKey this
+
+template Factory
+  with
+    operator : Party
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance ApartmentPropertyFactory.I for Factory where
+      view = ApartmentPropertyFactory.View with operator
+      
+      create' ApartmentPropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floor, parkingSpaces, elevator, buildDate, installedEquipment, additionalInformation, description, observers} =
+        do
+          cid <- toInterfaceContractId <$> create ApartmentProperty with
+            operator = propertyKey.operator
+            user = propertyKey.user
+            id = propertyKey.id, ..
+          ApartmentProperty.createReference propertyKey.operator cid
+          pure cid
+
+    interface instance Disclosure.I for Factory where
+      view = Disclosure.View with disclosureControllers = Set.singleton operator; observers
+      setObservers = setObserversImpl @Factory @Disclosure.I this None
+      addObservers = addObserversImpl @Factory @Disclosure.I this None
+      removeObservers = removeObserversImpl @Factory @Disclosure.I this None

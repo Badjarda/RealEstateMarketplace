@@ -1,0 +1,141 @@
+module App.PropertyManager.Property.GarageProperty where
+
+import DA.Set qualified as Set (fromList, singleton)
+
+import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty(I, View(..), GetGarageInstrumentKey(..), GetGaragePropertyAddress(..), GetGaragePropertyPostalCode(..), GetGaragePropertyDistrict(..), GetGaragePropertyCounty(..), GetGarageType(..), GetGarageArea(..), GetVehicleCapacity(..), GetGarageInstalledEquipment(..), GetGarageAdditionalInformation(..), GetGarageDescription(..), SetGarageDescription(..), SetGarageAdditionalInformation(..), SetGarageInstalledEquipment(..), SetGarageType(..), SetGarageArea(..), SetVehicleCapacity(..), SetGaragePropertyCounty(..), SetGaragePropertyDistrict(..), SetGaragePropertyPostalCode(..), SetGaragePropertyAddress(..), SetGarageInstrumentKey(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.GarageProperty.Factory qualified as GaragePropertyFactory(I, View(..), Create(..))
+import Interface.PropertyManager.Property.Common (GarageType)
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I, View(..), flattenObservers)
+import Daml.Finance.Util.Disclosure(addObserversImpl, removeObserversImpl, setObserversImpl)
+
+template GarageProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    garageArea: Decimal
+    garageType: GarageType
+    vehicleCapacity: Int
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+    observers: PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, user) : (Party, Party)
+  
+    maintainer key._2
+
+    interface instance GarageProperty.I for GarageProperty where
+      view = GarageProperty.View with ..
+
+      getKey = GarageProperty.propertyKey this
+
+      getGarageInstrumentKey GarageProperty.GetGarageInstrumentKey{} = do 
+        pure instrument
+
+      getGaragePropertyAddress GarageProperty.GetGaragePropertyAddress{} = do 
+        pure propertyAddress
+      
+      getGaragePropertyPostalCode GarageProperty.GetGaragePropertyPostalCode{} = do 
+        pure propertyPostalCode
+
+      getGaragePropertyDistrict GarageProperty.GetGaragePropertyDistrict{} = do 
+        pure propertyDistrict
+
+      getGaragePropertyCounty GarageProperty.GetGaragePropertyCounty{} = do 
+        pure propertyCounty
+
+      getGarageType GarageProperty.GetGarageType{} = do 
+        pure garageType
+
+      getGarageArea GarageProperty.GetGarageArea{} = do 
+        pure garageArea
+
+      getVehicleCapacity GarageProperty.GetVehicleCapacity{} = do 
+        pure vehicleCapacity
+
+      getGarageInstalledEquipment GarageProperty.GetGarageInstalledEquipment{} = do 
+        pure installedEquipment
+
+      getGarageAdditionalInformation GarageProperty.GetGarageAdditionalInformation{} = do 
+        pure additionalInformation
+
+      getGarageDescription GarageProperty.GetGarageDescription{} = do 
+        pure description 
+
+      setGarageInstrumentKey GarageProperty.SetGarageInstrumentKey{newGarageInstrumentKey} = do 
+        toInterfaceContractId <$> create this with instrument = newGarageInstrumentKey
+
+      setGaragePropertyAddress GarageProperty.SetGaragePropertyAddress{newGaragePropertyAddress} = do 
+        toInterfaceContractId <$> create this with propertyAddress = newGaragePropertyAddress
+      
+      setGaragePropertyPostalCode GarageProperty.SetGaragePropertyPostalCode{newGaragePropertyPostalCode} = do 
+        toInterfaceContractId <$> create this with propertyPostalCode = newGaragePropertyPostalCode
+      
+      setGaragePropertyDistrict GarageProperty.SetGaragePropertyDistrict{newGaragePropertyDistrict} = do 
+        toInterfaceContractId <$> create this with propertyDistrict = newGaragePropertyDistrict
+
+      setGaragePropertyCounty GarageProperty.SetGaragePropertyCounty{newGaragePropertyCounty} = do 
+        toInterfaceContractId <$> create this with propertyCounty = newGaragePropertyCounty
+      
+      setGarageType GarageProperty.SetGarageType{newGarageType} = do 
+        toInterfaceContractId <$> create this with garageType = newGarageType
+      
+      setGarageArea GarageProperty.SetGarageArea{newGarageArea} = do 
+        toInterfaceContractId <$> create this with garageArea = newGarageArea
+
+      setVehicleCapacity GarageProperty.SetVehicleCapacity{newVehicleCapacity} = do 
+        toInterfaceContractId <$> create this with vehicleCapacity = newVehicleCapacity
+
+      setGarageInstalledEquipment GarageProperty.SetGarageInstalledEquipment{newGarageInstalledEquipment} = do 
+        toInterfaceContractId <$> create this with installedEquipment = newGarageInstalledEquipment
+      
+      setGarageAdditionalInformation GarageProperty.SetGarageAdditionalInformation{newGarageAdditionalInformation} = do 
+        toInterfaceContractId <$> create this with additionalInformation = newGarageAdditionalInformation
+      
+      setGarageDescription GarageProperty.SetGarageDescription{newGarageDescription} = do 
+        toInterfaceContractId <$> create this with description = newGarageDescription
+
+    interface instance Disclosure.I for GarageProperty where
+      view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
+      setObservers = setObserversImpl this . Some . GarageProperty.disclosureUpdateReference $
+        GarageProperty.propertyKey this
+      addObservers = addObserversImpl this . Some . GarageProperty.disclosureUpdateReference $
+        GarageProperty.propertyKey this
+      removeObservers = removeObserversImpl this . Some . GarageProperty.disclosureUpdateReference $
+        GarageProperty.propertyKey this
+
+template Factory
+  with
+    operator : Party
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance GaragePropertyFactory.I for Factory where
+      view = GaragePropertyFactory.View with operator
+      
+      create' GaragePropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, garageType, garageArea, vehicleCapacity, installedEquipment, additionalInformation, description, observers} =
+        do
+          cid <- toInterfaceContractId <$> create GarageProperty with
+            operator = propertyKey.operator
+            user = propertyKey.user
+            id = propertyKey.id, ..
+          GarageProperty.createReference propertyKey.operator cid
+          pure cid
+
+    interface instance Disclosure.I for Factory where
+      view = Disclosure.View with disclosureControllers = Set.singleton operator; observers
+      setObservers = setObserversImpl @Factory @Disclosure.I this None
+      addObservers = addObserversImpl @Factory @Disclosure.I this None
+      removeObservers = removeObserversImpl @Factory @Disclosure.I this None

@@ -1,0 +1,309 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
+module Interface.PropertyManager.Property.GarageProperty.GarageProperty where
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.Common (GarageType)
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, Parties, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (AddObservers(..), I, RemoveObservers(..), flattenObservers)
+import Daml.Finance.Interface.Util.InterfaceKey (createReferenceHelper, disclosureUpdateReferenceHelper, exerciseInterfaceByKeyHelper)
+import Daml.Finance.Interface.Util.InterfaceKey qualified as InterfaceKey (HasInterfaceKey(..))
+
+
+type I = GarageProperty
+
+type R = Reference
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    garageArea: Decimal
+    garageType: GarageType
+    vehicleCapacity: Int
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+  deriving (Eq, Show)
+
+toKey : View -> PropertyKey
+toKey v = PropertyKey with operator = v.operator, user = v.user, id = v.id
+
+propertyKey : (HasToInterface i GarageProperty) => i -> PropertyKey
+propertyKey = toKey . view . toInterface @GarageProperty
+
+
+interface GarageProperty requires Disclosure.I where
+  viewtype V
+
+  getKey : PropertyKey
+
+  getGarageInstrumentKey : GetGarageInstrumentKey -> Update(InstrumentKey)
+  setGarageInstrumentKey : SetGarageInstrumentKey -> Update(ContractId GarageProperty)
+
+  getGaragePropertyAddress : GetGaragePropertyAddress -> Update(Text)
+  setGaragePropertyAddress : SetGaragePropertyAddress -> Update(ContractId GarageProperty)
+
+  getGaragePropertyPostalCode : GetGaragePropertyPostalCode -> Update(Text)
+  setGaragePropertyPostalCode : SetGaragePropertyPostalCode -> Update(ContractId GarageProperty)
+
+  getGaragePropertyDistrict : GetGaragePropertyDistrict -> Update(Text)
+  setGaragePropertyDistrict : SetGaragePropertyDistrict -> Update(ContractId GarageProperty)
+
+  getGaragePropertyCounty : GetGaragePropertyCounty -> Update(Text)
+  setGaragePropertyCounty : SetGaragePropertyCounty -> Update(ContractId GarageProperty)
+
+  getGarageType : GetGarageType -> Update(GarageType)
+  setGarageType : SetGarageType -> Update(ContractId GarageProperty)
+
+  getGarageArea : GetGarageArea -> Update(Decimal)
+  setGarageArea : SetGarageArea -> Update(ContractId GarageProperty)
+
+  getVehicleCapacity : GetVehicleCapacity -> Update(Int)
+  setVehicleCapacity : SetVehicleCapacity -> Update(ContractId GarageProperty)
+
+  getGarageInstalledEquipment : GetGarageInstalledEquipment -> Update(Text)
+  setGarageInstalledEquipment : SetGarageInstalledEquipment -> Update(ContractId GarageProperty)
+
+  getGarageAdditionalInformation : GetGarageAdditionalInformation -> Update(Text)
+  setGarageAdditionalInformation : SetGarageAdditionalInformation -> Update(ContractId GarageProperty)
+
+  getGarageDescription : GetGarageDescription -> Update(Text)
+  setGarageDescription : SetGarageDescription -> Update(ContractId GarageProperty)
+
+  nonconsuming choice GetView : View
+    with
+      viewer : Party
+    controller viewer
+    do
+      pure $ view this
+  
+  nonconsuming choice GetGarageInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      getGarageInstrumentKey this arg
+
+  choice SetGarageInstrumentKey: ContractId GarageProperty
+    with
+      newGarageInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      setGarageInstrumentKey this arg
+  
+  nonconsuming choice GetGaragePropertyAddress : Text
+    controller signatory this
+    do
+      getGaragePropertyAddress this arg
+
+  choice SetGaragePropertyAddress : ContractId GarageProperty
+    with
+      newGaragePropertyAddress : Text
+    controller signatory this
+    do
+      setGaragePropertyAddress this arg
+
+  nonconsuming choice GetGaragePropertyPostalCode : Text
+    controller signatory this
+    do
+      getGaragePropertyPostalCode this arg
+
+  choice SetGaragePropertyPostalCode : ContractId GarageProperty
+    with
+      newGaragePropertyPostalCode : Text
+    controller signatory this
+    do
+      setGaragePropertyPostalCode this arg
+  
+  nonconsuming choice GetGaragePropertyDistrict : Text
+    controller signatory this
+    do
+      getGaragePropertyDistrict this arg
+
+  choice SetGaragePropertyDistrict : ContractId GarageProperty
+    with
+      newGaragePropertyDistrict : Text
+    controller signatory this
+    do
+      setGaragePropertyDistrict this arg
+
+  nonconsuming choice GetGaragePropertyCounty : Text
+    controller signatory this
+    do
+      getGaragePropertyCounty this arg
+
+  choice SetGaragePropertyCounty : ContractId GarageProperty
+    with
+      newGaragePropertyCounty : Text
+    controller signatory this
+    do
+      setGaragePropertyCounty this arg
+
+  nonconsuming choice GetGarageType : GarageType
+    controller signatory this
+    do
+      getGarageType this arg
+
+  choice SetGarageType : ContractId GarageProperty
+    with
+      newGarageType : GarageType
+    controller signatory this
+    do
+      setGarageType this arg
+
+  nonconsuming choice GetGarageArea : Decimal
+    controller signatory this
+    do
+      getGarageArea this arg
+
+  choice SetGarageArea : ContractId GarageProperty
+    with
+      newGarageArea : Decimal
+    controller signatory this
+    do
+      setGarageArea this arg
+
+  nonconsuming choice GetVehicleCapacity : Int
+    controller signatory this
+    do
+      getVehicleCapacity this arg
+
+  choice SetVehicleCapacity : ContractId GarageProperty
+    with
+      newVehicleCapacity : Int
+    controller signatory this
+    do
+      setVehicleCapacity this arg
+  
+  nonconsuming choice GetGarageInstalledEquipment : Text
+    controller signatory this
+    do
+      getGarageInstalledEquipment this arg
+
+  choice SetGarageInstalledEquipment : ContractId GarageProperty
+    with
+      newGarageInstalledEquipment : Text
+    controller signatory this
+    do
+      setGarageInstalledEquipment this arg
+  
+  nonconsuming choice GetGarageAdditionalInformation : Text
+    controller signatory this
+    do
+      getGarageAdditionalInformation this arg
+
+  choice SetGarageAdditionalInformation : ContractId GarageProperty
+    with
+      newGarageAdditionalInformation : Text
+    controller signatory this
+    do
+      setGarageAdditionalInformation this arg
+
+  nonconsuming choice GetGarageDescription : Text
+    controller signatory this
+    do
+      getGarageDescription this arg
+
+  choice SetGarageDescription : ContractId GarageProperty
+    with
+      newGarageDescription : Text
+    controller signatory this
+    do
+      setGarageDescription this arg
+      
+  choice Remove : ()
+    controller signatory this
+    do
+      (refCid, _) <- fetchByKey @Reference $ getKey this
+      archive refCid
+
+
+template Reference
+  with
+    garagePropertyView : View
+    cid : ContractId GarageProperty
+    observers : PartiesMap
+  where
+    signatory garagePropertyView.operator
+    observer Disclosure.flattenObservers observers, garagePropertyView.user
+
+    key toKey garagePropertyView : PropertyKey
+    maintainer key.operator
+
+    nonconsuming choice GetCid : ContractId GarageProperty
+      with
+        viewer : Party
+      controller viewer
+      do
+        pure cid
+
+    choice SetCid : ContractId Reference
+      with
+        newCid : ContractId GarageProperty
+      controller signatory this
+      do
+        create this with cid = newCid
+
+    choice SetObservers : ContractId Reference
+      with
+        newObservers : PartiesMap
+      controller signatory this
+      do
+        create this with observers = newObservers
+
+disclose : (Text, Parties) -> Party -> Parties -> PropertyKey -> Update (ContractId GarageProperty)
+disclose observersToAdd actor disclosers garageProperty =
+  fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      garageProperty
+      actor
+      Disclosure.AddObservers with disclosers; observersToAdd
+
+undisclose : (Text, Parties) -> Party -> Parties -> PropertyKey ->
+  Update (Optional (ContractId GarageProperty))
+undisclose observersToRemove actor disclosers garageProperty =
+  fmap fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      garageProperty
+      actor
+      Disclosure.RemoveObservers with disclosers; observersToRemove
+
+exerciseInterfaceByKey : forall i c r.
+    ( HasInterfaceTypeRep i
+    , HasExercise i c r
+    )
+    => PropertyKey -- ^ The GarageProperty key.
+    -> Party      -- ^ The actor exercising.
+    -> c          -- ^ The choice arguments.
+    -> Update r
+exerciseInterfaceByKey k actor arg =
+  exerciseInterfaceByKeyHelper @Reference @GetCid @SetCid @SetObservers @GetView @i k actor arg
+
+-- | HIDE
+-- Create instance of HasInterfaceKey.
+instance InterfaceKey.HasInterfaceKey GarageProperty View PropertyKey Reference GetCid SetCid SetObservers
+  GetView where
+    createReference = Reference
+    getCid = GetCid
+    setCid = SetCid
+    setObservers = SetObservers
+    getView = GetView
+
+-- | HIDE
+-- Create Reference for the GarageProperty.
+createReference : Party -> ContractId GarageProperty -> Update (ContractId Reference)
+createReference = createReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView
+
+-- | HIDE
+-- Helper function to update the GarageProperty reference once observers are added to the GarageProperty.
+disclosureUpdateReference : PropertyKey -> PartiesMap -> ContractId GarageProperty ->
+  Update (ContractId Disclosure.I)
+disclosureUpdateReference =
+  disclosureUpdateReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView

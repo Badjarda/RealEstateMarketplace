@@ -1,0 +1,63 @@
+module App.Role.User where
+
+import Interface.Role.User qualified as User(I, O, R, View(..), OView(..), RView(..), Accept(..), Decline(..), Approve(..), Reject(..))
+import Interface.Common.Types (UserRoleKey(..))
+import App.Credential.Credential
+
+
+template Role 
+  with
+    operator: Party
+    user: Party
+  where
+    signatory operator, user
+
+    key (operator, user) :  (Party, Party)
+    maintainer key._1
+
+    interface instance User.I for Role where
+      view = User.View with ..
+
+template Offer
+  with
+    operator: Party
+    user: Party
+    userRole : UserRoleKey
+  where
+    signatory operator
+    observer user
+
+    interface instance User.O for Offer where
+      view = User.OView with ..
+
+      accept User.Accept = do
+        create Credential with operator, user, roles = [userRole]
+
+        toInterfaceContractId <$> create Role with ..
+
+      decline User.Decline{} = do
+        pure()
+
+template Request
+  with
+    operator: Party
+    user: Party
+  where
+    signatory user
+    observer operator
+
+    interface instance User.R for Request where
+      view = User.RView with user, operator
+
+      approve User.Approve{operator, userRole} = do
+        create Credential with operator, user, roles = [userRole]
+
+        toInterfaceContractId <$> create Role with ..
+
+      reject User.Reject{} = do
+        pure()
+
+
+            
+        
+    

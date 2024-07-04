@@ -1,0 +1,105 @@
+module App.Custody.Model where
+
+import DA.Set (fromList)
+
+import Interface.Common.Removable qualified as Removable (I, View(..))
+import Interface.Custody.Choices.OpenAccountRequest qualified as OpenAccountRequest (HasImplementation, I, View(..))
+import Interface.Custody.Choices.CloseAccountRequest qualified as CloseAccountRequest (HasImplementation, I, View(..))
+import Interface.Custody.Choices.DepositRequest qualified as DepositRequest (HasImplementation, I, View(..))
+import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest (HasImplementation, I, View(..))
+
+import Daml.Finance.Interface.Account.Account qualified as Account (Controllers)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, Id, InstrumentQuantity, PartiesMap)
+
+instance OpenAccountRequest.HasImplementation OpenAccountRequest
+
+template OpenAccountRequest
+  with
+    operator : Party
+    user : Party
+    id : Id
+    description : Text
+    controllers : Account.Controllers
+    observers : PartiesMap
+  where
+    signatory operator, user
+
+    interface instance Removable.I for OpenAccountRequest where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance OpenAccountRequest.I for OpenAccountRequest where
+      view = OpenAccountRequest.View with
+        operator
+        user
+        id
+        description
+        controllers
+        observers
+
+      asRemovable = toInterface @Removable.I this
+
+instance CloseAccountRequest.HasImplementation CloseAccountRequest
+
+template CloseAccountRequest
+  with
+    operator : Party
+    user : Party
+    account : AccountKey
+  where
+    signatory operator, user
+
+    interface instance Removable.I for CloseAccountRequest where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance CloseAccountRequest.I for CloseAccountRequest where
+      view = CloseAccountRequest.View with
+        operator
+        user
+        account
+
+      asRemovable = toInterface @Removable.I this
+
+instance DepositRequest.HasImplementation DepositRequest
+
+template DepositRequest
+  with
+    operator : Party
+    user : Party
+    quantity : InstrumentQuantity
+    account : AccountKey
+  where
+    signatory operator, user
+
+    interface instance Removable.I for DepositRequest where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance DepositRequest.I for DepositRequest where
+      view = DepositRequest.View with
+        operator
+        user
+        quantity
+        account
+
+      asRemovable = toInterface @Removable.I this
+
+instance WithdrawRequest.HasImplementation WithdrawRequest
+
+template WithdrawRequest
+  with
+    operator : Party
+    user : Party
+    holdingCid : ContractId Holding.I
+  where
+    signatory operator, user
+
+    interface instance Removable.I for WithdrawRequest where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance WithdrawRequest.I for WithdrawRequest where
+      view = WithdrawRequest.View with
+        operator
+        user
+        holdingCid
+
+      asRemovable = toInterface @Removable.I this

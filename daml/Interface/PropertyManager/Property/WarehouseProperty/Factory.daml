@@ -1,0 +1,43 @@
+module Interface.PropertyManager.Property.WarehouseProperty.Factory where
+
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.Common (WarehouseType(..))
+import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty (I)
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I)
+
+type I = Factory
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+  deriving (Eq, Show)
+
+interface Factory requires Disclosure.I where
+  viewtype V
+
+  create' : Create -> Update (ContractId WarehouseProperty.I)
+
+  nonconsuming choice Create : ContractId WarehouseProperty.I
+    with
+      instrument: InstrumentKey
+      propertyKey: PropertyKey
+      propertyAddress: Text
+      propertyPostalCode : Text
+      propertyDistrict : Text
+      propertyCounty : Text
+      warehouseType: WarehouseType 
+      grossArea: Decimal
+      usableArea: Decimal
+      floors: Int
+      buildDate: Date
+      installedEquipment: Text
+      additionalInformation: Text
+      description: Text
+      observers : PartiesMap
+    controller propertyKey.operator, propertyKey.user
+    do
+      create' this arg

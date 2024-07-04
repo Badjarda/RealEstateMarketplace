@@ -1,0 +1,43 @@
+module App.ProfileManager.Model where
+
+import DA.Set (fromList)
+
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+import Interface.Common.Removable qualified as Removable (I, View(..))
+import Interface.ProfileManager.Choices.RequestCreateUserProfile qualified as RequestCreateUserProfile (HasImplementation, I, View(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap)
+
+
+
+instance RequestCreateUserProfile.HasImplementation RequestCreateUserProfile
+
+template RequestCreateUserProfile
+  with
+    operator: Party
+    user: Party
+    id: Id
+    username: Text
+    firstName: Text
+    lastName: Text
+    fullName: Text
+    birthday: Date
+    gender: Optional Gender
+    nationality: Nationality
+    contactMail: Text
+    cellphoneNumber: Optional Int
+    taxId: Int
+    socialSecurityId: Int
+    observers: PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, id) : (Party, Id)
+    maintainer key._1
+
+    interface instance Removable.I for RequestCreateUserProfile where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance RequestCreateUserProfile.I for RequestCreateUserProfile where
+      view = RequestCreateUserProfile.View with ..
+      asRemovable = toInterface @Removable.I this

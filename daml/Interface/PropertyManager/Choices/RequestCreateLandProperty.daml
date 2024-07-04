@@ -1,0 +1,42 @@
+module Interface.PropertyManager.Choices.RequestCreateLandProperty where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Interface.PropertyManager.Property.Common (LandType, ViableConstructionTypes)
+
+type I = RequestCreateLandProperty
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    landInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    landType: LandType
+    totalLandArea: Decimal
+    minimumSurfaceForSale: Decimal
+    buildableArea: Decimal
+    buildableFloors: Int
+    accessByRoad: Bool
+    installedEquipment: Text
+    viableConstructionTypes: [ViableConstructionTypes]
+    additionalInformation: Text
+    description: Text
+    observers : PartiesMap
+  deriving (Eq, Show)
+
+interface RequestCreateLandProperty where
+  viewtype View
+
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t RequestCreateLandProperty, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation RequestCreateLandProperty
+instance HasToInterface RequestCreateLandProperty Removable.I where _toInterface = asRemovable

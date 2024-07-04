@@ -1,0 +1,32 @@
+module Interface.RoleManager.UserRole.Factory where
+
+import Interface.Common.Types (UserRoleKey(..))
+import Interface.RoleManager.UserRole.UserRole qualified as UserRole (I)
+import Interface.RoleManager.UserRole.Permission
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I)
+
+type I = Factory
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+  deriving (Eq, Show)
+
+interface Factory requires Disclosure.I where
+  viewtype V
+
+  create' : Create -> Update (ContractId UserRole.I)
+
+  nonconsuming choice Create : ContractId UserRole.I
+    with
+      userRole : UserRoleKey
+      permissions : [Permission]
+      description : Text
+      observers : PartiesMap
+    controller userRole.operator
+    do
+      create' this arg

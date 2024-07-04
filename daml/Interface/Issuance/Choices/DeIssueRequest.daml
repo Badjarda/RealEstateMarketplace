@@ -1,0 +1,26 @@
+module Interface.Issuance.Choices.DeIssueRequest where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Types.Common.Types (Id)
+
+type I = DeIssueRequest
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    user : Party
+    issuanceId : Id
+    holdingCid : ContractId Holding.I
+  deriving (Eq, Show)
+
+interface DeIssueRequest where
+  viewtype View
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t DeIssueRequest, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation DeIssueRequest
+instance HasToInterface DeIssueRequest Removable.I where _toInterface = asRemovable

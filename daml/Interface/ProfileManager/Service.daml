@@ -1,0 +1,233 @@
+module Interface.ProfileManager.Service where
+
+import Interface.Base.Service qualified as Base (I, Implementation)
+import Interface.Common.Types (UserProfileKey(..))
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+import Interface.ProfileManager.Choices.RequestCreateUserProfile qualified as RequestCreateUserProfile(I)
+import Interface.ProfileManager.UserProfile.Factory qualified as UserProfile(Factory(..))
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap, Id)
+
+
+type I = Service
+
+type O = Offer
+
+type R = Request
+
+data View = View
+    with
+        userProfileFactoryCid: ContractId UserProfile.Factory 
+    deriving (Eq, Show)
+
+data OView = OView
+  with
+    operator : Party
+    user : Party
+    userProfileFactoryCid: ContractId UserProfile.Factory 
+  deriving(Eq, Show)
+
+data RView = RView
+  with
+    operator : Party
+    user : Party
+  deriving(Eq, Show)
+
+interface Service where
+    viewtype View
+
+    asBase : Base.I
+    
+    requestCreateUserProfile : RequestCreateUserProfile -> Update (ContractId RequestCreateUserProfile.I)
+    createUserProfile: CreateUserProfile -> Update (UserProfileKey) 
+
+    updateUsername : UpdateUsername -> Update ()
+
+    updateFirstName : UpdateFirstName -> Update ()
+
+    updateLastName : UpdateLastName -> Update ()
+
+    updateFullName : UpdateFullName -> Update ()
+
+    updateBirthday: UpdateBirthday -> Update()
+
+    updateGender: UpdateGender -> Update()
+
+    updateNationality: UpdateNationality -> Update()
+
+    updateContactMail : UpdateContactMail -> Update ()
+
+    updateCellphoneNumber : UpdateCellphoneNumber -> Update ()
+
+    updateTaxId : UpdateTaxId -> Update ()
+
+    updateSocialSecurityId : UpdateSocialSecurityId -> Update ()
+
+
+    nonconsuming choice RequestCreateUserProfile : ContractId RequestCreateUserProfile.I
+      with
+          id: Id
+          username: Text
+          firstName: Text
+          lastName: Text
+          fullName: Text
+          birthday: Date
+          gender: Optional Gender
+          nationality: Nationality
+          contactMail: Text
+          cellphoneNumber: Optional Int
+          taxId: Int
+          socialSecurityId: Int
+          observers : PartiesMap
+      controller (view $ asBase this).user
+      do
+        requestCreateUserProfile this arg
+
+    nonconsuming choice CreateUserProfile : UserProfileKey
+      with
+          createUserProfileRequest: ContractId RequestCreateUserProfile.I
+      controller (view $ asBase this).operator
+      do
+        createUserProfile this arg
+
+    nonconsuming choice UpdateUsername : ()
+      with
+        newUsername : Text
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateUsername this arg
+  
+    nonconsuming choice UpdateFirstName : ()
+      with
+        newFirstName : Text
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateFirstName this arg
+
+    nonconsuming choice UpdateLastName : ()
+      with
+          newLastName : Text
+          userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateLastName this arg
+
+    nonconsuming choice UpdateFullName : ()
+      with
+        newFullName : Text
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateFullName this arg
+
+    nonconsuming choice UpdateBirthday : ()
+      with
+        newBirthday : Date
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateBirthday this arg
+
+    nonconsuming choice UpdateGender : ()
+      with
+        newGender : Optional Gender
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateGender this arg
+
+    nonconsuming choice UpdateNationality : ()
+      with
+        newNationality : Nationality
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateNationality this arg
+
+    nonconsuming choice UpdateContactMail : ()
+      with
+        newContactMail : Text
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateContactMail this arg
+    
+    nonconsuming choice UpdateCellphoneNumber : ()
+      with
+        newCellphoneNumber : Optional Int
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateCellphoneNumber this arg
+
+    nonconsuming choice UpdateTaxId : ()
+      with
+        newTaxId : Int
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateTaxId this arg
+
+    nonconsuming choice UpdateSocialSecurityId : ()
+      with
+        newSocialSecurityId : Int
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateSocialSecurityId this arg
+
+
+interface Offer where
+  viewtype OView
+
+  accept : Accept -> Update (ContractId Service)
+  decline : Decline -> Update ()
+  withdraw : Withdraw -> Update ()
+
+  choice Accept : ContractId Service
+    controller (view this).user
+    do
+      accept this arg
+
+  choice Decline : ()
+    controller (view this).user
+    do
+      decline this arg
+
+  choice Withdraw : ()
+    controller (view this).operator
+    do
+      withdraw this arg
+
+interface Request where
+  viewtype RView
+
+  cancel : Cancel -> Update ()
+  reject : Reject -> Update ()
+  approve : Approve -> Update (ContractId Service)
+
+  choice Cancel : ()
+    controller (view this).user
+    do
+      cancel this arg
+
+  choice Reject : ()
+    controller (view this).operator
+    do
+      reject this arg
+
+  choice Approve : ContractId Service
+    with
+      operator: Party
+      userProfileFactoryCid: ContractId UserProfile.Factory 
+    controller operator, (view this).operator
+    do
+      approve this arg
+
+
+type ImplementationService t = (HasToInterface t Service, Base.Implementation t)
+class (ImplementationService t) => HasImplementation t
+instance HasImplementation Service
+instance HasToInterface Service Base.I where _toInterface = asBase

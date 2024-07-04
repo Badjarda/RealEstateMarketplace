@@ -1,0 +1,155 @@
+module Test.Unit.Custody where
+
+import Prelude hiding (Scenario)
+import Daml.Script
+import DA.Date
+import DA.Map (fromList, empty)
+import DA.Set (singleton)
+import DA.Time (time)
+
+import Test.Util.Update.Role (createOperatorRole, createRoleUser)
+import Test.Util.Update.Workflow (createInitialUserRole)
+import Test.Util.Update.Service (createCustodyService, createPropertyManagerService)
+import Test.Util.Script.Workflow (openAccount, closeAccount, deposit, withdrawal, originateToken, createApartmentProperty)
+import Test.Util.Update.Common (qty)
+import Test.Types (Fixture(..))
+
+import Daml.Finance.Interface.Types.Common.Types (HoldingStandard(..), Id(..), InstrumentKey(..))
+
+import Daml.Finance.Settlement.Hierarchy qualified as Settlement (Hierarchy(..))
+
+template Scenario
+  with
+    parties : [Party]
+  where
+    signatory parties
+
+    nonconsuming choice Setup : Fixture
+      controller parties
+      do
+        let [marketplace, user, bank, public] = parties
+
+        -- Create Roles
+        createOperatorRole marketplace
+        userRole <- createInitialUserRole marketplace public
+        createRoleUser marketplace user userRole
+
+        -- Create Services
+        let
+          assets = ["MKP"]
+          custodianPaths = [[user]]
+          cashRoute = Settlement.Hierarchy with rootCustodian = marketplace; pathsToRootCustodian = custodianPaths
+          secRoute = Settlement.Hierarchy with rootCustodian = marketplace; pathsToRootCustodian = custodianPaths
+          paths = fromList $ ("EUR", cashRoute) :: map (\a -> (a, secRoute)) assets
+
+        createCustodyService  marketplace user public paths
+        createPropertyManagerService marketplace user
+                
+        pure Fixture with instruments = []; accounts = []; holdings = []; services = [], roles = []
+
+testOpenAccount : Script ()
+testOpenAccount = do
+  parties@[marketplace, user, bank, public] <-
+    mapA allocateParty ["Marketplace", "User", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+  
+  openAccount marketplace user public "User@Marketplace" empty
+
+  pure()
+
+testCloseAccount : Script ()
+testCloseAccount = do
+  parties@[marketplace, user, bank, public] <-
+    mapA allocateParty ["Marketplace", "User", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+    
+  userAccount <- openAccount marketplace user public "User@Marketplace" empty
+  closeAccount marketplace user public userAccount empty
+
+  pure()
+
+
+testDepositPropertyInstrument : Script ()
+testDepositPropertyInstrument = do
+  parties@[marketplace, user, bank, public] <-
+    mapA allocateParty ["Marketplace", "User", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+    single_observers = singleton marketplace
+    observers = fromList [("Default", single_observers)]
+    id = Id "Custom Apartment Property"
+    instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ApartmentPropertInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  --eur <- originateToken bank bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  userAccount <- openAccount marketplace user public "User@Marketplace" empty
+  (instrumentKey,_) <- createApartmentProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
+  deposit marketplace user public (qty 1.0 instrumentKey) userAccount
+
+  pure()
+
+testDepositCurrencyInstrument : Script ()
+testDepositCurrencyInstrument = do
+  parties@[marketplace, user, bank, public] <-
+    mapA allocateParty ["Marketplace", "User", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+
+  eur <- originateToken user bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  userAccount <- openAccount marketplace user public "User@Marketplace" empty
+  deposit marketplace user public (qty 100.0 eur) userAccount
+
+  pure()
+
+testWithdrawPropertyInstrument : Script ()
+testWithdrawPropertyInstrument = do
+  parties@[marketplace, user, bank, public] <-
+    mapA allocateParty ["Marketplace", "User", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+    single_observers = singleton marketplace
+    observers = fromList [("Default", single_observers)]
+    id = Id "Custom Apartment Property"
+    instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ApartmentPropertInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  userAccount <- openAccount marketplace user public "User@Marketplace" empty
+  (instrumentKey,_) <- createApartmentProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
+  holdingCid <- deposit marketplace user public (qty 1.0 instrumentKey) userAccount
+  withdrawal marketplace user public holdingCid
+
+  pure()
+
+
+testWithdrawCurrencyInstrument : Script ()
+testWithdrawCurrencyInstrument = do
+  parties@[marketplace, user, bank, public] <-
+    mapA allocateParty ["Marketplace", "User", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+
+  eur <- originateToken user bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  userAccount <- openAccount marketplace user public "User@Marketplace" empty
+  holdingCid <- deposit marketplace user public (qty 100.0 eur) userAccount
+  withdrawal marketplace user public holdingCid
+
+  pure()
+

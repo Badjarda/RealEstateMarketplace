@@ -1,0 +1,39 @@
+module Interface.Base.Offer where
+
+import Interface.Base.Service qualified as Service (I)
+
+type I = Offer
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    user : Party
+  deriving (Eq, Show)
+
+interface Offer where
+  viewtype V
+
+  accept : Update (ContractId Service.I)
+  reject : Update ()
+  withdraw : Update ()
+
+  choice Accept : ContractId Service.I
+    controller (view this).user
+    do
+      accept this
+
+  choice Reject : ()
+    controller (view this).user
+    do
+      reject this
+
+  choice Withdraw : ()
+    controller (view this).user
+    do
+      withdraw this
+
+type Implementation t = HasToInterface t Offer
+class (Implementation t) => HasImplementation t
+instance HasImplementation Offer

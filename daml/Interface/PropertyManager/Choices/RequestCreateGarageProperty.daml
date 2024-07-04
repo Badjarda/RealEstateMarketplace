@@ -1,0 +1,38 @@
+module Interface.PropertyManager.Choices.RequestCreateGarageProperty where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Interface.PropertyManager.Property.Common (GarageType)
+
+type I = RequestCreateGarageProperty
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    garageInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    garageArea: Decimal
+    garageType: GarageType
+    vehicleCapacity: Int
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+    observers : PartiesMap
+  deriving (Eq, Show)
+
+interface RequestCreateGarageProperty where
+  viewtype View
+
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t RequestCreateGarageProperty, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation RequestCreateGarageProperty
+instance HasToInterface RequestCreateGarageProperty Removable.I where _toInterface = asRemovable

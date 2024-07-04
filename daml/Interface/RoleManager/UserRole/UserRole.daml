@@ -1,0 +1,157 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
+module Interface.RoleManager.UserRole.UserRole where
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, Parties)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (AddObservers(..), I, RemoveObservers(..), flattenObservers)
+import Daml.Finance.Interface.Util.InterfaceKey (createReferenceHelper, disclosureUpdateReferenceHelper, exerciseInterfaceByKeyHelper)
+import Daml.Finance.Interface.Util.InterfaceKey qualified as InterfaceKey (HasInterfaceKey(..))
+
+import Interface.Common.Types (UserRoleKey(..))
+import Interface.RoleManager.UserRole.Permission
+
+type I = UserRole
+
+type R = Reference
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    id : Id
+    description : Text
+    permissions : [Permission]
+  deriving (Eq, Show)
+
+toKey : View -> UserRoleKey
+toKey v = UserRoleKey with operator = v.operator; id = v.id
+
+userRoleKey : (HasToInterface i UserRole) => i -> UserRoleKey
+userRoleKey = toKey . view . toInterface @UserRole
+
+interface UserRole requires Disclosure.I where
+  viewtype V
+
+  getKey : UserRoleKey
+  addPermission : AddPermission -> Update (ContractId UserRole)
+  removePermission : RemovePermission -> Update (ContractId UserRole)
+  setPermissions : SetPermissions -> Update (ContractId UserRole)
+
+  nonconsuming choice GetView : View
+    with
+      viewer : Party
+    controller viewer
+    do
+      pure $ view this
+
+  choice AddPermission : ContractId UserRole
+    with
+      permission : Permission
+    controller signatory this
+    do
+      addPermission this arg
+  
+  choice RemovePermission : ContractId UserRole
+    with
+      permission : Permission
+    controller signatory this
+    do
+      removePermission this arg
+
+  choice SetPermissions : ContractId UserRole
+    with
+      permissions : [Permission]
+    controller signatory this
+    do
+      setPermissions this arg
+
+  choice Remove : ()
+    controller signatory this
+    do
+      (refCid, _) <- fetchByKey @Reference $ getKey this
+      archive refCid
+
+
+template Reference
+  with
+    userRoleView : View
+    cid : ContractId UserRole
+    observers : PartiesMap
+  where
+    signatory userRoleView.operator
+    observer Disclosure.flattenObservers observers
+
+    key toKey userRoleView : UserRoleKey
+    maintainer key.operator
+
+    nonconsuming choice GetCid : ContractId UserRole
+      with
+        viewer : Party
+      controller viewer
+      do
+        pure cid
+
+    choice SetCid : ContractId Reference
+      with
+        newCid : ContractId UserRole
+      controller signatory this
+      do
+        create this with cid = newCid
+
+    choice SetObservers : ContractId Reference
+      with
+        newObservers : PartiesMap
+      controller signatory this
+      do
+        create this with observers = newObservers
+
+disclose : (Text, Parties) -> Party -> Parties -> UserRoleKey -> Update (ContractId UserRole)
+disclose observersToAdd actor disclosers userRole =
+  fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      userRole
+      actor
+      Disclosure.AddObservers with disclosers; observersToAdd
+
+undisclose : (Text, Parties) -> Party -> Parties -> UserRoleKey ->
+  Update (Optional (ContractId UserRole))
+undisclose observersToRemove actor disclosers userRole =
+  fmap fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      userRole
+      actor
+      Disclosure.RemoveObservers with disclosers; observersToRemove
+
+exerciseInterfaceByKey : forall i c r.
+  ( HasInterfaceTypeRep i
+  , HasExercise i c r
+  )
+  => UserRoleKey -- ^ The UserRole key.
+  -> Party      -- ^ The actor exercising.
+  -> c          -- ^ The choice arguments.
+  -> Update r
+exerciseInterfaceByKey k actor arg =
+  exerciseInterfaceByKeyHelper @Reference @GetCid @SetCid @SetObservers @GetView @i k actor arg
+
+-- | HIDE
+-- Create instance of HasInterfaceKey.
+instance InterfaceKey.HasInterfaceKey UserRole View UserRoleKey Reference GetCid SetCid SetObservers
+  GetView where
+    createReference = Reference
+    getCid = GetCid
+    setCid = SetCid
+    setObservers = SetObservers
+    getView = GetView
+
+-- | HIDE
+-- Create Reference for the UserRole.
+createReference : Party -> ContractId UserRole -> Update (ContractId Reference)
+createReference = createReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView
+
+-- | HIDE
+-- Helper function to update the UserRole reference once observers are added to the UserRole.
+disclosureUpdateReference : UserRoleKey -> PartiesMap -> ContractId UserRole ->
+  Update (ContractId Disclosure.I)
+disclosureUpdateReference =
+  disclosureUpdateReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView

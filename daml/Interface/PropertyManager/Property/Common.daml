@@ -1,0 +1,28 @@
+module Interface.PropertyManager.Property.Common where
+
+---- Land Property
+
+data LandType = Urban | Urbanizable | Rustic
+  deriving (Eq, Show)
+
+data ViableConstructionTypes = RusticStructure | PublicInfrastructure | Residence | Building | Warehouse
+  deriving (Eq, Show)
+
+---- Residence Property
+
+data ResidenceType = Detached | Townhouse | CornerLot
+  deriving (Eq, Show)
+
+data Parking = Covered | Street | PrivateGarage
+  deriving (Eq, Show)
+
+data Orientation = East | West | South | North
+  deriving (Eq, Show)
+
+---- Garage Property
+data GarageType = IsolatedPrivate | ParkingSpace | CondominiumPrivate 
+  deriving (Eq, Show)
+
+---- Warehouse Property
+data WarehouseType = IsolatedWarehouse | BuildingWarehouse | StorageRoom 
+  deriving (Eq, Show)

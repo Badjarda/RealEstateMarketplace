@@ -1,0 +1,154 @@
+module App.Custody.Util where
+
+import DA.Assert ((===))
+
+import Interface.RoleManager.UserRole.Permission
+import Interface.Custody.Choices.OpenAccountRequest qualified as OpenAccountRequest(I, View(..))
+import Interface.Custody.Choices.CloseAccountRequest qualified as CloseAccountRequest(I, View(..))
+import Interface.Custody.Choices.DepositRequest qualified as DepositRequest(I, View(..))
+import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest(I, View(..))
+import Interface.Common.Util (fetchAndRemove)
+import App.Custody.Model qualified as CustodyModel
+import App.Util qualified as UserUtil (hasPermission)
+import App.Credential.Credential
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, AccountKey(..), InstrumentQuantity, HoldingFactoryKey)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Account.Factory qualified as AccountFactory (I, Create(..))
+import Daml.Finance.Interface.Account.Account qualified as Account (Remove(..), Credit(..), Debit(..), R, Controllers)
+import Daml.Finance.Interface.Account.Util (getAccount)
+
+
+data OpenAccountRequest = OpenAccountRequest
+  with
+    operator : Party
+    user : Party
+    id : Id
+    description : Text
+    controllers : Account.Controllers
+    observers : PartiesMap
+    permission : Permission
+
+requestOpenAccountAux : OpenAccountRequest -> Update (ContractId OpenAccountRequest.I)
+requestOpenAccountAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the opening of an account" permission 
+  toInterfaceContractId <$> create CustodyModel.OpenAccountRequest with
+    operator = request.operator
+    user = request.user 
+    id = request.id
+    description = request.description 
+    controllers = request.controllers
+    observers = request.observers
+
+data CloseAccountRequest = CloseAccountRequest
+  with
+    operator : Party
+    user : Party
+    account : AccountKey
+    permission : Permission
+
+requestCloseAccountAux : CloseAccountRequest -> Update (ContractId CloseAccountRequest.I)
+requestCloseAccountAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the closing of an account" permission 
+  toInterfaceContractId <$> create CustodyModel.CloseAccountRequest with
+    operator = request.operator
+    user = request.user 
+    account = request.account
+
+data DepositRequest = DepositRequest
+  with
+    operator : Party
+    user : Party
+    quantity : InstrumentQuantity
+    account : AccountKey
+    permission : Permission
+
+requestDepositAux : DepositRequest -> Update (ContractId DepositRequest.I)
+requestDepositAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the deposit into an account" permission 
+  toInterfaceContractId <$> create CustodyModel.DepositRequest with
+    operator = request.operator 
+    user = request.user 
+    quantity = request.quantity
+    account = request.account
+
+data WithdrawRequest = WithdrawRequest
+  with
+    operator : Party
+    user : Party
+    holdingCid : ContractId Holding.I
+    permission : Permission
+
+requestWithdrawAux : WithdrawRequest -> Update (ContractId WithdrawRequest.I)
+requestWithdrawAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the withdraw from an account" permission 
+  toInterfaceContractId <$> create CustodyModel.WithdrawRequest with
+    operator = request.operator
+    user = request.user 
+    holdingCid = request.holdingCid
+
+data OpenAccount = OpenAccount
+  with
+    operator : Party
+    user : Party
+    openAccountRequestCid : ContractId OpenAccountRequest.I
+    accountFactoryCid : ContractId AccountFactory.I
+    holdingFactoryKey : HoldingFactoryKey
+
+openAccountAux : OpenAccount -> Update (AccountKey)
+openAccountAux request = do
+  OpenAccountRequest.View{id; description; controllers; observers} <- view <$> fetchAndRemove request.openAccountRequestCid
+  let account = AccountKey with custodian = request.operator; owner = request.user; id
+  accountCid <- exercise request.accountFactoryCid AccountFactory.Create with account, description, controllers,  holdingFactory = request.holdingFactoryKey; observers
+  pure account
+
+data CloseAccount = CloseAccount
+  with
+    operator : Party
+    user : Party
+    closeAccountRequestCid : ContractId CloseAccountRequest.I
+
+closeAccountAux : CloseAccount -> Update ()
+closeAccountAux request = do
+  CloseAccountRequest.View{account} <- view <$> fetchAndRemove request.closeAccountRequestCid
+  (_, ref) <- fetchByKey @Account.R account
+  exercise ref.cid Account.Remove
+
+data Deposit = Deposit
+  with
+    operator : Party
+    user : Party
+    depositRequestCid : ContractId DepositRequest.I
+
+depositAux : Deposit -> Update (ContractId Holding.I)
+depositAux request = do
+  DepositRequest.View{quantity; account} <- view <$> fetchAndRemove request.depositRequestCid
+  account.custodian === request.operator
+  account.owner === request.user
+  (_, ref) <- fetchByKey @Account.R account
+  exercise ref.cid Account.Credit with quantity
+
+data Withdraw = Withdraw
+  with
+    operator : Party
+    user : Party
+    withdrawRequestCid : ContractId WithdrawRequest.I
+
+withdrawAux : Withdraw -> Update ()
+withdrawAux request = do
+  WithdrawRequest.View{holdingCid} <- view <$> fetchAndRemove request.withdrawRequestCid
+  holding <- fetch holdingCid
+  let account = getAccount holding
+  account.custodian === request.operator
+  account.owner === request.user
+  (_, ref) <- fetchByKey @Account.R account
+  exercise ref.cid Account.Debit with holdingCid
+

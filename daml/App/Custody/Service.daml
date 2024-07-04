@@ -1,0 +1,116 @@
+module App.Custody.Service where
+
+import Interface.Base.Service qualified as Base (I, View(..))
+import Interface.Custody.Service qualified as Service(I, O, R, View(..), OView(..), RView(..), RequestOpenAccount(..), RequestCloseAccount(..), RequestDeposit(..), RequestWithdraw(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdrawal(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
+import Interface.RoleManager.UserRole.Permission
+import App.Custody.Util (OpenAccountRequest(..), CloseAccountRequest(..), DepositRequest(..), WithdrawRequest(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdraw(..),  requestOpenAccountAux, requestCloseAccountAux, requestDepositAux, requestWithdrawAux, openAccountAux, closeAccountAux, depositAux, withdrawAux)
+
+import Daml.Finance.Interface.Types.Common.Types (HoldingFactoryKey(..))
+import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
+import Daml.Finance.Interface.Account.Factory qualified as Account (I)
+
+
+type T = Service
+
+instance Service.HasImplementation Service
+
+template Service
+  with
+    operator : Party
+    user : Party
+    accountFactoryCid : ContractId Account.I
+    holdingFactoryKey : HoldingFactoryKey
+    claimRuleCid : ContractId Lifecycle.Claim
+  where
+    signatory operator, user
+
+    key (operator, user) : (Party, Party)
+    maintainer key._1
+
+    interface instance Base.I for Service where
+      view = Base.View with operator; user
+
+      terminate = pure ()
+
+    interface instance Service.I for Service where
+      view = Service.View with accountFactoryCid; holdingFactoryKey; claimRuleCid
+
+      asBase = toInterface @Base.I this
+
+      requestOpenAccount Service.RequestOpenAccount{id; description; controllers; observers} = do
+        let openAccountRequestParams = OpenAccountRequest with permission = MANAGE_ROLE, ..
+        requestOpenAccountAux openAccountRequestParams
+
+      requestCloseAccount Service.RequestCloseAccount{account} = do
+        let closeAccountRequestParams = CloseAccountRequest with permission = MANAGE_ROLE, ..
+        requestCloseAccountAux closeAccountRequestParams
+
+      requestDeposit Service.RequestDeposit{quantity; account} = do
+        let requestDepositParams = DepositRequest with permission = MANAGE_ROLE, ..
+        requestDepositAux requestDepositParams
+
+      requestWithdraw Service.RequestWithdraw{holdingCid} = do
+        let requestWithdrawParams = WithdrawRequest with permission = MANAGE_ROLE, ..
+        requestWithdrawAux requestWithdrawParams
+
+      openAccount Service.OpenAccount{openAccountRequestCid} = do
+        let openAccountParams = OpenAccount with ..
+        openAccountAux openAccountParams
+
+      closeAccount Service.CloseAccount{closeAccountRequestCid} = do
+        let closeAccountParams = CloseAccount with ..
+        closeAccountAux closeAccountParams
+
+      deposit Service.Deposit{depositRequestCid} = do
+        let depositParams = Deposit with ..
+        depositAux depositParams
+
+      withdrawal Service.Withdrawal{withdrawRequestCid} = do
+        let withdrawParams = Withdraw with ..
+        withdrawAux withdrawParams
+
+
+template Offer
+  with
+    operator : Party
+    user : Party
+    claimRuleCid : ContractId Lifecycle.Claim
+    accountFactoryCid : ContractId Account.I
+    holdingFactoryKey : HoldingFactoryKey
+
+  where
+    signatory operator
+    observer user
+
+    interface instance Service.O for Offer where
+      view = Service.OView with ..
+      
+      accept Service.Accept = do
+        toInterfaceContractId <$> create Service with operator, user, claimRuleCid, accountFactoryCid, holdingFactoryKey
+
+      decline Service.Decline = do
+        pure()
+
+      withdraw Service.Withdraw = do
+        pure()
+
+
+template Request
+  with
+    user : Party
+    operator : Party
+  where
+    signatory user
+    observer operator
+
+    interface instance Service.R for Request where
+      view = Service.RView with operator, user
+
+      cancel Service.Cancel = do
+        pure()
+
+      reject Service.Reject = do
+        pure()
+
+      approve Service.Approve{operator, claimRuleCid, accountFactoryCid, holdingFactoryKey} = do
+        toInterfaceContractId <$> create Service with operator, user, claimRuleCid, accountFactoryCid, holdingFactoryKey

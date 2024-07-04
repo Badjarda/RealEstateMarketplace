@@ -1,0 +1,47 @@
+module Test.Util.Update.Common where
+
+import Daml.Script
+import DA.Text (asciiToLower, replace)
+import DA.List (head, singleton)
+import DA.Optional (fromOptional)
+
+import Daml.Finance.Interface.Types.Common.Types (InstrumentKey, InstrumentQuantity, Quantity(..))
+
+data PartyInfo = PartyInfo
+  with
+    scenario : Text
+    name : Text
+    id : Party
+  deriving (Eq, Show)
+
+allocateUser : Text -> [Party] -> [Party] -> Script User
+allocateUser displayName actAsParties readAsParties = do
+  userId <- validateUserId $ asciiToLower displayName
+  let
+    user = User userId (Some $ head actAsParties)
+    actAsRights = fmap CanActAs actAsParties
+    readAsRights = fmap CanReadAs readAsParties
+  createUser user $ actAsRights ++ readAsRights
+  pure user
+
+allocateParties : Text -> [Text] -> Text -> Script [PartyInfo]
+allocateParties scenario partyNames publicPartyName = do
+  existingParties <- listKnownParties
+  let
+    scopedPartyName p = p <> "-" <> scenario
+    allocate publicParty party =
+      case find (\d -> (fromOptional "" d.displayName) == party) existingParties of
+        Some detail -> do pure detail.party
+        None -> do
+          let
+            scopedPartyName = party <> "-" <> scenario
+            scopedUserName = replace " " "-" scopedPartyName
+          p <- allocatePartyWithHint scopedPartyName $ PartyIdHint scopedPartyName
+          u <- allocateUser scopedUserName [p] [publicParty]
+          pure p
+  publicParty <- allocatePartyWithHint (scopedPartyName publicPartyName) $ PartyIdHint (scopedPartyName publicPartyName)
+  parties <- mapA (allocate publicParty) partyNames
+  pure $ map (\(name, id) -> PartyInfo with scenario; name; id) $ zip partyNames parties ++ singleton (publicPartyName, publicParty)
+
+qty : Decimal -> InstrumentKey -> InstrumentQuantity
+qty amount instrument = Quantity with unit = instrument; amount

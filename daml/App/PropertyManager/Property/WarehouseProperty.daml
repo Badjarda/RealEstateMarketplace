@@ -1,0 +1,155 @@
+module App.PropertyManager.Property.WarehouseProperty where
+
+import DA.Set qualified as Set (fromList, singleton)
+
+import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty(I, View(..), GetWarehouseInstrumentKey(..), GetWarehousePropertyAddress(..), GetWarehousePropertyPostalCode(..), GetWarehousePropertyDistrict(..), GetWarehousePropertyCounty(..), GetWarehouseType(..), GetWarehouseGrossArea(..), GetWarehouseUsableArea(..), GetWarehouseFloors(..), GetWarehouseBuildDate(..), GetWarehouseInstalledEquipment(..), GetWarehouseAdditionalInformation(..), GetWarehouseDescription(..), SetWarehouseInstrumentKey(..), SetWarehousePropertyAddress(..), SetWarehousePropertyPostalCode(..), SetWarehousePropertyDistrict(..), SetWarehousePropertyCounty(..), SetWarehouseGrossArea(..), SetWarehouseUsableArea(..), SetWarehouseFloors(..), SetWarehouseType(..), SetWarehouseBuildDate(..), SetWarehouseInstalledEquipment(..), SetWarehouseAdditionalInformation(..), SetWarehouseDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.WarehouseProperty.Factory qualified as WarehousePropertyFactory(I, View(..), Create(..))
+import Interface.PropertyManager.Property.Common (WarehouseType)
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I, View(..), flattenObservers)
+import Daml.Finance.Util.Disclosure(addObserversImpl, removeObserversImpl, setObserversImpl)
+
+template WarehouseProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    warehouseType: WarehouseType 
+    grossArea: Decimal
+    usableArea: Decimal
+    floors: Int
+    buildDate: Date
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+    observers: PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, user) : (Party, Party)
+  
+    maintainer key._2
+
+    interface instance WarehouseProperty.I for WarehouseProperty where
+      view = WarehouseProperty.View with ..
+
+      getKey = WarehouseProperty.propertyKey this
+
+      getWarehouseInstrumentKey WarehouseProperty.GetWarehouseInstrumentKey{} = do 
+        pure instrument
+
+      getWarehousePropertyAddress WarehouseProperty.GetWarehousePropertyAddress{} = do 
+        pure propertyAddress
+      
+      getWarehousePropertyPostalCode WarehouseProperty.GetWarehousePropertyPostalCode{} = do 
+        pure propertyPostalCode
+
+      getWarehousePropertyDistrict WarehouseProperty.GetWarehousePropertyDistrict{} = do 
+        pure propertyDistrict
+
+      getWarehousePropertyCounty WarehouseProperty.GetWarehousePropertyCounty{} = do 
+        pure propertyCounty
+
+      getWarehouseType WarehouseProperty.GetWarehouseType{} = do 
+        pure warehouseType
+
+      getWarehouseGrossArea WarehouseProperty.GetWarehouseGrossArea{} = do 
+        pure grossArea
+
+      getWarehouseUsableArea WarehouseProperty.GetWarehouseUsableArea{} = do 
+        pure usableArea
+      
+      getWarehouseFloors WarehouseProperty.GetWarehouseFloors{} = do 
+        pure floors
+
+      getWarehouseBuildDate WarehouseProperty.GetWarehouseBuildDate{} = do 
+        pure buildDate
+
+      getWarehouseInstalledEquipment WarehouseProperty.GetWarehouseInstalledEquipment{} = do 
+        pure installedEquipment
+
+      getWarehouseAdditionalInformation WarehouseProperty.GetWarehouseAdditionalInformation{} = do 
+        pure additionalInformation
+
+      getWarehouseDescription WarehouseProperty.GetWarehouseDescription{} = do 
+        pure description 
+
+      setWarehouseInstrumentKey WarehouseProperty.SetWarehouseInstrumentKey{newWarehouseInstrumentKey} = do 
+        toInterfaceContractId <$> create this with instrument = newWarehouseInstrumentKey
+
+      setWarehousePropertyAddress WarehouseProperty.SetWarehousePropertyAddress{newWarehousePropertyAddress} = do 
+        toInterfaceContractId <$> create this with propertyAddress = newWarehousePropertyAddress
+      
+      setWarehousePropertyPostalCode WarehouseProperty.SetWarehousePropertyPostalCode{newWarehousePropertyPostalCode} = do 
+        toInterfaceContractId <$> create this with propertyPostalCode = newWarehousePropertyPostalCode
+      
+      setWarehousePropertyDistrict WarehouseProperty.SetWarehousePropertyDistrict{newWarehousePropertyDistrict} = do 
+        toInterfaceContractId <$> create this with propertyDistrict = newWarehousePropertyDistrict
+
+      setWarehousePropertyCounty WarehouseProperty.SetWarehousePropertyCounty{newWarehousePropertyCounty} = do 
+        toInterfaceContractId <$> create this with propertyCounty = newWarehousePropertyCounty
+      
+      setWarehouseType WarehouseProperty.SetWarehouseType{newWarehouseType} = do 
+        toInterfaceContractId <$> create this with warehouseType = newWarehouseType
+      
+      setWarehouseGrossArea WarehouseProperty.SetWarehouseGrossArea{newWarehouseGrossArea} = do 
+        toInterfaceContractId <$> create this with grossArea = newWarehouseGrossArea
+      
+      setWarehouseUsableArea WarehouseProperty.SetWarehouseUsableArea{newWarehouseUsableArea} = do 
+        toInterfaceContractId <$> create this with usableArea = newWarehouseUsableArea
+      
+      setWarehouseFloors WarehouseProperty.SetWarehouseFloors{newWarehouseFloors} = do 
+        toInterfaceContractId <$> create this with floors = newWarehouseFloors
+
+      setWarehouseBuildDate WarehouseProperty.SetWarehouseBuildDate{newWarehouseBuildDate} = do 
+        toInterfaceContractId <$> create this with buildDate = newWarehouseBuildDate
+
+      setWarehouseInstalledEquipment WarehouseProperty.SetWarehouseInstalledEquipment{newWarehouseInstalledEquipment} = do 
+        toInterfaceContractId <$> create this with installedEquipment = newWarehouseInstalledEquipment
+      
+      setWarehouseAdditionalInformation WarehouseProperty.SetWarehouseAdditionalInformation{newWarehouseAdditionalInformation} = do 
+        toInterfaceContractId <$> create this with additionalInformation = newWarehouseAdditionalInformation
+      
+      setWarehouseDescription WarehouseProperty.SetWarehouseDescription{newWarehouseDescription} = do 
+        toInterfaceContractId <$> create this with description = newWarehouseDescription
+
+    interface instance Disclosure.I for WarehouseProperty where
+      view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
+      setObservers = setObserversImpl this . Some . WarehouseProperty.disclosureUpdateReference $
+        WarehouseProperty.propertyKey this
+      addObservers = addObserversImpl this . Some . WarehouseProperty.disclosureUpdateReference $
+        WarehouseProperty.propertyKey this
+      removeObservers = removeObserversImpl this . Some . WarehouseProperty.disclosureUpdateReference $
+        WarehouseProperty.propertyKey this
+
+template Factory
+  with
+    operator : Party
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance WarehousePropertyFactory.I for Factory where
+      view = WarehousePropertyFactory.View with operator
+      
+      create' WarehousePropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, warehouseType, grossArea, usableArea, floors, buildDate, installedEquipment, additionalInformation, description, observers} =
+        do
+          cid <- toInterfaceContractId <$> create WarehouseProperty with
+            operator = propertyKey.operator
+            user = propertyKey.user
+            id = propertyKey.id, ..
+          WarehouseProperty.createReference propertyKey.operator cid
+          pure cid
+
+    interface instance Disclosure.I for Factory where
+      view = Disclosure.View with disclosureControllers = Set.singleton operator; observers
+      setObservers = setObserversImpl @Factory @Disclosure.I this None
+      addObservers = addObserversImpl @Factory @Disclosure.I this None
+      removeObservers = removeObserversImpl @Factory @Disclosure.I this None

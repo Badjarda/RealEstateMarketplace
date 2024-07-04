@@ -1,0 +1,29 @@
+module Interface.Custody.Choices.OpenAccountRequest where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Account.Account qualified as Account (Controllers)
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap)
+
+type I = OpenAccountRequest
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    user : Party
+    id : Id
+    description : Text
+    controllers : Account.Controllers
+    observers : PartiesMap
+  deriving (Eq, Show)
+
+interface OpenAccountRequest where
+  viewtype View
+
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t OpenAccountRequest, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation OpenAccountRequest
+instance HasToInterface OpenAccountRequest Removable.I where _toInterface = asRemovable

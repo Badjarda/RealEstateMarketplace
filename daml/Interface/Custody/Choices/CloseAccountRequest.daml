@@ -1,0 +1,25 @@
+module Interface.Custody.Choices.CloseAccountRequest where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Types.Common.Types (AccountKey)
+
+type I = CloseAccountRequest
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    user : Party
+    account : AccountKey
+  deriving (Eq, Show)
+
+interface CloseAccountRequest where
+  viewtype View
+
+  asRemovable : Removable.I
+  
+type Implementation t = (HasToInterface t CloseAccountRequest, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation CloseAccountRequest
+instance HasToInterface CloseAccountRequest Removable.I where _toInterface = asRemovable

@@ -1,0 +1,133 @@
+module App.Role.Operator where
+
+import Interface.Role.Operator qualified as Operator(I, O, R, View(..), OView(..), RView(..), CreateInitialRole(..), OfferUserRole(..), ApproveUserRole(..), OfferUserRoleManagerService(..), ApproveUserRoleManagerRequest(..), TerminateUserRoleManagerService(..), TerminateRole(..), OfferPropertyManagerService(..), ApprovePropertyManagerRequest(..), TerminatePropertyManagerService(..), OfferUserProfileManagerService(..), ApproveUserProfileManagerRequest(..), TerminateUserProfileManagerService(..), OfferCustodianService(..), ApproveCustodianRequest(..), TerminateCustodianService(..), OfferIssuanceService(..), ApproveIssuanceRequest(..), TerminateIssuanceService(..), Accept(..), Decline(..), Approve(..), Reject(..))
+
+import Interface.Role.User qualified as User(Approve(..))
+import Interface.ProfileManager.Service qualified as ProfileManager(Approve(..))
+import Interface.RoleManager.Service qualified as RoleManager(Approve(..))
+import Interface.Custody.Service qualified as Custody(Approve(..))
+import Interface.Issuance.Service qualified as Issuance(Approve(..))
+import Interface.PropertyManager.Service qualified as PropertyManager(Approve(..))
+
+import App.Role.User qualified as User(Offer(..))
+import App.PropertyManager.Service qualified as PropertyManager(Service, Offer(..))
+import App.RoleManager.Service qualified as RoleManager(Service, Offer(..))
+import App.Custody.Service qualified as Custody(Service, Offer(..))
+import App.Issuance.Service qualified as Issuance(Service, Offer(..))
+import App.ProfileManager.Service qualified as ProfileManager(Service, Offer(..))
+
+import Interface.Base.Service qualified as Base(I, Terminate(..))
+import Interface.Common.Types (UserRoleKey(..))
+import Interface.RoleManager.UserRole.Factory qualified as UserRole (Factory(..), Create(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id(..))
+
+template Role 
+  with
+    operator: Party
+    userRoleFactoryCid: ContractId UserRole.Factory
+  where
+    signatory operator
+
+    key operator : Party
+    maintainer key
+
+    interface instance Operator.I for Role where
+      view = Operator.View with operator, userRoleFactoryCid
+
+      createInitialRole Operator.CreateInitialRole{userDescription, userPermissions, observers} = do
+        let userRole = UserRoleKey with operator, id = Id "RegisteredUserRole"
+        exercise userRoleFactoryCid UserRole.Create with userRole = userRole, description = userDescription, permissions = userPermissions, observers
+        return userRole
+
+      offerUserRole Operator.OfferUserRole{user, userRole} = do
+        toInterfaceContractId <$> create User.Offer with user, operator, userRole
+
+      approveUserRole Operator.ApproveUserRole{userRoleRequestCid, userRole} = do
+        exercise userRoleRequestCid User.Approve with ..
+
+      offerUserRoleManagerService Operator.OfferUserRoleManagerService{user, userRoleFactoryCid} = do
+        toInterfaceContractId <$> create RoleManager.Offer with ..
+
+      approveUserRoleManagerService Operator.ApproveUserRoleManagerRequest{userRoleManagerServiceRequestCid, userRoleFactoryCid} = do
+         exercise userRoleManagerServiceRequestCid RoleManager.Approve with ..
+
+      terminateUserRoleManagerService Operator.TerminateUserRoleManagerService{user} = do
+        (serviceCid, _) <- fetchByKey @RoleManager.Service (operator, user)
+        exercise (toInterfaceContractId @Base.I serviceCid) Base.Terminate with actor = operator
+
+      offerPropertyManagerService Operator.OfferPropertyManagerService{user, apartmentPropertyFactoryCid, landPropertyFactoryCid, residencePropertyFactoryCid, garagePropertyFactoryCid, warehousePropertyFactoryCid} = do
+        toInterfaceContractId <$> create PropertyManager.Offer with ..
+
+      approvePropertyManagerService Operator.ApprovePropertyManagerRequest{propertyManagerServiceRequestCid, apartmentPropertyFactoryCid,landPropertyFactoryCid, residencePropertyFactoryCid, garagePropertyFactoryCid, warehousePropertyFactoryCid} = do
+         exercise propertyManagerServiceRequestCid PropertyManager.Approve with ..
+
+      terminatePropertyManagerService Operator.TerminatePropertyManagerService{user} = do
+        (serviceCid, _) <- fetchByKey @PropertyManager.Service (operator, user)
+        exercise (toInterfaceContractId @Base.I serviceCid) Base.Terminate with actor = operator
+      
+      offerUserProfileManagerService Operator.OfferUserProfileManagerService{user, userProfileFactoryCid} = do
+        toInterfaceContractId <$> create ProfileManager.Offer with ..
+
+      approveUserProfileManagerService Operator.ApproveUserProfileManagerRequest{userProfileManagerServiceRequestCid, userProfileFactoryCid} = do
+         exercise userProfileManagerServiceRequestCid ProfileManager.Approve with ..
+
+      terminateUserProfileManagerService Operator.TerminateUserProfileManagerService{user} = do
+        (serviceCid, _) <- fetchByKey @ProfileManager.Service (operator, user)
+        exercise (toInterfaceContractId @Base.I serviceCid) Base.Terminate with actor = operator
+      
+      offerCustodianService Operator.OfferCustodianService{user, accountFactoryCid, holdingFactoryKey, claimRuleCid} = do
+        toInterfaceContractId <$> create Custody.Offer with ..
+
+      approveCustodianService Operator.ApproveCustodianRequest{custodyServiceRequestCid, accountFactoryCid, holdingFactoryKey, claimRuleCid} = do
+         exercise custodyServiceRequestCid Custody.Approve with ..
+
+      terminateCustodianService Operator.TerminateCustodianService{user} = do
+        (serviceCid, _) <- fetchByKey @Custody.Service (operator, user)
+        exercise (toInterfaceContractId @Base.I serviceCid) Base.Terminate with actor = operator
+      
+      offerIssuanceService Operator.OfferIssuanceService{user} = do
+        toInterfaceContractId <$> create Issuance.Offer with ..
+
+      approveIssuanceService Operator.ApproveIssuanceRequest{issuanceServiceRequestCid} = do
+         exercise issuanceServiceRequestCid Issuance.Approve with ..
+
+      terminateIssuanceService Operator.TerminateIssuanceService{user} = do
+        (serviceCid, _) <- fetchByKey @Issuance.Service (operator, user)
+        exercise (toInterfaceContractId @Base.I serviceCid) Base.Terminate with actor = operator
+
+      terminateRole Operator.TerminateRole{} = do
+        pure()
+
+template Offer
+  with
+    operator: Party
+    userRoleFactoryCid: ContractId UserRole.Factory 
+  where
+    signatory operator
+    observer operator
+
+    interface instance Operator.O for Offer where
+      view = Operator.OView with operator, userRoleFactoryCid
+
+      accept Operator.Accept = do
+        toInterfaceContractId <$> create Role with ..
+
+      decline Operator.Decline{} = do
+        pure()
+
+template Request
+  with
+    operator: Party
+  where
+    signatory operator
+    observer operator
+
+    interface instance Operator.R for Request where
+      view = Operator.RView with operator
+
+      approve Operator.Approve{userRoleFactoryCid} = do
+        toInterfaceContractId <$> create Role with ..
+
+      reject Operator.Reject{} = do
+        pure()

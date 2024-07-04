@@ -1,0 +1,1021 @@
+module Interface.PropertyManager.Service where
+
+import Interface.Base.Service qualified as Base (I, Implementation)
+
+import Interface.PropertyManager.Choices.RequestCreateApartmentProperty qualified as RequestCreateApartmentProperty(I)
+import Interface.PropertyManager.Choices.RequestCreateLandProperty qualified as RequestCreateLandProperty(I)
+import Interface.PropertyManager.Choices.RequestCreateResidenceProperty qualified as RequestCreateResidenceProperty(I)
+import Interface.PropertyManager.Choices.RequestCreateGarageProperty qualified as RequestCreateGarageProperty(I)
+import Interface.PropertyManager.Choices.RequestCreateWarehouseProperty qualified as RequestCreateWarehouseProperty(I)
+import Interface.PropertyManager.Property.ApartmentProperty.Factory qualified as ApartmentProperty(Factory(..))
+import Interface.PropertyManager.Property.LandProperty.Factory qualified as LandProperty(Factory(..))
+import Interface.PropertyManager.Property.ResidenceProperty.Factory qualified as ResidenceProperty(Factory(..))
+import Interface.PropertyManager.Property.GarageProperty.Factory qualified as GarageProperty(Factory(..))
+import Interface.PropertyManager.Property.WarehouseProperty.Factory qualified as WarehouseProperty(Factory(..))
+
+import Interface.Common.Types (PropertyKey(..), PropertyKey(..), PropertyKey(..))
+import Interface.PropertyManager.Property.Common (WarehouseType, GarageType, LandType, ViableConstructionTypes, ResidenceType, Parking, Orientation)
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap, Id, InstrumentKey)
+
+type I = Service
+
+type O = Offer
+
+type R = Request
+
+data View = View
+    with
+        apartmentPropertyFactoryCid: ContractId ApartmentProperty.Factory 
+        landPropertyFactoryCid: ContractId LandProperty.Factory 
+        residencePropertyFactoryCid: ContractId ResidenceProperty.Factory
+        garagePropertyFactoryCid: ContractId GarageProperty.Factory
+        warehousePropertyFactoryCid: ContractId WarehouseProperty.Factory  
+    deriving (Eq, Show)
+
+data OView = OView
+  with
+    operator : Party
+    user : Party
+    apartmentPropertyFactoryCid: ContractId ApartmentProperty.Factory
+    landPropertyFactoryCid: ContractId LandProperty.Factory 
+    residencePropertyFactoryCid: ContractId ResidenceProperty.Factory 
+    garagePropertyFactoryCid: ContractId GarageProperty.Factory
+    warehousePropertyFactoryCid: ContractId WarehouseProperty.Factory 
+  deriving(Eq, Show)
+
+data RView = RView
+  with
+    operator : Party
+    user : Party
+  deriving(Eq, Show)
+
+interface Service where
+    viewtype View
+
+    asBase : Base.I
+    
+    requestCreateApartmentProperty : RequestCreateApartmentProperty -> Update (ContractId RequestCreateApartmentProperty.I)
+    createApartmentProperty: CreateApartmentProperty -> Update (InstrumentKey,PropertyKey) 
+
+    requestCreateLandProperty : RequestCreateLandProperty -> Update (ContractId RequestCreateLandProperty.I)
+    createLandProperty: CreateLandProperty -> Update (InstrumentKey,PropertyKey)
+
+    requestCreateResidenceProperty : RequestCreateResidenceProperty -> Update (ContractId RequestCreateResidenceProperty.I)
+    createResidenceProperty: CreateResidenceProperty -> Update (InstrumentKey,PropertyKey)
+
+    requestCreateGarageProperty : RequestCreateGarageProperty -> Update (ContractId RequestCreateGarageProperty.I)
+    createGarageProperty: CreateGarageProperty -> Update (InstrumentKey,PropertyKey)
+
+    requestCreateWarehouseProperty : RequestCreateWarehouseProperty -> Update (ContractId RequestCreateWarehouseProperty.I)
+    createWarehouseProperty: CreateWarehouseProperty -> Update (InstrumentKey,PropertyKey)
+
+    updateApartmentInstrumentKey : UpdateApartmentInstrumentKey -> Update()
+
+    updateApartmentPropertyAddress : UpdateApartmentPropertyAddress -> Update()
+
+    updateApartmentPropertyPostalCode : UpdateApartmentPropertyPostalCode -> Update()
+
+    updateApartmentPropertyDistrict : UpdateApartmentPropertyDistrict -> Update()
+
+    updateApartmentPropertyCounty : UpdateApartmentPropertyCounty -> Update()
+
+    updateApartmentGrossArea : UpdateApartmentGrossArea -> Update()
+
+    updateApartmentUsableArea : UpdateApartmentUsableArea -> Update()
+
+    updateApartmentBedrooms : UpdateApartmentBedrooms -> Update()
+
+    updateApartmentBathrooms : UpdateApartmentBathrooms -> Update()
+
+    updateApartmentFloor : UpdateApartmentFloor -> Update()
+
+    updateApartmentParkingSpaces : UpdateApartmentParkingSpaces -> Update()
+
+    updateApartmentElevator : UpdateApartmentElevator -> Update()
+
+    updateApartmentBuildDate : UpdateApartmentBuildDate -> Update()
+
+    updateApartmentInstalledEquipment : UpdateApartmentInstalledEquipment -> Update()
+
+    updateApartmentAdditionalInformation : UpdateApartmentAdditionalInformation -> Update()
+
+    updateApartmentDescription : UpdateApartmentDescription -> Update()
+
+------------------------------------------------
+
+    updateLandInstrumentKey : UpdateLandInstrumentKey -> Update()
+
+    updateLandPropertyAddress : UpdateLandPropertyAddress -> Update()
+
+    updateLandPropertyPostalCode : UpdateLandPropertyPostalCode -> Update()
+
+    updateLandPropertyDistrict : UpdateLandPropertyDistrict -> Update()
+
+    updateLandPropertyCounty : UpdateLandPropertyCounty -> Update()
+
+    updateLandType : UpdateLandType -> Update()
+
+    updateTotalLandArea : UpdateTotalLandArea -> Update()
+
+    updateMinimumSurfaceForSale : UpdateMinimumSurfaceForSale -> Update()
+
+    updateLandBuildableArea : UpdateLandBuildableArea -> Update()
+
+    updateLandBuildableFloors : UpdateLandBuildableFloors -> Update()
+
+    updateLandAccessByRoad : UpdateLandAccessByRoad -> Update()
+
+    updateLandInstalledEquipment : UpdateLandInstalledEquipment -> Update()
+
+    updateLandViableConstructionTypes : UpdateLandViableConstructionTypes -> Update()
+
+    updateLandAdditionalInformation : UpdateLandAdditionalInformation -> Update()
+
+    updateLandDescription : UpdateLandDescription -> Update()
+
+------------------------------------------------
+
+    updateResidenceInstrumentKey : UpdateResidenceInstrumentKey -> Update()
+
+    updateResidencePropertyAddress : UpdateResidencePropertyAddress -> Update()
+
+    updateResidencePropertyPostalCode : UpdateResidencePropertyPostalCode -> Update()
+
+    updateResidencePropertyDistrict : UpdateResidencePropertyDistrict -> Update()
+
+    updateResidencePropertyCounty : UpdateResidencePropertyCounty -> Update()
+
+    updateResidenceGrossArea : UpdateResidenceGrossArea -> Update()
+
+    updateResidenceUsableArea : UpdateResidenceUsableArea -> Update()
+
+    updateResidenceBedrooms : UpdateResidenceBedrooms -> Update()
+
+    updateResidenceBathrooms : UpdateResidenceBathrooms -> Update()
+
+    updateResidenceFloors : UpdateResidenceFloors -> Update()
+
+    updateResidenceType : UpdateResidenceType -> Update()
+
+    updateResidenceBackyard : UpdateResidenceBackyard -> Update()
+
+    updateResidenceParking : UpdateResidenceParking -> Update()
+
+    updateResidenceOrientation : UpdateResidenceOrientation -> Update()
+
+    updateResidenceBuildDate : UpdateResidenceBuildDate -> Update()
+
+    updateResidenceInstalledEquipment : UpdateResidenceInstalledEquipment -> Update()
+
+    updateResidenceAdditionalInformation : UpdateResidenceAdditionalInformation -> Update()
+
+    updateResidenceDescription : UpdateResidenceDescription -> Update()
+
+------------------------------------------------
+
+    updateGarageInstrumentKey : UpdateGarageInstrumentKey -> Update()
+
+    updateGaragePropertyAddress : UpdateGaragePropertyAddress -> Update()
+
+    updateGaragePropertyPostalCode : UpdateGaragePropertyPostalCode -> Update()
+
+    updateGaragePropertyDistrict : UpdateGaragePropertyDistrict -> Update()
+
+    updateGaragePropertyCounty : UpdateGaragePropertyCounty -> Update()
+
+    updateGarageArea : UpdateGarageArea -> Update()
+
+    updateGarageType : UpdateGarageType -> Update()
+
+    updateVehicleCapacity : UpdateVehicleCapacity -> Update()
+
+    updateGarageInstalledEquipment : UpdateGarageInstalledEquipment -> Update()
+
+    updateGarageAdditionalInformation : UpdateGarageAdditionalInformation -> Update()
+
+    updateGarageDescription : UpdateGarageDescription -> Update()
+
+------------------------------------------------
+
+    updateWarehouseInstrumentKey : UpdateWarehouseInstrumentKey -> Update()
+
+    updateWarehousePropertyAddress : UpdateWarehousePropertyAddress -> Update()
+
+    updateWarehousePropertyPostalCode : UpdateWarehousePropertyPostalCode -> Update()
+
+    updateWarehousePropertyDistrict : UpdateWarehousePropertyDistrict -> Update()
+
+    updateWarehousePropertyCounty : UpdateWarehousePropertyCounty -> Update()
+
+    updateWarehouseType : UpdateWarehouseType -> Update()
+
+    updateWarehouseGrossArea : UpdateWarehouseGrossArea -> Update()
+
+    updateWarehouseUsableArea : UpdateWarehouseUsableArea -> Update()
+
+    updateWarehouseFloors : UpdateWarehouseFloors -> Update()
+
+    updateWarehouseBuildDate : UpdateWarehouseBuildDate -> Update()
+
+    updateWarehouseInstalledEquipment : UpdateWarehouseInstalledEquipment -> Update()
+
+    updateWarehouseAdditionalInformation : UpdateWarehouseAdditionalInformation -> Update()
+
+    updateWarehouseDescription : UpdateWarehouseDescription -> Update()
+
+--------------------------------------------------
+
+    nonconsuming choice RequestCreateApartmentProperty : ContractId RequestCreateApartmentProperty.I
+      with
+          id: Id
+          apartmentInstrument: InstrumentKey
+          propertyAddress: Text
+          propertyPostalCode : Text
+          propertyDistrict : Text
+          propertyCounty : Text
+          grossArea: Decimal
+          usableArea: Decimal
+          bedrooms: Int
+          bathrooms: Int
+          floor: Int
+          parkingSpaces: Int
+          elevator: Bool
+          buildDate: Date
+          installedEquipment: Text
+          additionalInformation: Text
+          description: Text
+          observers : PartiesMap
+      controller (view $ asBase this).user
+      do
+        requestCreateApartmentProperty this arg
+
+    nonconsuming choice CreateApartmentProperty : (InstrumentKey,PropertyKey)
+      with
+          createApartmentPropertyRequest: ContractId RequestCreateApartmentProperty.I
+      controller (view $ asBase this).operator
+      do
+        createApartmentProperty this arg
+    
+    nonconsuming choice RequestCreateLandProperty : ContractId RequestCreateLandProperty.I
+      with
+          id: Id
+          landInstrument: InstrumentKey
+          propertyAddress: Text
+          propertyPostalCode : Text
+          propertyDistrict : Text
+          propertyCounty : Text
+          landType: LandType
+          totalLandArea: Decimal
+          minimumSurfaceForSale: Decimal
+          buildableArea: Decimal
+          buildableFloors: Int
+          accessByRoad: Bool
+          installedEquipment: Text
+          viableConstructionTypes: [ViableConstructionTypes]
+          additionalInformation: Text
+          description: Text
+          observers : PartiesMap
+      controller (view $ asBase this).user
+      do
+        requestCreateLandProperty this arg
+
+    nonconsuming choice CreateLandProperty : (InstrumentKey,PropertyKey)
+      with
+          createLandPropertyRequest: ContractId RequestCreateLandProperty.I
+      controller (view $ asBase this).operator
+      do
+        createLandProperty this arg
+    
+    nonconsuming choice RequestCreateResidenceProperty : ContractId RequestCreateResidenceProperty.I
+      with
+          id: Id
+          residenceInstrument: InstrumentKey
+          propertyAddress: Text
+          propertyPostalCode : Text
+          propertyDistrict : Text
+          propertyCounty : Text
+          grossArea: Decimal
+          usableArea: Decimal
+          bedrooms: Int
+          bathrooms: Int
+          floors: Int
+          residenceType: ResidenceType 
+          backyard: Text --m^2, frontwards, backwards...
+          parking: Parking 
+          buildDate: Date
+          orientation: Orientation
+          installedEquipment: Text
+          additionalInformation: Text
+          description: Text
+          observers : PartiesMap
+      controller (view $ asBase this).user
+      do
+        requestCreateResidenceProperty this arg
+
+    nonconsuming choice CreateResidenceProperty : (InstrumentKey,PropertyKey)
+      with
+          createResidencePropertyRequest: ContractId RequestCreateResidenceProperty.I
+      controller (view $ asBase this).operator
+      do
+        createResidenceProperty this arg
+
+    nonconsuming choice RequestCreateGarageProperty : ContractId RequestCreateGarageProperty.I
+      with
+          id: Id
+          garageInstrument: InstrumentKey
+          propertyAddress: Text
+          propertyPostalCode : Text
+          propertyDistrict : Text
+          propertyCounty : Text
+          garageArea: Decimal
+          garageType: GarageType
+          vehicleCapacity: Int
+          installedEquipment: Text
+          additionalInformation: Text
+          description: Text
+          observers : PartiesMap
+      controller (view $ asBase this).user
+      do
+        requestCreateGarageProperty this arg
+
+    nonconsuming choice CreateGarageProperty : (InstrumentKey,PropertyKey)
+      with
+          createGaragePropertyRequest: ContractId RequestCreateGarageProperty.I
+      controller (view $ asBase this).operator
+      do
+        createGarageProperty this arg
+
+    nonconsuming choice RequestCreateWarehouseProperty : ContractId RequestCreateWarehouseProperty.I
+      with
+          id: Id
+          warehouseInstrument: InstrumentKey
+          propertyAddress: Text
+          propertyPostalCode : Text
+          propertyDistrict : Text
+          propertyCounty : Text
+          warehouseType: WarehouseType 
+          grossArea: Decimal
+          usableArea: Decimal
+          floors: Int
+          buildDate: Date
+          installedEquipment: Text
+          additionalInformation: Text
+          description: Text
+          observers : PartiesMap
+      controller (view $ asBase this).user
+      do
+        requestCreateWarehouseProperty this arg
+
+    nonconsuming choice CreateWarehouseProperty : (InstrumentKey,PropertyKey)
+      with
+          createWarehousePropertyRequest: ContractId RequestCreateWarehouseProperty.I
+      controller (view $ asBase this).operator
+      do
+        createWarehouseProperty this arg
+    
+    nonconsuming choice UpdateApartmentInstrumentKey : ()
+      with
+        newApartmentInstrumentKey : InstrumentKey
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentInstrumentKey this arg
+
+    nonconsuming choice UpdateApartmentPropertyAddress : ()
+      with
+        newApartmentPropertyAddress : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentPropertyAddress this arg
+
+    nonconsuming choice UpdateApartmentPropertyPostalCode : ()
+      with
+        newApartmentPropertyPostalCode : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentPropertyPostalCode this arg
+
+    nonconsuming choice UpdateApartmentPropertyDistrict : ()
+      with
+        newApartmentPropertyDistrict : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentPropertyDistrict this arg
+
+    nonconsuming choice UpdateApartmentPropertyCounty : ()
+      with
+        newApartmentPropertyCounty : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentPropertyCounty this arg
+
+    nonconsuming choice UpdateApartmentGrossArea : ()
+      with
+        newApartmentGrossArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentGrossArea this arg
+
+    nonconsuming choice UpdateApartmentUsableArea : ()
+      with
+        newApartmentUsableArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentUsableArea this arg
+    
+    nonconsuming choice UpdateApartmentBedrooms : ()
+      with
+        newApartmentBedrooms : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentBedrooms this arg
+    
+    nonconsuming choice UpdateApartmentBathrooms : ()
+      with
+        newApartmentBathrooms : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentBathrooms this arg
+    
+    nonconsuming choice UpdateApartmentFloor : ()
+      with
+        newApartmentFloor : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentFloor this arg
+
+    nonconsuming choice UpdateApartmentParkingSpaces : ()
+      with
+        newApartmentParkingSpaces : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentParkingSpaces this arg
+    
+    nonconsuming choice UpdateApartmentElevator : ()
+      with
+        newApartmentElevator : Bool
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentElevator this arg
+    
+    nonconsuming choice UpdateApartmentBuildDate : ()
+      with
+        newApartmentBuildDate : Date
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentBuildDate this arg
+    
+    nonconsuming choice UpdateApartmentInstalledEquipment : ()
+      with
+        newApartmentInstalledEquipment : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentInstalledEquipment this arg
+    
+    nonconsuming choice UpdateApartmentAdditionalInformation : ()
+      with
+        newApartmentAdditionalInformation : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentAdditionalInformation this arg
+    
+    nonconsuming choice UpdateApartmentDescription : ()
+      with
+        newApartmentDescription : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentDescription this arg
+
+----------------------
+
+    nonconsuming choice UpdateLandInstrumentKey : ()
+      with
+        newLandInstrumentKey : InstrumentKey
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandInstrumentKey this arg
+
+    nonconsuming choice UpdateLandPropertyAddress : ()
+      with
+        newLandPropertyAddress : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandPropertyAddress this arg
+
+    nonconsuming choice UpdateLandPropertyPostalCode : ()
+      with
+        newLandPropertyPostalCode : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandPropertyPostalCode this arg
+
+    nonconsuming choice UpdateLandPropertyDistrict : ()
+      with
+        newLandPropertyDistrict : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandPropertyDistrict this arg
+
+    nonconsuming choice UpdateLandPropertyCounty : ()
+      with
+        newLandPropertyCounty : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandPropertyCounty this arg
+ 
+    nonconsuming choice UpdateLandType : ()
+      with
+        newLandType : LandType
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandType this arg
+    
+    nonconsuming choice UpdateTotalLandArea : ()
+      with
+        newTotalLandArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateTotalLandArea this arg
+    
+    nonconsuming choice UpdateMinimumSurfaceForSale : ()
+      with
+        newLandMinimumSurfaceForSale : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateMinimumSurfaceForSale this arg
+    
+    nonconsuming choice UpdateLandBuildableArea : ()
+      with
+        newLandBuildableArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandBuildableArea this arg
+    
+    nonconsuming choice UpdateLandBuildableFloors : ()
+      with
+        newLandBuildableFloors : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandBuildableFloors this arg
+    
+    nonconsuming choice UpdateLandAccessByRoad : ()
+      with
+        newLandAccessByRoad : Bool
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandAccessByRoad this arg
+    
+    nonconsuming choice UpdateLandInstalledEquipment : ()
+      with
+        newLandInstalledEquipment : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandInstalledEquipment this arg
+    
+    nonconsuming choice UpdateLandViableConstructionTypes : ()
+      with
+        newLandViableConstructionTypes : [ViableConstructionTypes]
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandViableConstructionTypes this arg
+    
+    nonconsuming choice UpdateLandAdditionalInformation : ()
+      with
+        newLandAdditionalInformation : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandAdditionalInformation this arg
+    
+    nonconsuming choice UpdateLandDescription : ()
+      with
+        newLandDescription : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandDescription this arg
+
+------------------------
+    
+    nonconsuming choice UpdateResidenceInstrumentKey : ()
+      with
+        newResidenceInstrumentKey : InstrumentKey
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceInstrumentKey this arg
+
+    nonconsuming choice UpdateResidencePropertyAddress : ()
+      with
+        newResidencePropertyAddress : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidencePropertyAddress this arg
+
+    nonconsuming choice UpdateResidencePropertyPostalCode : ()
+      with
+        newResidencePropertyPostalCode : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidencePropertyPostalCode this arg
+
+    nonconsuming choice UpdateResidencePropertyDistrict : ()
+      with
+        newResidencePropertyDistrict : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidencePropertyDistrict this arg
+
+    nonconsuming choice UpdateResidencePropertyCounty : ()
+      with
+        newResidencePropertyCounty : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidencePropertyCounty this arg
+
+    nonconsuming choice UpdateResidenceGrossArea : ()
+      with
+        newResidenceGrossArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceGrossArea this arg
+
+    nonconsuming choice UpdateResidenceUsableArea : ()
+      with
+        newResidenceUsableArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceUsableArea this arg
+    
+    nonconsuming choice UpdateResidenceBedrooms : ()
+      with
+        newResidenceBedrooms : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceBedrooms this arg
+    
+    nonconsuming choice UpdateResidenceBathrooms : ()
+      with
+        newResidenceBathrooms : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceBathrooms this arg
+    
+    nonconsuming choice UpdateResidenceFloors : ()
+      with
+        newResidenceFloors : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceFloors this arg
+
+    nonconsuming choice UpdateResidenceType : ()
+      with
+        newResidenceType : ResidenceType
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceType this arg
+    
+    nonconsuming choice UpdateResidenceBackyard : ()
+      with
+        newResidenceBackyardDescription : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceBackyard this arg
+
+    nonconsuming choice UpdateResidenceParking : ()
+      with
+        newResidenceParking : Parking
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceParking this arg
+
+    nonconsuming choice UpdateResidenceOrientation : ()
+      with
+        newResidenceOrientation : Orientation
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceOrientation this arg
+    
+    nonconsuming choice UpdateResidenceBuildDate : ()
+      with
+        newResidenceBuildDate : Date
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceBuildDate this arg
+    
+    nonconsuming choice UpdateResidenceInstalledEquipment : ()
+      with
+        newResidenceInstalledEquipment : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceInstalledEquipment this arg
+    
+    nonconsuming choice UpdateResidenceAdditionalInformation : ()
+      with
+        newResidenceAdditionalInformation : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceAdditionalInformation this arg
+    
+    nonconsuming choice UpdateResidenceDescription : ()
+      with
+        newResidenceDescription : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidenceDescription this arg
+-----------------------------------------------------------------------------
+
+    nonconsuming choice UpdateGarageInstrumentKey : ()
+      with
+        newGarageInstrumentKey : InstrumentKey
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGarageInstrumentKey this arg
+
+    nonconsuming choice UpdateGaragePropertyAddress : ()
+      with
+        newGaragePropertyAddress : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGaragePropertyAddress this arg
+
+    nonconsuming choice UpdateGaragePropertyPostalCode : ()
+      with
+        newGaragePropertyPostalCode : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGaragePropertyPostalCode this arg
+
+    nonconsuming choice UpdateGaragePropertyDistrict : ()
+      with
+        newGaragePropertyDistrict : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGaragePropertyDistrict this arg
+
+    nonconsuming choice UpdateGaragePropertyCounty : ()
+      with
+        newGaragePropertyCounty : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGaragePropertyCounty this arg
+
+    nonconsuming choice UpdateGarageArea : ()
+      with
+        newGarageArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGarageArea this arg
+
+    nonconsuming choice UpdateGarageType : ()
+      with
+        newGarageType : GarageType
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGarageType this arg
+    
+    nonconsuming choice UpdateVehicleCapacity : ()
+      with
+        newVehicleCapacity : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateVehicleCapacity this arg
+    
+    nonconsuming choice UpdateGarageInstalledEquipment : ()
+      with
+        newGarageInstalledEquipment : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGarageInstalledEquipment this arg
+    
+    nonconsuming choice UpdateGarageAdditionalInformation : ()
+      with
+        newGarageAdditionalInformation : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGarageAdditionalInformation this arg
+    
+    nonconsuming choice UpdateGarageDescription : ()
+      with
+        newGarageDescription : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGarageDescription this arg
+
+----------------------------------------------------------
+
+    nonconsuming choice UpdateWarehouseInstrumentKey : ()
+      with
+        newWarehouseInstrumentKey : InstrumentKey
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseInstrumentKey this arg
+
+    nonconsuming choice UpdateWarehousePropertyAddress : ()
+      with
+        newWarehousePropertyAddress : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehousePropertyAddress this arg
+
+    nonconsuming choice UpdateWarehousePropertyPostalCode : ()
+      with
+        newWarehousePropertyPostalCode : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehousePropertyPostalCode this arg
+
+    nonconsuming choice UpdateWarehousePropertyDistrict : ()
+      with
+        newWarehousePropertyDistrict : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehousePropertyDistrict this arg
+
+    nonconsuming choice UpdateWarehousePropertyCounty : ()
+      with
+        newWarehousePropertyCounty : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehousePropertyCounty this arg
+    
+    nonconsuming choice UpdateWarehouseType : ()
+      with
+        newWarehouseType : WarehouseType
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseType this arg
+
+    nonconsuming choice UpdateWarehouseGrossArea : ()
+      with
+        newWarehouseGrossArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseGrossArea this arg
+
+    nonconsuming choice UpdateWarehouseUsableArea : ()
+      with
+        newWarehouseUsableArea : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseUsableArea this arg
+    
+    nonconsuming choice UpdateWarehouseFloors : ()
+      with
+        newWarehouseFloors : Int
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseFloors this arg
+    
+    nonconsuming choice UpdateWarehouseBuildDate : ()
+      with
+        newWarehouseBuildDate : Date
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseBuildDate this arg
+    
+    nonconsuming choice UpdateWarehouseInstalledEquipment : ()
+      with
+        newWarehouseInstalledEquipment : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseInstalledEquipment this arg
+    
+    nonconsuming choice UpdateWarehouseAdditionalInformation : ()
+      with
+        newWarehouseAdditionalInformation : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseAdditionalInformation this arg
+    
+    nonconsuming choice UpdateWarehouseDescription : ()
+      with
+        newWarehouseDescription : Text
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehouseDescription this arg
+ 
+interface Offer where
+  viewtype OView
+
+  accept : Accept -> Update (ContractId Service)
+  decline : Decline -> Update ()
+  withdraw : Withdraw -> Update ()
+
+  choice Accept : ContractId Service
+    controller (view this).user
+    do
+      accept this arg
+
+  choice Decline : ()
+    controller (view this).user
+    do
+      decline this arg
+
+  choice Withdraw : ()
+    controller (view this).operator
+    do
+      withdraw this arg
+
+interface Request where
+  viewtype RView
+
+  cancel : Cancel -> Update ()
+  reject : Reject -> Update ()
+  approve : Approve -> Update (ContractId Service)
+
+  choice Cancel : ()
+    controller (view this).user
+    do
+      cancel this arg
+
+  choice Reject : ()
+    controller (view this).operator
+    do
+      reject this arg
+
+  choice Approve : ContractId Service
+    with
+      operator: Party
+      apartmentPropertyFactoryCid: ContractId ApartmentProperty.Factory
+      landPropertyFactoryCid: ContractId LandProperty.Factory
+      residencePropertyFactoryCid: ContractId ResidenceProperty.Factory
+      garagePropertyFactoryCid: ContractId GarageProperty.Factory
+      warehousePropertyFactoryCid: ContractId WarehouseProperty.Factory 
+    controller operator
+    do
+      approve this arg
+
+type ImplementationService t = (HasToInterface t Service, Base.Implementation t)
+class (ImplementationService t) => HasImplementation t
+instance HasImplementation Service
+instance HasToInterface Service Base.I where _toInterface = asBase

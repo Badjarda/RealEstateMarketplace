@@ -1,0 +1,123 @@
+module App.ProfileManager.Service where
+
+import Interface.ProfileManager.Service qualified as Service(I, R, O, View(..), OView(..), RView(..),RequestCreateUserProfile(..), UpdateUsername(..), UpdateFullName(..), UpdateFirstName(..), UpdateLastName(..), UpdateBirthday(..), UpdateGender(..), UpdateNationality(..), UpdateContactMail(..), UpdateCellphoneNumber(..), UpdateTaxId(..), UpdateSocialSecurityId(..), CreateUserProfile(..), Accept(..), Decline(..), Withdraw(..), Approve(..), Reject(..), Cancel(..))
+import Interface.ProfileManager.UserProfile.Factory qualified as UserProfile(Factory(..))
+import Interface.Base.Service qualified as Base (I, View(..))
+import Interface.RoleManager.UserRole.Permission
+import App.ProfileManager.Util (CreateUserProfileRequest(..), CreateUserProfile(..), UpdateUsernameRequest(..), UpdateFullNameRequest(..), UpdateFirstNameRequest(..), UpdateLastNameRequest(..), UpdateBirthdayRequest(..), UpdateGenderRequest(..), UpdateNationalityRequest(..), UpdateContactMailRequest(..), UpdateCellphoneNumberRequest(..), UpdateTaxIdRequest(..), UpdateSocialSecurityIdRequest(..), requestCreateUserProfileAux, createUserProfileAux, updateUsernameAux, updateFullNameAux, updateFirstNameAux, updateLastNameAux, updateBirthdayAux, updateGenderAux, updateNationalityAux, updateContactMailAux, updateCellphoneNumberAux, updateTaxIdAux, updateSocialSecurityIdAux)
+
+type T = Service
+
+template Service 
+  with
+    operator: Party
+    user: Party
+    userProfileFactoryCid: ContractId UserProfile.Factory 
+  where
+  signatory operator, user
+
+  key (operator, user) : (Party, Party)
+  maintainer key._1
+
+  interface instance Base.I for Service where
+    view = Base.View with operator; user
+    terminate = pure ()
+
+  interface instance Service.I for Service where
+    view = Service.View with userProfileFactoryCid
+
+    asBase = toInterface @Base.I this
+
+    requestCreateUserProfile Service.RequestCreateUserProfile{id,username,firstName,lastName,fullName,birthday,gender,nationality,contactMail,cellphoneNumber,taxId,socialSecurityId,observers} = do
+      let requestCreateUserProfileParams = CreateUserProfileRequest with permission = MANAGE_ROLE, ..
+      requestCreateUserProfileAux requestCreateUserProfileParams
+
+    createUserProfile Service.CreateUserProfile{createUserProfileRequest} = do
+      let createUserProfileParams = CreateUserProfile with ..
+      createUserProfileAux createUserProfileParams
+
+    updateUsername Service.UpdateUsername{userProfileKey, newUsername} = do
+      let requestUpdateUsernameParams = UpdateUsernameRequest with ..
+      updateUsernameAux requestUpdateUsernameParams
+
+    updateFirstName Service.UpdateFirstName{userProfileKey, newFirstName} = do
+      let requestUpdateFirstNameParams = UpdateFirstNameRequest with ..
+      updateFirstNameAux requestUpdateFirstNameParams
+
+    updateLastName Service.UpdateLastName{userProfileKey, newLastName} = do
+      let requestUpdateLastNameParams = UpdateLastNameRequest with ..
+      updateLastNameAux requestUpdateLastNameParams
+      
+    updateContactMail Service.UpdateContactMail{userProfileKey, newContactMail} = do
+      let requestUpdateContactMailParams = UpdateContactMailRequest with ..
+      updateContactMailAux requestUpdateContactMailParams
+    
+    updateFullName Service.UpdateFullName{userProfileKey, newFullName} = do
+      let requestUpdateFullNameParams = UpdateFullNameRequest with ..
+      updateFullNameAux requestUpdateFullNameParams
+
+    updateBirthday Service.UpdateBirthday{userProfileKey, newBirthday} = do
+      let requestUpdateBirthdayParams = UpdateBirthdayRequest with ..
+      updateBirthdayAux requestUpdateBirthdayParams
+
+    updateGender Service.UpdateGender{userProfileKey, newGender} = do
+      let requestUpdateGenderParams = UpdateGenderRequest with ..
+      updateGenderAux requestUpdateGenderParams
+
+    updateNationality Service.UpdateNationality{userProfileKey, newNationality} = do
+      let requestUpdateNationalityParams = UpdateNationalityRequest with ..
+      updateNationalityAux requestUpdateNationalityParams
+
+    updateCellphoneNumber Service.UpdateCellphoneNumber{userProfileKey, newCellphoneNumber} = do
+      let requestUpdateCellphoneNumberParams = UpdateCellphoneNumberRequest with ..
+      updateCellphoneNumberAux requestUpdateCellphoneNumberParams
+
+    updateTaxId Service.UpdateTaxId{userProfileKey, newTaxId} = do
+      let requestUpdateTaxIdParams = UpdateTaxIdRequest with ..
+      updateTaxIdAux requestUpdateTaxIdParams
+
+    updateSocialSecurityId Service.UpdateSocialSecurityId{userProfileKey, newSocialSecurityId} = do
+      let requestUpdateSocialSecurityIdParams = UpdateSocialSecurityIdRequest with ..
+      updateSocialSecurityIdAux requestUpdateSocialSecurityIdParams
+
+template Offer
+  with
+    operator : Party
+    user : Party
+    userProfileFactoryCid: ContractId UserProfile.Factory 
+  where
+  signatory operator
+  observer user
+
+  interface instance Service.O for Offer where
+    view = Service.OView with operator, user, userProfileFactoryCid
+
+    accept Service.Accept = do
+      toInterfaceContractId <$> create Service with operator, user, userProfileFactoryCid
+
+    decline Service.Decline{} = do
+      pure()
+
+    withdraw Service.Withdraw{} = do
+      pure()
+
+template Request
+  with
+    operator : Party
+    user : Party
+  where
+  signatory user
+  observer operator
+
+  interface instance Service.R for Request where
+    view = Service.RView with operator,user
+
+    approve Service.Approve{operator, userProfileFactoryCid} = do
+      toInterfaceContractId <$> create Service with operator, user, userProfileFactoryCid
+
+    reject Service.Reject{} = do
+      pure()
+      
+    cancel Service.Cancel{} = do
+      pure()
+

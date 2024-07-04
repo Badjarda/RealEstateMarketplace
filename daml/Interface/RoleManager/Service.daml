@@ -1,0 +1,141 @@
+module Interface.RoleManager.Service where
+
+import Interface.Base.Service qualified as Base (I, Implementation)
+import Interface.Common.Types (UserRoleKey(..))
+
+import Interface.RoleManager.UserRole.Factory qualified as UserRole(Factory(..))
+import Interface.RoleManager.UserRole.Permission
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap, Id)
+
+
+type I = Service
+
+type O = Offer
+
+type R = Request
+
+data View = View
+    with
+        userRoleFactoryCid: ContractId UserRole.Factory 
+    deriving (Eq, Show)
+
+data OView = OView
+  with
+    operator : Party
+    user : Party
+    userRoleFactoryCid: ContractId UserRole.Factory 
+  deriving(Eq, Show)
+
+data RView = RView
+  with
+    operator : Party
+    user : Party
+  deriving(Eq, Show)
+
+interface Service where
+    viewtype View
+
+    asBase : Base.I
+    
+    createUserRole: CreateUserRole -> Update (UserRoleKey) 
+    deleteUserRole: DeleteUserRole -> Update () 
+
+    addPermissionToUserRole : AddPermissionToUserRole -> Update ()
+    removePermissionInUserRole : RemovePermissionInUserRole -> Update ()
+    updateUserRole : UpdateUserRole -> Update ()
+
+    nonconsuming choice CreateUserRole : UserRoleKey
+      with
+          id : Id
+          description : Text
+          permissions : [Permission]
+          observers : PartiesMap
+      controller (view $ asBase this).operator
+      do
+          createUserRole this arg
+
+    nonconsuming choice DeleteUserRole : ()
+      with
+          userRole : UserRoleKey
+      controller (view $ asBase this).operator
+      do
+          deleteUserRole this arg
+
+    nonconsuming choice AddPermissionToUserRole : ()
+      with
+        userRole : UserRoleKey
+        permission : Permission
+      controller (view $ asBase this).operator
+      do
+        addPermissionToUserRole this arg
+
+    nonconsuming choice RemovePermissionInUserRole : ()
+      with
+        userRole : UserRoleKey
+        permission : Permission
+      controller (view $ asBase this).operator
+      do
+        removePermissionInUserRole this arg
+    
+    nonconsuming choice UpdateUserRole : ()
+      with
+        userRole : UserRoleKey
+        permissions : [Permission]
+      controller (view $ asBase this).operator
+      do
+        updateUserRole this arg
+    
+
+interface Offer where
+  viewtype OView
+
+  accept : Accept -> Update (ContractId Service)
+  decline : Decline -> Update ()
+  withdraw : Withdraw -> Update ()
+
+  choice Accept : ContractId Service
+    controller (view this).user
+    do
+      accept this arg
+
+  choice Decline : ()
+    controller (view this).user
+    do
+      decline this arg
+
+  choice Withdraw : ()
+    controller (view this).operator
+    do
+      withdraw this arg
+
+interface Request where
+  viewtype RView
+
+  cancel : Cancel -> Update ()
+  reject : Reject -> Update ()
+  approve : Approve -> Update (ContractId Service)
+
+  choice Cancel : ()
+    controller (view this).user
+    do
+      cancel this arg
+
+  choice Reject : ()
+    controller (view this).operator
+    do
+      reject this arg
+
+  choice Approve : ContractId Service
+    with
+      operator: Party
+      userRoleFactoryCid: ContractId UserRole.Factory 
+    controller operator, (view this).operator
+    do
+      approve this arg
+
+
+type ImplementationService t = (HasToInterface t Service, Base.Implementation t)
+class (ImplementationService t) => HasImplementation t
+instance HasImplementation Service
+instance HasToInterface Service Base.I where _toInterface = asBase

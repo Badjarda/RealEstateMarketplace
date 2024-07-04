@@ -1,0 +1,23 @@
+module Interface.Common.Types where
+
+import Daml.Finance.Interface.Types.Common.Types (Id)
+
+data UserRoleKey = UserRoleKey
+  with
+    operator: Party
+    id: Id
+  deriving (Eq, Ord, Show)
+
+data UserProfileKey = UserProfileKey
+  with
+    operator: Party
+    user: Party
+    id: Id
+  deriving (Eq, Ord, Show)
+
+data PropertyKey = PropertyKey
+  with
+    operator: Party
+    user: Party
+    id: Id
+  deriving (Eq, Ord, Show)

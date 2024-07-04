@@ -1,0 +1,45 @@
+module Interface.PropertyManager.Property.ApartmentProperty.Factory where
+
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (I)
+
+import Daml.Finance.Interface.Types.Common.Types (InstrumentKey,PartiesMap)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I)
+
+type I = Factory
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+  deriving (Eq, Show)
+
+interface Factory requires Disclosure.I where
+  viewtype V
+
+  create' : Create -> Update (ContractId ApartmentProperty.I)
+
+  nonconsuming choice Create : ContractId ApartmentProperty.I
+    with
+      instrument: InstrumentKey
+      propertyKey: PropertyKey
+      propertyAddress: Text
+      propertyPostalCode : Text
+      propertyDistrict : Text
+      propertyCounty : Text
+      grossArea: Decimal
+      usableArea: Decimal
+      bedrooms: Int
+      bathrooms: Int
+      floor: Int
+      parkingSpaces: Int
+      elevator: Bool
+      buildDate: Date
+      installedEquipment: Text
+      additionalInformation: Text
+      description: Text
+      observers : PartiesMap
+    controller propertyKey.operator, propertyKey.user
+    do
+      create' this arg

@@ -1,0 +1,45 @@
+module Interface.PropertyManager.Property.LandProperty.Factory where
+
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.Common (LandType, ViableConstructionTypes)
+import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty (I)
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I)
+
+type I = Factory
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+  deriving (Eq, Show)
+
+interface Factory requires Disclosure.I where
+  viewtype V
+
+  create' : Create -> Update (ContractId LandProperty.I)
+
+  nonconsuming choice Create : ContractId LandProperty.I
+    with
+      instrument: InstrumentKey
+      propertyKey: PropertyKey
+      propertyAddress: Text
+      propertyPostalCode : Text
+      propertyDistrict : Text
+      propertyCounty : Text
+      landType: LandType
+      totalLandArea: Decimal
+      minimumSurfaceForSale: Decimal
+      buildableArea: Decimal
+      buildableFloors: Int
+      accessByRoad: Bool
+      installedEquipment: Text
+      viableConstructionTypes: [ViableConstructionTypes]
+      additionalInformation: Text
+      description: Text
+      observers : PartiesMap
+    controller propertyKey.operator, propertyKey.user
+    do
+      create' this arg

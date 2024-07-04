@@ -1,0 +1,14 @@
+module Interface.RoleManager.UserRole.Permission where
+
+data Permission =
+  VIEW_ALL_MARKETPLACE_TRANSACTIONS    |
+  MANAGE_ALL_MARKETPLACE_TRANSACTIONS  |
+  --role
+  VIEW_ROLE                            |
+  MANAGE_ROLE                          |
+  --permission
+  MANAGE_PERMISSION                    |
+  --transaction 
+    VIEW_TRANSACTION                   |
+  MANAGE_TRANSACTION                
+  deriving (Eq, Show)

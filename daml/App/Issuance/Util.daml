@@ -1,0 +1,101 @@
+module App.Issuance.Util where
+
+import DA.Assert ((===))
+
+import Interface.RoleManager.UserRole.Permission
+import Interface.Issuance.Issuance qualified as Issuance (I)
+import Interface.Issuance.Choices.IssueRequest qualified as IssueRequest (I, View(..))
+import Interface.Issuance.Choices.DeIssueRequest qualified as DeIssueRequest (I, View(..))
+import Interface.Common.Util (fetchAndRemove)
+import App.Util qualified as RealtorUtil (hasPermission)
+import App.Issuance.Model qualified as IssuanceModel
+import App.Credential.Credential
+
+import Daml.Finance.Interface.Account.Account qualified as Account (I, Credit(..), Debit(..), exerciseInterfaceByKey)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Types.Common.Types (Id, AccountKey(..), InstrumentQuantity)
+import Daml.Finance.Interface.Account.Util (getAccount)
+import Daml.Finance.Interface.Holding.Util (getAmount)
+
+
+data IssueRequest = IssueRequest
+  with
+    operator : Party
+    user : Party
+    issuanceId : Id
+    description : Text
+    quantity : InstrumentQuantity
+    account : AccountKey
+    permission : Permission
+
+issueRequestAux : IssueRequest -> Update (ContractId IssueRequest.I)
+issueRequestAux request = do
+    (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+    permission <- RealtorUtil.hasPermission credential.roles request.permission
+    assertMsg "You do not have permission to issue an instrument" permission 
+    toInterfaceContractId <$> create IssuanceModel.IssueRequest with
+      operator = request.operator  
+      user = request.user 
+      issuanceId = request.issuanceId
+      description = request.description
+      quantity = request.quantity
+      account = request.account
+
+data DeIssueRequest = DeIssueRequest
+  with
+    operator : Party
+    user : Party
+    issuanceId : Id
+    holdingCid : ContractId Holding.I
+    permission : Permission
+
+deIssueRequestAux : DeIssueRequest -> Update (ContractId DeIssueRequest.I)
+deIssueRequestAux request = do
+    (_, credential) <-  fetchByKey @Credential (request.operator, request.user)
+    permission <- RealtorUtil.hasPermission credential.roles request.permission
+    assertMsg "You do not have permission to deissue an instrument" permission 
+    toInterfaceContractId <$> create IssuanceModel.DeIssueRequest with
+      operator = request.operator
+      user = request.user
+      issuanceId = request.issuanceId
+      holdingCid = request.holdingCid
+
+data Issue = Issue
+  with
+    operator : Party
+    user : Party
+    issueRequestCid : ContractId IssueRequest.I
+
+issueAux : Issue -> Update (ContractId Issuance.I, ContractId Holding.I)
+issueAux request = do
+    IssueRequest.View{issuanceId, description, quantity, account} <- view <$> fetchAndRemove request.issueRequestCid
+    issuanceCid <- toInterfaceContractId <$> create IssuanceModel.Issuance with
+      operator = request.operator
+      user = request.user
+      id = issuanceId
+      description = description
+      quantity = quantity
+    account.custodian === request.operator
+    account.owner === request.user
+    holdingCid <- Account.exerciseInterfaceByKey @Account.I account request.operator Account.Credit with quantity
+    pure (issuanceCid, holdingCid)
+
+data DeIssue = DeIssue
+  with
+    operator : Party
+    user : Party
+    deIssueRequestCid : ContractId DeIssueRequest.I
+
+deIssueAux : DeIssue -> Update  (ContractId Issuance.I)
+deIssueAux request = do
+      DeIssueRequest.View{issuanceId; holdingCid} <- view <$> fetchAndRemove request.deIssueRequestCid
+      holding <- fetch holdingCid
+      let
+        account = getAccount holding
+        amount = getAmount holding
+      account.custodian === request.operator
+      account.owner === request.user
+      Account.exerciseInterfaceByKey @Account.I account request.operator Account.Debit with holdingCid
+      (issuanceCid, issuance) <- fetchByKey @IssuanceModel.Issuance (request.operator, issuanceId)
+      archive issuanceCid
+      toInterfaceContractId <$> create issuance with quantity = (issuance.quantity with amount = issuance.quantity.amount - amount)

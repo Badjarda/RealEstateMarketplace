@@ -1,0 +1,214 @@
+module Test.Unit.PropertyTransactions where
+
+import Prelude hiding (Scenario)
+import Daml.Script
+import DA.Date
+import DA.Map (fromList, empty)
+import DA.Set (singleton)
+import DA.Time (time)
+
+import Interface.PropertyManager.Property.Common(LandType(..), ViableConstructionTypes(..), ResidenceType(..), Parking(..), Orientation(..), GarageType(..), WarehouseType(..))
+
+import Test.Util.Update.Role (createOperatorRole, createRoleUser)
+import Test.Util.Update.Workflow (createInitialUserRole)
+import Test.Util.Update.Service (createCustodyService, createPropertyManagerService, createIssuanceService)
+import Test.Util.Script.Workflow (issue, transfer, openAccount, deposit, originateToken, createApartmentProperty, createLandProperty, createResidenceProperty, createGarageProperty, createWarehouseProperty)
+import Test.Util.Update.Common (qty)
+import Test.Types (Fixture(..))
+
+import Daml.Finance.Interface.Types.Common.Types (HoldingStandard(..), Id(..), InstrumentKey(..))
+
+import Daml.Finance.Settlement.Hierarchy qualified as Settlement (Hierarchy(..))
+
+template Scenario
+  with
+    parties : [Party]
+  where
+    signatory parties
+
+    nonconsuming choice Setup : Fixture
+      controller parties
+      do
+        let [marketplace, seller, buyer, bank, public] = parties
+
+        -- Create Roles
+        createOperatorRole marketplace
+        userRole <- createInitialUserRole marketplace public
+        createRoleUser marketplace seller userRole
+        createRoleUser marketplace buyer userRole
+
+        -- Create Services
+        let
+          assets = ["MKP"]
+          custodianPaths = [[seller, buyer]]
+          cashRoute = Settlement.Hierarchy with rootCustodian = marketplace; pathsToRootCustodian = custodianPaths
+          secRoute = Settlement.Hierarchy with rootCustodian = marketplace; pathsToRootCustodian = custodianPaths
+          paths = fromList $ ("EUR", cashRoute) :: map (\a -> (a, secRoute)) assets
+
+        createCustodyService  marketplace seller public paths
+        createCustodyService  marketplace buyer public paths
+        createPropertyManagerService marketplace seller
+        createPropertyManagerService marketplace buyer
+        createIssuanceService marketplace seller
+        createIssuanceService marketplace buyer
+                
+        pure Fixture with instruments = []; accounts = []; holdings = []; services = [], roles = []
+
+testTransferApartmentPropertyForAmount : Script ()
+testTransferApartmentPropertyForAmount = do
+  parties@[marketplace, seller, buyer, bank, public] <-
+    mapA allocateParty ["Marketplace", "Seller", "Buyer", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+    single_observers = singleton marketplace
+    observers = fromList [("Default", single_observers)]
+    id = Id "Created Apartment Property"
+    instrument = InstrumentKey with issuer=marketplace; depository=seller; id = Id "ApartmentPropertInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  -- Setup Buyer
+  eur <- originateToken buyer bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  buyerAccount <- openAccount marketplace buyer public "BuyerUser@Marketplace" empty
+  (fundsHoldingCid) <- deposit marketplace buyer public (qty 250000.0 eur) buyerAccount
+
+  -- Setup Seller
+  sellerAccount <- openAccount marketplace seller public "Seller@Marketplace" empty
+  (instrumentKey, propertyKey) <- createApartmentProperty marketplace seller public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
+  (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
+
+  transfer seller buyerAccount public $ coerceContractId propertyHoldingCid
+  transfer buyer sellerAccount public $ coerceContractId fundsHoldingCid
+
+  pure()
+
+
+testTransferLandPropertyForAmount : Script ()
+testTransferLandPropertyForAmount = do
+  parties@[marketplace, seller, buyer, bank, public] <-
+    mapA allocateParty ["Marketplace", "Seller", "Buyer", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+    single_observers = singleton marketplace
+    observers = fromList [("Default", single_observers)]
+    id = Id "Created Land Property"
+    instrument = InstrumentKey with issuer=marketplace; depository=seller; id = Id "LandPropertInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  -- Setup Buyer
+  eur <- originateToken buyer bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  buyerAccount <- openAccount marketplace buyer public "BuyerUser@Marketplace" empty
+  (fundsHoldingCid) <- deposit marketplace buyer public (qty 250000.0 eur) buyerAccount
+
+  -- Setup Seller
+  sellerAccount <- openAccount marketplace seller public "Seller@Marketplace" empty
+  (instrumentKey, propertyKey) <- createLandProperty marketplace seller public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
+
+  transfer seller buyerAccount public $ coerceContractId propertyHoldingCid
+  transfer buyer sellerAccount public $ coerceContractId fundsHoldingCid
+
+  pure()
+
+testTransferResidencePropertyForAmount : Script ()
+testTransferResidencePropertyForAmount = do
+  parties@[marketplace, seller, buyer, bank, public] <-
+    mapA allocateParty ["Marketplace", "Seller", "Buyer", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+    single_observers = singleton marketplace
+    observers = fromList [("Default", single_observers)]
+    id = Id "Created Residence Property"
+    instrument = InstrumentKey with issuer=marketplace; depository=seller; id = Id "ResidencePropertInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  -- Setup Buyer
+  eur <- originateToken buyer bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  buyerAccount <- openAccount marketplace buyer public "BuyerUser@Marketplace" empty
+  (fundsHoldingCid) <- deposit marketplace buyer public (qty 250000.0 eur) buyerAccount
+
+  -- Setup Seller
+  sellerAccount <- openAccount marketplace seller public "Seller@Marketplace" empty
+  (instrumentKey, propertyKey) <- createResidenceProperty marketplace seller public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
+
+  transfer seller buyerAccount public $ coerceContractId propertyHoldingCid
+  transfer buyer sellerAccount public $ coerceContractId fundsHoldingCid
+
+  pure()
+
+testTransferGaragePropertyForAmount : Script ()
+testTransferGaragePropertyForAmount = do
+  parties@[marketplace, seller, buyer, bank, public] <-
+    mapA allocateParty ["Marketplace", "Seller", "Buyer", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+    single_observers = singleton marketplace
+    observers = fromList [("Default", single_observers)]
+    id = Id "Created Garage Property"
+    instrument = InstrumentKey with issuer=marketplace; depository=seller; id = Id "GaragePropertInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  -- Setup Buyer
+  eur <- originateToken buyer bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  buyerAccount <- openAccount marketplace buyer public "BuyerUser@Marketplace" empty
+  (fundsHoldingCid) <- deposit marketplace buyer public (qty 250000.0 eur) buyerAccount
+
+  -- Setup Seller
+  sellerAccount <- openAccount marketplace seller public "Seller@Marketplace" empty
+  (instrumentKey, propertyKey) <- createGarageProperty marketplace seller public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description"
+  (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
+
+  transfer seller buyerAccount public $ coerceContractId propertyHoldingCid
+  transfer buyer sellerAccount public $ coerceContractId fundsHoldingCid
+
+  pure()
+
+testTransferWarehousePropertyForAmount : Script ()
+testTransferWarehousePropertyForAmount = do
+  parties@[marketplace, seller, buyer, bank, public] <-
+    mapA allocateParty ["Marketplace", "Seller", "Buyer", "Bank", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  -- Time
+  t <- getTime
+  let
+    today = toDateUTC t
+    yday = time (addDays today (-1)) 0 0 0
+    single_observers = singleton marketplace
+    observers = fromList [("Default", single_observers)]
+    id = Id "Created Warehouse Property"
+    instrument = InstrumentKey with issuer=marketplace; depository=seller; id = Id "WarehousePropertInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  -- Setup Buyer
+  eur <- originateToken buyer bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
+  buyerAccount <- openAccount marketplace buyer public "BuyerUser@Marketplace" empty
+  (fundsHoldingCid) <- deposit marketplace buyer public (qty 250000.0 eur) buyerAccount
+
+  -- Setup Seller
+  sellerAccount <- openAccount marketplace seller public "Seller@Marketplace" empty
+  (instrumentKey, propertyKey) <- createWarehouseProperty marketplace seller public observers id instrument"RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" StorageRoom 200.0 150.0 1 (date 2024 Apr 04)  "InstalledEquipment" "AdditionalInformation" "Description"
+  (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
+
+  transfer seller buyerAccount public $ coerceContractId propertyHoldingCid
+  transfer buyer sellerAccount public $ coerceContractId fundsHoldingCid
+
+  pure()
+
+
+

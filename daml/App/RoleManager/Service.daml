@@ -1,0 +1,90 @@
+module App.RoleManager.Service where
+
+import Interface.RoleManager.Service qualified as Service(I, R, O, View(..), OView(..), RView(..), CreateUserRole(..), DeleteUserRole(..), AddPermissionToUserRole(..), RemovePermissionInUserRole(..), UpdateUserRole(..), Accept(..), Decline(..), Withdraw(..), Approve(..), Reject(..), Cancel(..))
+import Interface.RoleManager.UserRole.Factory qualified as UserRole (Factory(..))
+import Interface.Base.Service qualified as Base (I, View(..))
+import Interface.RoleManager.UserRole.Permission
+import App.RoleManager.Util (CreateUserRole(..), DeleteUserRole(..), AddPermissionToUserRole(..), RemovePermissionInUserRole(..), UpdateUserRole(..), createUserRoleAux, deleteUserRoleAux, addPermissionToUserRoleAux, removePermissionInUserRoleAux, updateUserRoleAux)
+
+type T = Service
+
+template Service 
+  with
+    operator: Party
+    user: Party
+    userRoleFactoryCid: ContractId UserRole.Factory 
+  where
+  signatory operator, user
+
+  key (operator, user) : (Party, Party)
+  maintainer key._1
+
+  interface instance Base.I for Service where
+    view = Base.View with operator; user
+    terminate = pure ()
+
+  interface instance Service.I for Service where
+      view = Service.View with userRoleFactoryCid
+
+      asBase = toInterface @Base.I this
+
+      createUserRole Service.CreateUserRole{id, description, permissions, observers} = do
+        let createUserRoleParams = CreateUserRole with permission = MANAGE_ROLE, ..
+        createUserRoleAux createUserRoleParams
+
+      deleteUserRole Service.DeleteUserRole{userRole} = do
+        let deleteUserRoleParams = DeleteUserRole with permission = MANAGE_ROLE, ..
+        deleteUserRoleAux deleteUserRoleParams
+
+      addPermissionToUserRole Service.AddPermissionToUserRole{userRole, permission} = do
+        let addPermissionParams = AddPermissionToUserRole with permission = MANAGE_ROLE, addPermission = permission, ..
+        addPermissionToUserRoleAux addPermissionParams
+
+      removePermissionInUserRole Service.RemovePermissionInUserRole{userRole, permission} = do
+        let removePermissionParams = RemovePermissionInUserRole with permission = MANAGE_ROLE, removePermission = permission, ..
+        removePermissionInUserRoleAux removePermissionParams
+
+      updateUserRole Service.UpdateUserRole{userRole, permissions} = do
+        let updatePermissionParams = UpdateUserRole with permission = MANAGE_ROLE, ..
+        updateUserRoleAux updatePermissionParams
+
+template Offer
+  with
+    operator : Party
+    user : Party
+    userRoleFactoryCid: ContractId UserRole.Factory 
+  where
+  signatory operator
+  observer user
+
+  interface instance Service.O for Offer where
+    view = Service.OView with operator, user, userRoleFactoryCid
+
+    accept Service.Accept = do
+      toInterfaceContractId <$> create Service with operator, user, userRoleFactoryCid
+
+    decline Service.Decline{} = do
+      pure()
+
+    withdraw Service.Withdraw{} = do
+      pure()
+
+template Request
+  with
+    operator : Party
+    user : Party
+  where
+  signatory user
+  observer operator
+
+  interface instance Service.R for Request where
+    view = Service.RView with operator, user
+
+    approve Service.Approve{operator, userRoleFactoryCid} = do
+      toInterfaceContractId <$> create Service with operator, user, userRoleFactoryCid
+
+    reject Service.Reject{} = do
+      pure()
+      
+    cancel Service.Cancel{} = do
+      pure()

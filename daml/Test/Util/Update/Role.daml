@@ -1,0 +1,25 @@
+module Test.Util.Update.Role where
+
+import DA.Map (fromList)
+
+import App.Role.Operator qualified as Operator(Role(..))
+import App.RoleManager.UserRole.UserRole qualified as UserRole (Factory(..))
+
+import Interface.Role.Operator qualified as Operator(I, OfferUserRole(..))
+import Interface.Role.User qualified as User(Accept(..), Role(..))
+import Interface.Common.Types (UserRoleKey(..))
+
+import DA.Set (singleton)
+
+createOperatorRole : Party -> Update (ContractId Operator.Role)
+createOperatorRole operator = do
+  let observers = singleton operator
+  userRoleFactoryCid <- toInterfaceContractId <$> create UserRole.Factory with operator, observers =  fromList [("Default", observers)]
+  create Operator.Role with operator, userRoleFactoryCid
+
+createRoleUser : Party -> Party -> UserRoleKey -> Update (ContractId User.Role)
+createRoleUser operator user userRole = do
+  let observers = singleton operator
+  operatorCid <- toInterfaceContractId @Operator.I . fst <$> fetchByKey @Operator.Role operator
+  offerCid <-  exercise operatorCid Operator.OfferUserRole with user, userRole
+  exercise offerCid User.Accept

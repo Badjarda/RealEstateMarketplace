@@ -1,0 +1,421 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
+module Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty where
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.Common (ResidenceType, Parking, Orientation)
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, Parties, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (AddObservers(..), I, RemoveObservers(..), flattenObservers)
+import Daml.Finance.Interface.Util.InterfaceKey (createReferenceHelper, disclosureUpdateReferenceHelper, exerciseInterfaceByKeyHelper)
+import Daml.Finance.Interface.Util.InterfaceKey qualified as InterfaceKey (HasInterfaceKey(..))
+
+type I = ResidenceProperty -- MORADIA
+
+type R = Reference
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    grossArea: Decimal
+    usableArea: Decimal
+    bedrooms: Int
+    bathrooms: Int
+    floors: Int
+    residenceType: ResidenceType 
+    backyard: Text --m^2, frontwards, backwards...
+    parking: Parking 
+    buildDate: Date
+    orientation: Orientation
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+  deriving (Eq, Show)
+
+toKey : View -> PropertyKey
+toKey v = PropertyKey with operator = v.operator, user = v.user, id = v.id
+
+propertyKey : (HasToInterface i ResidenceProperty) => i -> PropertyKey
+propertyKey = toKey . view . toInterface @ResidenceProperty
+
+
+interface ResidenceProperty requires Disclosure.I where
+  viewtype V
+
+  getKey : PropertyKey
+
+  getResidenceInstrumentKey : GetResidenceInstrumentKey -> Update(InstrumentKey)
+  setResidenceInstrumentKey : SetResidenceInstrumentKey -> Update(ContractId ResidenceProperty)
+
+  getResidencePropertyAddress : GetResidencePropertyAddress -> Update(Text)
+  setResidencePropertyAddress : SetResidencePropertyAddress -> Update(ContractId ResidenceProperty)
+
+  getResidencePropertyPostalCode : GetResidencePropertyPostalCode -> Update(Text)
+  setResidencePropertyPostalCode : SetResidencePropertyPostalCode -> Update(ContractId ResidenceProperty)
+
+  getResidencePropertyDistrict : GetResidencePropertyDistrict -> Update(Text)
+  setResidencePropertyDistrict : SetResidencePropertyDistrict -> Update(ContractId ResidenceProperty)
+
+  getResidencePropertyCounty : GetResidencePropertyCounty -> Update(Text)
+  setResidencePropertyCounty : SetResidencePropertyCounty -> Update(ContractId ResidenceProperty)
+
+  getResidenceGrossArea : GetResidenceGrossArea -> Update(Decimal)
+  setResidenceGrossArea : SetResidenceGrossArea -> Update(ContractId ResidenceProperty)
+
+  getResidenceUsableArea : GetResidenceUsableArea -> Update(Decimal)
+  setResidenceUsableArea : SetResidenceUsableArea -> Update(ContractId ResidenceProperty)
+
+  getResidenceBedrooms : GetResidenceBedrooms -> Update(Int)
+  setResidenceBedrooms : SetResidenceBedrooms -> Update(ContractId ResidenceProperty)
+
+  getResidenceBathrooms : GetResidenceBathrooms -> Update(Int)
+  setResidenceBathrooms : SetResidenceBathrooms -> Update(ContractId ResidenceProperty)
+
+  getResidenceFloors : GetResidenceFloors -> Update(Int)
+  setResidenceFloors : SetResidenceFloors -> Update(ContractId ResidenceProperty)
+
+  getResidenceType : GetResidenceType -> Update(ResidenceType)
+  setResidenceType : SetResidenceType -> Update(ContractId ResidenceProperty)
+
+  getResidenceBackyard : GetResidenceBackyard -> Update(Text)
+  setResidenceBackyard : SetResidenceBackyard -> Update(ContractId ResidenceProperty)
+
+  getResidenceParking : GetResidenceParking-> Update(Parking)
+  setResidenceParking : SetResidenceParking -> Update(ContractId ResidenceProperty)
+
+  getResidenceBuildDate : GetResidenceBuildDate -> Update(Date)
+  setResidenceBuildDate : SetResidenceBuildDate -> Update(ContractId ResidenceProperty)
+
+  getResidenceOrientation : GetResidenceOrientation -> Update(Orientation)
+  setResidenceOrientation : SetResidenceOrientation -> Update(ContractId ResidenceProperty)
+
+  getResidenceInstalledEquipment : GetResidenceInstalledEquipment -> Update(Text)
+  setResidenceInstalledEquipment : SetResidenceInstalledEquipment -> Update(ContractId ResidenceProperty)
+
+  getResidenceAdditionalInformation : GetResidenceAdditionalInformation -> Update(Text)
+  setResidenceAdditionalInformation : SetResidenceAdditionalInformation -> Update(ContractId ResidenceProperty)
+
+  getResidenceDescription : GetResidenceDescription -> Update(Text)
+  setResidenceDescription : SetResidenceDescription -> Update(ContractId ResidenceProperty)
+
+  nonconsuming choice GetView : View
+    with
+      viewer : Party
+    controller viewer
+    do
+      pure $ view this
+  
+  nonconsuming choice GetResidenceInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      getResidenceInstrumentKey this arg
+
+  choice SetResidenceInstrumentKey: ContractId ResidenceProperty
+    with
+      newResidenceInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      setResidenceInstrumentKey this arg
+
+  nonconsuming choice GetResidencePropertyAddress : Text
+    controller signatory this
+    do
+      getResidencePropertyAddress this arg
+
+  choice SetResidencePropertyAddress : ContractId ResidenceProperty
+    with
+      newResidencePropertyAddress : Text
+    controller signatory this
+    do
+      setResidencePropertyAddress this arg
+
+  nonconsuming choice GetResidencePropertyPostalCode : Text
+    controller signatory this
+    do
+      getResidencePropertyPostalCode this arg
+
+  choice SetResidencePropertyPostalCode : ContractId ResidenceProperty
+    with
+      newResidencePropertyPostalCode : Text
+    controller signatory this
+    do
+      setResidencePropertyPostalCode this arg
+  
+  nonconsuming choice GetResidencePropertyDistrict : Text
+    controller signatory this
+    do
+      getResidencePropertyDistrict this arg
+
+  choice SetResidencePropertyDistrict : ContractId ResidenceProperty
+    with
+      newResidencePropertyDistrict : Text
+    controller signatory this
+    do
+      setResidencePropertyDistrict this arg
+
+  nonconsuming choice GetResidencePropertyCounty : Text
+    controller signatory this
+    do
+      getResidencePropertyCounty this arg
+
+  choice SetResidencePropertyCounty : ContractId ResidenceProperty
+    with
+      newResidencePropertyCounty : Text
+    controller signatory this
+    do
+      setResidencePropertyCounty this arg
+
+
+  nonconsuming choice GetResidenceGrossArea : Decimal
+    controller signatory this
+    do
+      getResidenceGrossArea this arg
+
+  choice SetResidenceGrossArea : ContractId ResidenceProperty
+    with
+      newResidenceGrossArea : Decimal
+    controller signatory this
+    do
+      setResidenceGrossArea this arg
+
+  nonconsuming choice GetResidenceUsableArea : Decimal
+    controller signatory this
+    do
+      getResidenceUsableArea this arg
+
+  choice SetResidenceUsableArea : ContractId ResidenceProperty
+    with
+      newResidenceUsableArea : Decimal
+    controller signatory this
+    do
+      setResidenceUsableArea this arg
+
+  nonconsuming choice GetResidenceBedrooms : Int
+    controller signatory this
+    do
+      getResidenceBedrooms this arg
+
+  choice SetResidenceBedrooms : ContractId ResidenceProperty
+    with
+      newResidenceBedrooms : Int
+    controller signatory this
+    do
+      setResidenceBedrooms this arg
+
+  nonconsuming choice GetResidenceBathrooms : Int
+    controller signatory this
+    do
+      getResidenceBathrooms this arg
+
+  choice SetResidenceBathrooms : ContractId ResidenceProperty
+    with
+      newResidenceBathrooms : Int
+    controller signatory this
+    do
+      setResidenceBathrooms this arg
+
+  nonconsuming choice GetResidenceFloors : Int
+    controller signatory this
+    do
+      getResidenceFloors this arg
+
+  choice SetResidenceFloors : ContractId ResidenceProperty
+    with
+      newResidenceFloors : Int
+    controller signatory this
+    do
+      setResidenceFloors this arg
+
+  nonconsuming choice GetResidenceType : ResidenceType
+    controller signatory this
+    do
+      getResidenceType this arg
+
+  choice SetResidenceType : ContractId ResidenceProperty
+    with
+      newResidenceType : ResidenceType
+    controller signatory this
+    do
+      setResidenceType this arg
+
+  nonconsuming choice GetResidenceBackyard : Text
+    controller signatory this
+    do
+      getResidenceBackyard this arg
+
+  choice SetResidenceBackyard : ContractId ResidenceProperty
+    with
+      newResidenceBackyard : Text
+    controller signatory this
+    do
+      setResidenceBackyard this arg
+
+  nonconsuming choice GetResidenceParking : Parking
+    controller signatory this
+    do
+      getResidenceParking this arg
+
+  choice SetResidenceParking : ContractId ResidenceProperty
+    with
+      newResidenceParking : Parking
+    controller signatory this
+    do
+      setResidenceParking this arg
+  
+  nonconsuming choice GetResidenceBuildDate : Date
+    controller signatory this
+    do
+      getResidenceBuildDate this arg
+
+  choice SetResidenceBuildDate : ContractId ResidenceProperty
+    with
+      newResidenceBuildDate : Date
+    controller signatory this
+    do
+      setResidenceBuildDate this arg
+  
+  nonconsuming choice GetResidenceOrientation : Orientation
+    controller signatory this
+    do
+      getResidenceOrientation this arg
+
+  choice SetResidenceOrientation : ContractId ResidenceProperty
+    with
+      newOrientation : Orientation
+    controller signatory this
+    do
+      setResidenceOrientation this arg
+
+  nonconsuming choice GetResidenceInstalledEquipment : Text
+    controller signatory this
+    do
+      getResidenceInstalledEquipment this arg
+
+  choice SetResidenceInstalledEquipment : ContractId ResidenceProperty
+    with
+      newResidenceInstalledEquipment : Text
+    controller signatory this
+    do
+      setResidenceInstalledEquipment this arg
+  
+  nonconsuming choice GetResidenceAdditionalInformation : Text
+    controller signatory this
+    do
+      getResidenceAdditionalInformation this arg
+
+  choice SetResidenceAdditionalInformation : ContractId ResidenceProperty
+    with
+      newResidenceAdditionalInformation : Text
+    controller signatory this
+    do
+      setResidenceAdditionalInformation this arg
+
+  nonconsuming choice GetResidenceDescription : Text
+    controller signatory this
+    do
+      getResidenceDescription this arg
+
+  choice SetResidenceDescription : ContractId ResidenceProperty
+    with
+      newResidenceDescription : Text
+    controller signatory this
+    do
+      setResidenceDescription this arg
+      
+  choice Remove : ()
+    controller signatory this
+    do
+      (refCid, _) <- fetchByKey @Reference $ getKey this
+      archive refCid
+
+
+template Reference
+  with
+    residencePropertyView : View
+    cid : ContractId ResidenceProperty
+    observers : PartiesMap
+  where
+    signatory residencePropertyView.operator
+    observer Disclosure.flattenObservers observers, residencePropertyView.user
+
+    key toKey residencePropertyView : PropertyKey
+    maintainer key.operator
+
+    nonconsuming choice GetCid : ContractId ResidenceProperty
+      with
+        viewer : Party
+      controller viewer
+      do
+        pure cid
+
+    choice SetCid : ContractId Reference
+      with
+        newCid : ContractId ResidenceProperty
+      controller signatory this
+      do
+        create this with cid = newCid
+
+    choice SetObservers : ContractId Reference
+      with
+        newObservers : PartiesMap
+      controller signatory this
+      do
+        create this with observers = newObservers
+
+disclose : (Text, Parties) -> Party -> Parties -> PropertyKey -> Update (ContractId ResidenceProperty)
+disclose observersToAdd actor disclosers residenceProperty =
+  fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      residenceProperty
+      actor
+      Disclosure.AddObservers with disclosers; observersToAdd
+
+undisclose : (Text, Parties) -> Party -> Parties -> PropertyKey ->
+  Update (Optional (ContractId ResidenceProperty))
+undisclose observersToRemove actor disclosers residenceProperty =
+  fmap fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      residenceProperty
+      actor
+      Disclosure.RemoveObservers with disclosers; observersToRemove
+
+exerciseInterfaceByKey : forall i c r.
+    ( HasInterfaceTypeRep i
+    , HasExercise i c r
+    )
+    => PropertyKey -- ^ The ResidenceProperty key.
+    -> Party      -- ^ The actor exercising.
+    -> c          -- ^ The choice arguments.
+    -> Update r
+exerciseInterfaceByKey k actor arg =
+  exerciseInterfaceByKeyHelper @Reference @GetCid @SetCid @SetObservers @GetView @i k actor arg
+
+-- | HIDE
+-- Create instance of HasInterfaceKey.
+instance InterfaceKey.HasInterfaceKey ResidenceProperty View PropertyKey Reference GetCid SetCid SetObservers
+  GetView where
+    createReference = Reference
+    getCid = GetCid
+    setCid = SetCid
+    setObservers = SetObservers
+    getView = GetView
+
+-- | HIDE
+-- Create Reference for the ResidenceProperty.
+createReference : Party -> ContractId ResidenceProperty -> Update (ContractId Reference)
+createReference = createReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView
+
+-- | HIDE
+-- Helper function to update the ResidenceProperty reference once observers are added to the ResidenceProperty.
+disclosureUpdateReference : PropertyKey -> PartiesMap -> ContractId ResidenceProperty ->
+  Update (ContractId Disclosure.I)
+disclosureUpdateReference =
+  disclosureUpdateReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView

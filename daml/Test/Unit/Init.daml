@@ -1,0 +1,10 @@
+module Test.Unit.Init where
+
+import Daml.Script;
+
+
+--init script
+runEmpty : Script ()
+runEmpty = do
+    
+  pure()

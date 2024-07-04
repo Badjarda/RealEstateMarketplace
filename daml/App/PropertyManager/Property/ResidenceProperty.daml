@@ -1,0 +1,190 @@
+module App.PropertyManager.Property.ResidenceProperty where
+
+import DA.Set qualified as Set (fromList, singleton)
+
+import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty(I, View(..), GetResidenceInstrumentKey(..), GetResidencePropertyAddress(..), GetResidencePropertyPostalCode(..), GetResidencePropertyDistrict(..), GetResidencePropertyCounty(..), GetResidenceGrossArea(..), GetResidenceUsableArea(..), GetResidenceBedrooms(..), GetResidenceBathrooms(..), GetResidenceFloors(..), GetResidenceType(..), GetResidenceBackyard(..), GetResidenceParking(..), GetResidenceBuildDate(..), GetResidenceOrientation(..), GetResidenceInstalledEquipment(..), GetResidenceAdditionalInformation(..), GetResidenceDescription(..), SetResidenceInstrumentKey(..), SetResidencePropertyAddress(..), SetResidencePropertyPostalCode(..), SetResidencePropertyDistrict(..), SetResidencePropertyCounty(..), SetResidenceGrossArea(..), SetResidenceUsableArea(..), SetResidenceBedrooms(..), SetResidenceBathrooms(..), SetResidenceFloors(..), SetResidenceType(..), SetResidenceBackyard(..), SetResidenceParking(..), SetResidenceBuildDate(..), SetResidenceOrientation(..), SetResidenceInstalledEquipment(..), SetResidenceAdditionalInformation(..), SetResidenceDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.ResidenceProperty.Factory qualified as ResidencePropertyFactory(I, View(..), Create(..))
+import Interface.PropertyManager.Property.Common (ResidenceType, Parking, Orientation)
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I, View(..), flattenObservers)
+import Daml.Finance.Util.Disclosure(addObserversImpl, removeObserversImpl, setObserversImpl)
+
+template ResidenceProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    grossArea: Decimal
+    usableArea: Decimal
+    bedrooms: Int
+    bathrooms: Int
+    floors: Int
+    residenceType: ResidenceType
+    backyard: Text -- m^2, frontwards, backwards...
+    parking: Parking
+    buildDate: Date
+    orientation: Orientation
+    installedEquipment: Text
+    additionalInformation: Text -- Other relevant information
+    description: Text
+    observers: PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, user) : (Party, Party)
+  
+    maintainer key._2
+
+    interface instance ResidenceProperty.I for ResidenceProperty where
+      view = ResidenceProperty.View with ..
+
+      getKey = ResidenceProperty.propertyKey this
+
+      getResidenceInstrumentKey ResidenceProperty.GetResidenceInstrumentKey{} = do 
+        pure instrument
+
+      getResidencePropertyAddress ResidenceProperty.GetResidencePropertyAddress{} = do 
+        pure propertyAddress
+      
+      getResidencePropertyPostalCode ResidenceProperty.GetResidencePropertyPostalCode{} = do 
+        pure propertyPostalCode
+
+      getResidencePropertyDistrict ResidenceProperty.GetResidencePropertyDistrict{} = do 
+        pure propertyDistrict
+
+      getResidencePropertyCounty ResidenceProperty.GetResidencePropertyCounty{} = do 
+        pure propertyCounty
+
+      getResidenceGrossArea ResidenceProperty.GetResidenceGrossArea{} = do 
+        pure grossArea
+
+      getResidenceUsableArea ResidenceProperty.GetResidenceUsableArea{} = do 
+        pure usableArea
+
+      getResidenceBedrooms ResidenceProperty.GetResidenceBedrooms{} = do 
+        pure bedrooms
+
+      getResidenceBathrooms ResidenceProperty.GetResidenceBathrooms{} = do 
+        pure bathrooms 
+      
+      getResidenceFloors ResidenceProperty.GetResidenceFloors{} = do 
+        pure floors
+
+      getResidenceType ResidenceProperty.GetResidenceType{} = do 
+        pure residenceType
+
+      getResidenceBackyard ResidenceProperty.GetResidenceBackyard{} = do 
+        pure backyard
+
+      getResidenceParking ResidenceProperty.GetResidenceParking{} = do 
+        pure parking
+
+      getResidenceBuildDate ResidenceProperty.GetResidenceBuildDate{} = do 
+        pure buildDate
+
+      getResidenceOrientation ResidenceProperty.GetResidenceOrientation{} = do 
+        pure orientation
+
+      getResidenceInstalledEquipment ResidenceProperty.GetResidenceInstalledEquipment{} = do 
+        pure installedEquipment
+
+      getResidenceAdditionalInformation ResidenceProperty.GetResidenceAdditionalInformation{} = do 
+        pure additionalInformation
+
+      getResidenceDescription ResidenceProperty.GetResidenceDescription{} = do 
+        pure description 
+
+      setResidenceInstrumentKey ResidenceProperty.SetResidenceInstrumentKey{newResidenceInstrumentKey} = do 
+        toInterfaceContractId <$> create this with instrument = newResidenceInstrumentKey
+
+      setResidencePropertyAddress ResidenceProperty.SetResidencePropertyAddress{newResidencePropertyAddress} = do 
+        toInterfaceContractId <$> create this with propertyAddress = newResidencePropertyAddress
+      
+      setResidencePropertyPostalCode ResidenceProperty.SetResidencePropertyPostalCode{newResidencePropertyPostalCode} = do 
+        toInterfaceContractId <$> create this with propertyPostalCode = newResidencePropertyPostalCode
+      
+      setResidencePropertyDistrict ResidenceProperty.SetResidencePropertyDistrict{newResidencePropertyDistrict} = do 
+        toInterfaceContractId <$> create this with propertyDistrict = newResidencePropertyDistrict
+
+      setResidencePropertyCounty ResidenceProperty.SetResidencePropertyCounty{newResidencePropertyCounty} = do 
+        toInterfaceContractId <$> create this with propertyCounty = newResidencePropertyCounty
+      
+      setResidenceGrossArea ResidenceProperty.SetResidenceGrossArea{newResidenceGrossArea} = do 
+        toInterfaceContractId <$> create this with grossArea = newResidenceGrossArea
+      
+      setResidenceUsableArea ResidenceProperty.SetResidenceUsableArea{newResidenceUsableArea} = do 
+        toInterfaceContractId <$> create this with usableArea = newResidenceUsableArea
+
+      setResidenceBedrooms ResidenceProperty.SetResidenceBedrooms{newResidenceBedrooms} = do 
+        toInterfaceContractId <$> create this with bedrooms = newResidenceBedrooms
+      
+      setResidenceBathrooms ResidenceProperty.SetResidenceBathrooms{newResidenceBathrooms} = do 
+        toInterfaceContractId <$> create this with bathrooms = newResidenceBathrooms
+      
+      setResidenceFloors ResidenceProperty.SetResidenceFloors{newResidenceFloors} = do 
+        toInterfaceContractId <$> create this with floors = newResidenceFloors
+
+      setResidenceType ResidenceProperty.SetResidenceType{newResidenceType} = do 
+        toInterfaceContractId <$> create this with residenceType = newResidenceType
+
+      setResidenceBackyard ResidenceProperty.SetResidenceBackyard{newResidenceBackyard} = do 
+        toInterfaceContractId <$> create this with backyard = newResidenceBackyard
+
+      setResidenceParking ResidenceProperty.SetResidenceParking{newResidenceParking} = do 
+        toInterfaceContractId <$> create this with parking = newResidenceParking
+
+      setResidenceBuildDate ResidenceProperty.SetResidenceBuildDate{newResidenceBuildDate} = do 
+        toInterfaceContractId <$> create this with buildDate = newResidenceBuildDate
+
+      setResidenceOrientation ResidenceProperty.SetResidenceOrientation{newOrientation} = do 
+        toInterfaceContractId <$> create this with orientation = newOrientation
+
+      setResidenceInstalledEquipment ResidenceProperty.SetResidenceInstalledEquipment{newResidenceInstalledEquipment} = do 
+        toInterfaceContractId <$> create this with installedEquipment = newResidenceInstalledEquipment
+      
+      setResidenceAdditionalInformation ResidenceProperty.SetResidenceAdditionalInformation{newResidenceAdditionalInformation} = do 
+        toInterfaceContractId <$> create this with additionalInformation = newResidenceAdditionalInformation
+      
+      setResidenceDescription ResidenceProperty.SetResidenceDescription{newResidenceDescription} = do 
+        toInterfaceContractId <$> create this with description = newResidenceDescription
+
+    interface instance Disclosure.I for ResidenceProperty where
+      view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
+      setObservers = setObserversImpl this . Some . ResidenceProperty.disclosureUpdateReference $
+        ResidenceProperty.propertyKey this
+      addObservers = addObserversImpl this . Some . ResidenceProperty.disclosureUpdateReference $
+        ResidenceProperty.propertyKey this
+      removeObservers = removeObserversImpl this . Some . ResidenceProperty.disclosureUpdateReference $
+        ResidenceProperty.propertyKey this
+
+template Factory
+  with
+    operator : Party
+    observers : PartiesMap
+  where
+    signatory operator
+    observer Disclosure.flattenObservers observers
+
+    interface instance ResidencePropertyFactory.I for Factory where
+      view = ResidencePropertyFactory.View with operator
+      
+      create' ResidencePropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floors, residenceType, backyard, parking, buildDate, orientation, installedEquipment, additionalInformation, description, observers} =
+        do
+          cid <- toInterfaceContractId <$> create ResidenceProperty with
+            operator = propertyKey.operator
+            user = propertyKey.user
+            id = propertyKey.id, ..
+          ResidenceProperty.createReference propertyKey.operator cid
+          pure cid
+
+    interface instance Disclosure.I for Factory where
+      view = Disclosure.View with disclosureControllers = Set.singleton operator; observers
+      setObservers = setObserversImpl @Factory @Disclosure.I this None
+      addObservers = addObserversImpl @Factory @Disclosure.I this None
+      removeObservers = removeObserversImpl @Factory @Disclosure.I this None

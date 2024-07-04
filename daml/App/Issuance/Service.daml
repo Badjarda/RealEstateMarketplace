@@ -1,0 +1,84 @@
+module App.Issuance.Service where
+
+import Interface.Base.Service qualified as Base (I, View(..))
+import Interface.Issuance.Service qualified as Service (I, O, R, View(..), OView(..), RView(..), RequestIssue(..), RequestDeIssue(..), Issue(..), DeIssue(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
+import Interface.RoleManager.UserRole.Permission
+import App.Issuance.Util (IssueRequest(..), DeIssueRequest(..), Issue(..), DeIssue(..), issueRequestAux, deIssueRequestAux, issueAux, deIssueAux)
+
+type T = Service
+
+instance Service.HasImplementation Service
+
+template Service
+  with
+    operator : Party
+    user : Party
+  where
+    signatory operator, user
+
+    key (operator, user) : (Party, Party)
+    maintainer key._1
+
+    interface instance Base.I for Service where
+      view = Base.View with operator; user
+      terminate = pure ()
+
+    interface instance Service.I for Service where
+      view = Service.View
+      asBase = toInterface @Base.I this
+      requestIssue Service.RequestIssue{issuanceId; description; quantity; account} = do
+        let requestIssueParams = IssueRequest with permission = MANAGE_ROLE, ..
+        issueRequestAux requestIssueParams
+      
+      requestDeIssue Service.RequestDeIssue{issuanceId; holdingCid} = do
+        let requestDeIssueParams = DeIssueRequest with permission = MANAGE_ROLE, ..
+        deIssueRequestAux requestDeIssueParams
+
+      issue Service.Issue{issueRequestCid} = do
+        let issueParams = Issue with ..
+        issueAux issueParams
+      
+      deIssue Service.DeIssue{deIssueRequestCid} = do
+        let deIssueParams = DeIssue with ..
+        deIssueAux deIssueParams
+
+template Offer
+  with
+    operator : Party
+    user : Party
+  where
+    signatory operator
+    observer user
+
+    interface instance Service.O for Offer where
+      view = Service.OView with ..
+
+      accept Service.Accept = do
+        toInterfaceContractId <$> create Service with operator, user 
+
+      decline Service.Decline = do
+        pure()
+
+      withdraw Service.Withdraw = do
+        pure()
+
+
+template Request
+  with
+    user : Party
+    operator : Party
+  where
+    signatory user
+    observer operator
+
+    interface instance Service.R for Request where
+      view = Service.RView with operator, user
+
+      cancel Service.Cancel = do
+        pure()
+
+      reject Service.Reject = do
+        pure()
+
+      approve Service.Approve{operator} = do
+        toInterfaceContractId <$> create Service with operator, user 

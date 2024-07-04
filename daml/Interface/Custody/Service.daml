@@ -1,0 +1,173 @@
+module Interface.Custody.Service where
+
+import Interface.Base.Service qualified as Base (I, Implementation)
+import Interface.Custody.Choices.OpenAccountRequest qualified as OpenAccountRequest (I)
+import Interface.Custody.Choices.CloseAccountRequest qualified as CloseAccountRequest (I)
+import Interface.Custody.Choices.DepositRequest qualified as DepositRequest (I)
+import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest (I)
+
+import Daml.Finance.Interface.Account.Account qualified as Account (Controllers)
+import Daml.Finance.Interface.Account.Factory qualified as Account (I)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, HoldingFactoryKey(..), Id, InstrumentQuantity, PartiesMap)
+
+
+type I = Service
+
+type O = Offer
+
+type R = Request
+
+type V = View
+
+data View = View
+  with
+    accountFactoryCid : ContractId Account.I
+    holdingFactoryKey : HoldingFactoryKey
+    claimRuleCid : ContractId Lifecycle.Claim
+  deriving (Eq, Show)
+
+data OView = OView
+  with
+    user : Party
+    operator : Party
+    accountFactoryCid : ContractId Account.I
+    holdingFactoryKey : HoldingFactoryKey
+    claimRuleCid : ContractId Lifecycle.Claim
+  deriving(Eq, Show)
+
+data RView = RView
+  with
+    user : Party
+    operator : Party
+  deriving(Eq, Show)
+
+interface Service where
+  viewtype V
+
+  asBase : Base.I
+
+  requestOpenAccount : RequestOpenAccount -> Update (ContractId OpenAccountRequest.I)
+  requestCloseAccount : RequestCloseAccount -> Update (ContractId CloseAccountRequest.I)
+  requestDeposit : RequestDeposit -> Update (ContractId DepositRequest.I)
+  requestWithdraw : RequestWithdraw -> Update (ContractId WithdrawRequest.I)
+  openAccount : OpenAccount -> Update (AccountKey)
+  closeAccount : CloseAccount -> Update ()
+  deposit : Deposit -> Update (ContractId Holding.I)
+  withdrawal : Withdrawal -> Update ()
+
+  nonconsuming choice RequestOpenAccount : ContractId OpenAccountRequest.I
+    with
+      id : Id
+      description : Text
+      controllers : Account.Controllers
+      observers : PartiesMap
+    controller (view $ asBase this).user
+    do
+      requestOpenAccount this arg
+
+  nonconsuming choice RequestCloseAccount : ContractId CloseAccountRequest.I
+    with
+      account : AccountKey
+    controller (view $ asBase this).user
+    do
+      requestCloseAccount this arg
+
+  nonconsuming choice RequestDeposit : ContractId DepositRequest.I
+    with
+      quantity : InstrumentQuantity
+      account : AccountKey
+    controller (view $ asBase this).user
+    do
+      requestDeposit this arg
+
+  nonconsuming choice RequestWithdraw : ContractId WithdrawRequest.I
+    with
+      holdingCid : ContractId Holding.I
+    controller (view $ asBase this).user
+    do
+      requestWithdraw this arg
+
+  nonconsuming choice OpenAccount : (AccountKey)
+    with
+      openAccountRequestCid : ContractId OpenAccountRequest.I
+    controller (view $ asBase this).operator
+    do
+      openAccount this arg
+
+  nonconsuming choice CloseAccount : ()
+    with
+      closeAccountRequestCid : ContractId CloseAccountRequest.I
+    controller (view $ asBase this).operator
+    do
+      closeAccount this arg
+
+  nonconsuming choice Deposit : ContractId Holding.I
+    with
+      depositRequestCid : ContractId DepositRequest.I
+    controller (view $ asBase this).operator
+    do
+      deposit this arg
+
+  nonconsuming choice Withdrawal : ()
+    with
+      withdrawRequestCid : ContractId WithdrawRequest.I
+    controller (view $ asBase this).operator
+    do
+      withdrawal this arg
+
+interface Offer where
+  viewtype OView
+
+  accept : Accept -> Update (ContractId Service)
+  decline : Decline -> Update ()
+  withdraw : Withdraw -> Update ()
+
+  choice Accept : ContractId Service
+    controller (view this).user
+    do
+      accept this arg
+
+  choice Decline : ()
+    controller (view this).user
+    do
+      decline this arg
+
+  choice Withdraw : ()
+    controller (view this).operator
+    do
+      withdraw this arg
+
+interface Request where
+  viewtype RView
+
+  cancel : Cancel -> Update ()
+  reject : Reject -> Update ()
+  approve : Approve -> Update (ContractId Service)
+
+  choice Cancel : ()
+    controller (view this).user
+    do
+      cancel this arg
+
+  choice Reject : ()
+    controller (view this).operator
+    do
+      reject this arg
+
+  choice Approve : ContractId Service
+    with
+      operator: Party
+      accountFactoryCid : ContractId Account.I
+      holdingFactoryKey : HoldingFactoryKey
+      claimRuleCid : ContractId Lifecycle.Claim
+    controller operator, (view this).operator
+    do
+      approve this arg
+
+type Implementation t = (HasToInterface t Service, Base.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation Service
+instance HasToInterface Service Base.I where _toInterface = asBase
+

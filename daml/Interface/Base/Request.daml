@@ -1,0 +1,40 @@
+module Interface.Base.Request where
+
+import Interface.Base.Service qualified as Service (I)
+
+type I = Request
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+    provider : Party
+    user : Party
+  deriving (Eq, Show)
+
+interface Request where
+  viewtype V
+
+  accept : Update (ContractId Service.I)
+  reject : Update ()
+  withdraw : Update ()
+
+  choice Accept : ContractId Service.I
+    controller (view this).operator, (view this).provider
+    do
+      accept this
+
+  choice Reject : ()
+    controller (view this).provider
+    do
+      reject this
+
+  choice Withdraw : ()
+    controller (view this).user
+    do
+      withdraw this
+
+type Implementation t = HasToInterface t Request
+class (Implementation t) => HasImplementation t
+instance HasImplementation Request

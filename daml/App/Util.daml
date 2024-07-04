@@ -1,0 +1,13 @@
+module App.Util where
+
+import Interface.Common.Types (UserRoleKey(..))
+import Interface.RoleManager.UserRole.Permission
+import Interface.RoleManager.UserRole.UserRole qualified as UserRole(R)
+
+hasPermission : [UserRoleKey] -> Permission -> Update Bool
+hasPermission userRoles permission = do
+  roles <- forA userRoles (\roleKey -> fetchByKey @UserRole.R roleKey)
+  let hasPermission = any (\(_, role) -> permission `elem` role.userRoleView.permissions) roles
+  pure hasPermission
+
+

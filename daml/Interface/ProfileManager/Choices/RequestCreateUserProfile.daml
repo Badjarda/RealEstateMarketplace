@@ -1,0 +1,39 @@
+module Interface.ProfileManager.Choices.RequestCreateUserProfile where
+
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap)
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+
+
+type I = RequestCreateUserProfile
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    username: Text
+    firstName: Text
+    lastName: Text
+    fullName: Text
+    birthday: Date
+    gender: Optional Gender
+    nationality: Nationality
+    contactMail: Text
+    cellphoneNumber: Optional Int
+    taxId: Int
+    socialSecurityId: Int
+    observers : PartiesMap
+  deriving (Eq, Show)
+
+interface RequestCreateUserProfile where
+  viewtype View
+
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t RequestCreateUserProfile, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation RequestCreateUserProfile
+instance HasToInterface RequestCreateUserProfile Removable.I where _toInterface = asRemovable

@@ -1,0 +1,43 @@
+module Test.Util.Update.Workflow where
+
+import DA.Set qualified as S (singleton)
+import DA.Map (fromList)
+
+import Interface.Role.Operator qualified as IOperator(I, CreateInitialRole(..))
+import Interface.Custody.Service qualified as CustodyService (I, OpenAccount(..), RequestOpenAccount(..), RequestDeposit(..), Deposit(..), CloseAccount(..), RequestCloseAccount(..),)
+
+import Interface.RoleManager.UserRole.Permission
+import Interface.Common.Types (UserRoleKey(..))
+
+import App.Role.Operator qualified as Operator(Role(..))
+import App.Custody.Service qualified as CustodyService (T)
+
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, Id(..), PartiesMap, InstrumentQuantity)
+import Daml.Finance.Interface.Account.Account qualified as Account (Controllers(..))
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+
+createInitialUserRole : Party -> Party -> Update (UserRoleKey)
+createInitialUserRole operator public = do
+  let publicObs = fromList [("Default", S.singleton public)]
+  operatorCid <- toInterfaceContractId @IOperator.I . fst <$> fetchByKey @Operator.Role operator
+  userRole <- exercise operatorCid IOperator.CreateInitialRole with userDescription = "Test User Role", userPermissions = [VIEW_ALL_MARKETPLACE_TRANSACTIONS, MANAGE_ALL_MARKETPLACE_TRANSACTIONS, VIEW_ROLE, MANAGE_ROLE, MANAGE_PERMISSION, VIEW_TRANSACTION, MANAGE_TRANSACTION], observers = publicObs
+  pure userRole
+
+createAccount : Party -> Party -> Party -> Text -> PartiesMap -> Update AccountKey
+createAccount operator user public id observers = do
+  let controllers = Account.Controllers with outgoing = S.singleton user; incoming = S.singleton user
+  serviceCid <- toInterfaceContractId @CustodyService.I . fst <$> fetchByKey @CustodyService.T (operator, user)
+  openAccountRequestCid <- exercise serviceCid CustodyService.RequestOpenAccount with id = Id id; description = id; controllers; observers
+  exercise serviceCid CustodyService.OpenAccount with openAccountRequestCid
+
+closeAccount : Party -> Party -> AccountKey -> PartiesMap -> Update ()
+closeAccount operator user account observers = do
+  serviceCid <- toInterfaceContractId @CustodyService.I . fst <$> fetchByKey @CustodyService.T (operator, user)
+  closeAccountRequestCid <- exercise serviceCid CustodyService.RequestCloseAccount with account
+  exercise serviceCid CustodyService.CloseAccount with closeAccountRequestCid
+
+deposit : Party -> Party -> InstrumentQuantity -> AccountKey -> Update (ContractId Holding.I)
+deposit operator user quantity account = do
+  serviceCid <- toInterfaceContractId @CustodyService.I . fst <$> fetchByKey @CustodyService.T (operator, user)
+  depositRequestCid <- exercise serviceCid CustodyService.RequestDeposit with quantity, account
+  exercise serviceCid CustodyService.Deposit with depositRequestCid

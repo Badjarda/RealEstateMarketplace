@@ -1,0 +1,266 @@
+module Interface.Role.Operator where
+
+import Interface.Role.User qualified as User(Role, Offer, Request)
+import Interface.RoleManager.UserRole.Permission
+import Interface.RoleManager.Service qualified as UserRoleManager(Service, Offer, Request)
+import Interface.Custody.Service qualified as Custody(Service, Offer, Request)
+import Interface.Issuance.Service qualified as Issuance(Service, Offer, Request)
+import Interface.ProfileManager.Service qualified as UserProfileManager(Service, Offer, Request)
+import Interface.PropertyManager.Service qualified as PropertyManager(Service, Offer, Request)
+
+import Interface.RoleManager.UserRole.Factory qualified as UserRole (Factory(..))
+import Interface.PropertyManager.Property.ApartmentProperty.Factory qualified as ApartmentProperty (Factory(..))
+import Interface.PropertyManager.Property.LandProperty.Factory qualified as LandProperty (Factory(..))
+import Interface.PropertyManager.Property.ResidenceProperty.Factory qualified as ResidenceProperty (Factory(..))
+import Interface.PropertyManager.Property.GarageProperty.Factory qualified as GarageProperty (Factory(..))
+import Interface.PropertyManager.Property.WarehouseProperty.Factory qualified as WarehouseProperty (Factory(..))
+import Interface.ProfileManager.UserProfile.Factory qualified as UserProfile (Factory(..))
+
+import Interface.Common.Types (UserRoleKey(..))
+import Daml.Finance.Interface.Types.Common.Types (HoldingFactoryKey, PartiesMap)
+import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
+import Daml.Finance.Interface.Account.Factory qualified as AccountFactory (I)
+
+type I = Role
+
+type O = Offer
+
+type R = Request
+
+type V = View
+
+data View = View
+  with
+      operator: Party
+      userRoleFactoryCid: ContractId UserRole.Factory 
+  deriving (Eq, Show)
+
+data OView = OView
+  with
+      operator: Party
+      userRoleFactoryCid: ContractId UserRole.Factory 
+  deriving (Eq, Show)
+
+data RView = RView
+  with
+      operator: Party
+  deriving (Eq, Show)
+
+interface Role where
+  viewtype V
+
+  createInitialRole : CreateInitialRole -> Update (UserRoleKey)
+
+  offerUserRole : OfferUserRole -> Update (ContractId User.Offer)
+  approveUserRole : ApproveUserRole -> Update (ContractId User.Role)
+
+  offerUserRoleManagerService : OfferUserRoleManagerService -> Update (ContractId UserRoleManager.Offer)
+  approveUserRoleManagerService : ApproveUserRoleManagerRequest -> Update (ContractId UserRoleManager.Service)
+  terminateUserRoleManagerService : TerminateUserRoleManagerService -> Update ()
+
+  offerPropertyManagerService : OfferPropertyManagerService -> Update (ContractId PropertyManager.Offer)
+  approvePropertyManagerService : ApprovePropertyManagerRequest -> Update (ContractId PropertyManager.Service)
+  terminatePropertyManagerService : TerminatePropertyManagerService -> Update ()
+
+  offerUserProfileManagerService : OfferUserProfileManagerService -> Update (ContractId UserProfileManager.Offer)
+  approveUserProfileManagerService : ApproveUserProfileManagerRequest -> Update (ContractId UserProfileManager.Service)
+  terminateUserProfileManagerService : TerminateUserProfileManagerService -> Update ()
+
+  offerCustodianService : OfferCustodianService -> Update (ContractId Custody.Offer)
+  approveCustodianService : ApproveCustodianRequest -> Update (ContractId Custody.Service)
+  terminateCustodianService : TerminateCustodianService -> Update ()
+
+  offerIssuanceService : OfferIssuanceService -> Update (ContractId Issuance.Offer)
+  approveIssuanceService : ApproveIssuanceRequest -> Update (ContractId Issuance.Service)
+  terminateIssuanceService : TerminateIssuanceService -> Update ()
+
+  terminateRole : TerminateRole -> Update ()
+
+  nonconsuming choice CreateInitialRole : UserRoleKey
+    with
+      userDescription : Text
+      userPermissions : [Permission]
+      observers : PartiesMap
+    controller (view this).operator
+    do
+      createInitialRole this arg
+
+  nonconsuming choice OfferUserRole : ContractId User.Offer
+    with
+      user: Party
+      userRole : UserRoleKey
+    controller (view this).operator
+    do
+      offerUserRole this arg
+
+  nonconsuming choice ApproveUserRole : ContractId User.Role
+    with
+      userRoleRequestCid: ContractId User.Request
+      userRole : UserRoleKey
+    controller (view this).operator
+    do
+      approveUserRole this arg
+
+  nonconsuming choice OfferUserRoleManagerService : ContractId UserRoleManager.Offer
+    with
+      user: Party
+      userRoleFactoryCid: ContractId UserRole.Factory 
+    controller (view this).operator
+    do
+      offerUserRoleManagerService this arg
+
+  nonconsuming choice ApproveUserRoleManagerRequest : ContractId UserRoleManager.Service
+    with
+      userRoleManagerServiceRequestCid : ContractId UserRoleManager.Request
+      userRoleFactoryCid: ContractId UserRole.Factory 
+    controller (view this).operator
+    do
+        approveUserRoleManagerService this arg
+
+  nonconsuming choice TerminateUserRoleManagerService : ()
+    with
+      user: Party
+    controller (view this).operator
+    do
+      terminateUserRoleManagerService this arg
+
+  nonconsuming choice OfferPropertyManagerService : ContractId PropertyManager.Offer
+    with
+      user: Party
+      apartmentPropertyFactoryCid: ContractId ApartmentProperty.Factory
+      landPropertyFactoryCid: ContractId LandProperty.Factory
+      residencePropertyFactoryCid: ContractId ResidenceProperty.Factory
+      garagePropertyFactoryCid: ContractId GarageProperty.Factory
+      warehousePropertyFactoryCid: ContractId WarehouseProperty.Factory
+    controller (view this).operator
+    do
+      offerPropertyManagerService this arg
+
+  nonconsuming choice ApprovePropertyManagerRequest : ContractId PropertyManager.Service
+    with
+      propertyManagerServiceRequestCid : ContractId PropertyManager.Request
+      apartmentPropertyFactoryCid: ContractId ApartmentProperty.Factory 
+      landPropertyFactoryCid: ContractId LandProperty.Factory
+      residencePropertyFactoryCid: ContractId ResidenceProperty.Factory
+      garagePropertyFactoryCid: ContractId GarageProperty.Factory
+      warehousePropertyFactoryCid: ContractId WarehouseProperty.Factory
+    controller (view this).operator
+    do
+        approvePropertyManagerService this arg
+
+  nonconsuming choice TerminatePropertyManagerService : ()
+    with
+      user: Party
+    controller (view this).operator
+    do
+      terminatePropertyManagerService this arg
+  
+  nonconsuming choice OfferUserProfileManagerService : ContractId UserProfileManager.Offer
+    with
+      user: Party
+      userProfileFactoryCid: ContractId UserProfile.Factory 
+    controller (view this).operator
+    do
+      offerUserProfileManagerService this arg
+
+  nonconsuming choice ApproveUserProfileManagerRequest : ContractId UserProfileManager.Service
+    with
+      userProfileManagerServiceRequestCid : ContractId UserProfileManager.Request
+      userProfileFactoryCid: ContractId UserProfile.Factory 
+    controller (view this).operator
+    do
+        approveUserProfileManagerService this arg
+
+  nonconsuming choice TerminateUserProfileManagerService : ()
+    with
+      user: Party
+    controller (view this).operator
+    do
+      terminateUserProfileManagerService this arg
+
+  nonconsuming choice OfferCustodianService : ContractId Custody.Offer
+    with
+      user: Party
+      accountFactoryCid : ContractId AccountFactory.I
+      holdingFactoryKey : HoldingFactoryKey
+      claimRuleCid : ContractId Lifecycle.Claim
+    controller (view this).operator
+    do
+      offerCustodianService this arg
+
+  nonconsuming choice ApproveCustodianRequest : ContractId Custody.Service
+    with
+      custodyServiceRequestCid : ContractId Custody.Request
+      accountFactoryCid : ContractId AccountFactory.I
+      holdingFactoryKey : HoldingFactoryKey
+      claimRuleCid : ContractId Lifecycle.Claim
+    controller (view this).operator
+    do
+      approveCustodianService this arg
+
+  nonconsuming choice TerminateCustodianService : ()
+    with
+      user: Party
+    controller (view this).operator
+    do
+      terminateCustodianService this arg
+
+  nonconsuming choice OfferIssuanceService : ContractId Issuance.Offer
+    with
+      user: Party
+    controller (view this).operator
+    do
+      offerIssuanceService this arg
+
+  nonconsuming choice ApproveIssuanceRequest : ContractId Issuance.Service
+    with
+      issuanceServiceRequestCid : ContractId Issuance.Request
+    controller (view this).operator
+    do
+      approveIssuanceService this arg
+
+  nonconsuming choice TerminateIssuanceService : ()
+    with
+      user: Party
+    controller (view this).operator
+    do
+      terminateIssuanceService this arg
+
+  choice TerminateRole: ()
+    controller (view this).operator
+    do
+      terminateRole this arg
+  
+interface Offer where
+    viewtype OView
+
+    accept : Accept -> Update (ContractId Role)
+    decline : Decline -> Update ()
+
+    choice Accept : ContractId Role
+      controller (view this).operator
+      do
+        accept this arg
+
+    choice Decline : ()
+      controller (view this).operator
+      do
+        decline this arg
+
+interface Request where
+  viewtype RView
+  
+  approve : Approve -> Update (ContractId Role)
+  reject : Reject -> Update ()
+
+  choice Approve : ContractId Role
+    with
+      userRoleFactoryCid: ContractId UserRole.Factory 
+    controller (view this).operator
+    do
+      approve this arg
+
+  choice Reject : ()
+    controller (view this).operator
+    do
+      reject this arg

@@ -1,0 +1,40 @@
+module Interface.PropertyManager.Choices.RequestCreateWarehouseProperty where
+
+import Interface.PropertyManager.Property.Common (WarehouseType(..))
+import Interface.Common.Removable qualified as Removable (I, Implementation)
+import Daml.Finance.Interface.Types.Common.Types (InstrumentKey, PartiesMap, Id)
+
+type I = RequestCreateWarehouseProperty
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    warehouseInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    warehouseType: WarehouseType 
+    grossArea: Decimal
+    usableArea: Decimal
+    floors: Int
+    buildDate: Date
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+    observers : PartiesMap
+  deriving (Eq, Show)
+
+interface RequestCreateWarehouseProperty where
+  viewtype View
+
+  asRemovable : Removable.I
+
+type Implementation t = (HasToInterface t RequestCreateWarehouseProperty, Removable.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation RequestCreateWarehouseProperty
+instance HasToInterface RequestCreateWarehouseProperty Removable.I where _toInterface = asRemovable

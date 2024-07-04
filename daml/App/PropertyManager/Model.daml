@@ -1,0 +1,192 @@
+module App.PropertyManager.Model where
+
+import DA.Set (fromList)
+
+import Interface.Common.Removable qualified as Removable (I, View(..))
+import Interface.PropertyManager.Choices.RequestCreateApartmentProperty qualified as RequestCreateApartmentProperty (HasImplementation, I, View(..))
+import Interface.PropertyManager.Choices.RequestCreateLandProperty qualified as RequestCreateLandProperty (HasImplementation, I, View(..))
+import Interface.PropertyManager.Choices.RequestCreateResidenceProperty qualified as RequestCreateResidenceProperty (HasImplementation, I, View(..))
+import Interface.PropertyManager.Choices.RequestCreateGarageProperty qualified as RequestCreateGarageProperty (HasImplementation, I, View(..))
+import Interface.PropertyManager.Choices.RequestCreateWarehouseProperty qualified as RequestCreateWarehouseProperty (HasImplementation, I, View(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
+import Interface.PropertyManager.Property.Common (WarehouseType, GarageType, LandType, ViableConstructionTypes, ResidenceType, Parking, Orientation)
+
+
+instance RequestCreateApartmentProperty.HasImplementation RequestCreateApartmentProperty
+
+template RequestCreateApartmentProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    apartmentInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    grossArea: Decimal
+    usableArea: Decimal
+    bedrooms: Int
+    bathrooms: Int
+    floor: Int
+    parkingSpaces: Int
+    elevator: Bool
+    buildDate: Date
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+    observers : PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, id) : (Party, Id)
+    maintainer key._1
+
+    interface instance Removable.I for RequestCreateApartmentProperty where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance RequestCreateApartmentProperty.I for RequestCreateApartmentProperty where
+      view = RequestCreateApartmentProperty.View with ..
+      asRemovable = toInterface @Removable.I this
+
+instance RequestCreateLandProperty.HasImplementation RequestCreateLandProperty
+
+template RequestCreateLandProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    landInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    landType: LandType
+    totalLandArea: Decimal
+    minimumSurfaceForSale: Decimal
+    buildableArea: Decimal
+    buildableFloors: Int
+    accessByRoad: Bool
+    installedEquipment: Text
+    viableConstructionTypes: [ViableConstructionTypes]
+    additionalInformation: Text
+    description: Text
+    observers : PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, id) : (Party, Id)
+    maintainer key._1
+
+    interface instance Removable.I for RequestCreateLandProperty where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance RequestCreateLandProperty.I for RequestCreateLandProperty where
+      view = RequestCreateLandProperty.View with ..
+      asRemovable = toInterface @Removable.I this
+
+instance RequestCreateResidenceProperty.HasImplementation RequestCreateResidenceProperty
+
+template RequestCreateResidenceProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    residenceInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    grossArea: Decimal
+    usableArea: Decimal
+    bedrooms: Int
+    bathrooms: Int
+    floors: Int
+    residenceType: ResidenceType
+    backyard: Text -- m^2, frontwards, backwards...
+    parking: Parking
+    buildDate: Date
+    orientation: Orientation
+    installedEquipment: Text
+    additionalInformation: Text -- Other relevant information
+    description: Text
+    observers : PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, id) : (Party, Id)
+    maintainer key._1
+
+    interface instance Removable.I for RequestCreateResidenceProperty where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance RequestCreateResidenceProperty.I for RequestCreateResidenceProperty where
+      view = RequestCreateResidenceProperty.View with ..
+      asRemovable = toInterface @Removable.I this
+
+instance RequestCreateGarageProperty.HasImplementation RequestCreateGarageProperty
+
+template RequestCreateGarageProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    garageInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    garageArea: Decimal
+    garageType: GarageType
+    vehicleCapacity: Int
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+    observers : PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, id) : (Party, Id)
+    maintainer key._1
+
+    interface instance Removable.I for RequestCreateGarageProperty where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance RequestCreateGarageProperty.I for RequestCreateGarageProperty where
+      view = RequestCreateGarageProperty.View with ..
+      asRemovable = toInterface @Removable.I this
+
+instance RequestCreateWarehouseProperty.HasImplementation RequestCreateWarehouseProperty
+
+template RequestCreateWarehouseProperty
+  with
+    operator: Party
+    user: Party
+    id: Id
+    warehouseInstrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    warehouseType: WarehouseType 
+    grossArea: Decimal
+    usableArea: Decimal
+    floors: Int
+    buildDate: Date
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+    observers : PartiesMap
+  where
+    signatory operator, user
+
+    key (operator, id) : (Party, Id)
+    maintainer key._1
+
+    interface instance Removable.I for RequestCreateWarehouseProperty where
+      view = Removable.View with removers = fromList [operator, user]
+
+    interface instance RequestCreateWarehouseProperty.I for RequestCreateWarehouseProperty where
+      view = RequestCreateWarehouseProperty.View with ..
+      asRemovable = toInterface @Removable.I this

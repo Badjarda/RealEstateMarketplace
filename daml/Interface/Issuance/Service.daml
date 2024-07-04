@@ -1,0 +1,126 @@
+module Interface.Issuance.Service where
+
+import Interface.Base.Service qualified as Base (I, Implementation)
+import Interface.Issuance.Issuance qualified as Issuance (I)
+import Interface.Issuance.Choices.IssueRequest qualified as IssueRequest (I)
+import Interface.Issuance.Choices.DeIssueRequest qualified as DeIssueRequest (I)
+
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, Id, InstrumentQuantity)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+
+
+type I = Service
+
+type O = Offer
+
+type R = Request
+
+type V = View
+
+data View = View {}
+  deriving (Eq, Show)
+
+data OView = OView
+  with
+    user : Party
+    operator : Party
+  deriving(Eq, Show)
+
+data RView = RView
+  with
+    user : Party
+    operator : Party
+  deriving(Eq, Show)
+
+interface Service where
+  viewtype V
+
+  asBase : Base.I
+
+  requestIssue : RequestIssue -> Update (ContractId IssueRequest.I)
+  requestDeIssue : RequestDeIssue -> Update (ContractId DeIssueRequest.I)
+  issue : Issue -> Update (ContractId Issuance.I, ContractId Holding.I)
+  deIssue : DeIssue -> Update (ContractId Issuance.I)
+
+  nonconsuming choice RequestIssue : ContractId IssueRequest.I
+    with
+      issuanceId : Id
+      description : Text
+      quantity : InstrumentQuantity
+      account : AccountKey
+    controller (view $ asBase this).user
+    do
+      requestIssue this arg
+
+  nonconsuming choice RequestDeIssue : ContractId DeIssueRequest.I
+    with
+      issuanceId : Id
+      holdingCid : ContractId Holding.I
+    controller (view $ asBase this).user
+    do
+      requestDeIssue this arg
+
+  nonconsuming choice Issue : (ContractId Issuance.I, ContractId Holding.I)
+    with
+      issueRequestCid : ContractId IssueRequest.I
+    controller (view $ asBase this).operator
+    do
+      issue this arg
+
+  nonconsuming choice DeIssue : (ContractId Issuance.I)
+    with
+      deIssueRequestCid : ContractId DeIssueRequest.I
+    controller (view $ asBase this).operator
+    do
+      deIssue this arg
+
+interface Offer where
+  viewtype OView
+
+  accept : Accept -> Update (ContractId Service)
+  decline : Decline -> Update ()
+  withdraw : Withdraw -> Update ()
+
+  choice Accept : ContractId Service
+    controller (view this).user
+    do
+      accept this arg
+
+  choice Decline : ()
+    controller (view this).user
+    do
+      decline this arg
+
+  choice Withdraw : ()
+    controller (view this).operator
+    do
+      withdraw this arg
+
+interface Request where
+  viewtype RView
+
+  cancel : Cancel -> Update ()
+  reject : Reject -> Update ()
+  approve : Approve -> Update (ContractId Service)
+
+  choice Cancel : ()
+    controller (view this).user
+    do
+      cancel this arg
+
+  choice Reject : ()
+    controller (view this).operator
+    do
+      reject this arg
+
+  choice Approve : ContractId Service
+    with
+      operator: Party
+    controller operator, (view this).operator
+    do
+      approve this arg
+
+type Implementation t = (HasToInterface t Service, Base.Implementation t)
+class (Implementation t) => HasImplementation t
+instance HasImplementation Service
+instance HasToInterface Service Base.I where _toInterface = asBase

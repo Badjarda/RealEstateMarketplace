@@ -1,0 +1,41 @@
+module Interface.ProfileManager.UserProfile.Factory where
+
+import Interface.Common.Types (UserProfileKey(..))
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile (I)
+
+import Daml.Finance.Interface.Types.Common.Types (PartiesMap)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (I)
+
+type I = Factory
+
+type V = View
+
+data View = View
+  with
+    operator : Party
+  deriving (Eq, Show)
+
+interface Factory requires Disclosure.I where
+  viewtype V
+
+  create' : Create -> Update (ContractId UserProfile.I)
+
+  nonconsuming choice Create : ContractId UserProfile.I
+    with
+      userProfileKey: UserProfileKey
+      username: Text
+      firstName: Text
+      lastName: Text
+      fullName: Text
+      birthday: Date
+      gender: Optional Gender
+      nationality: Nationality
+      contactMail: Text
+      cellphoneNumber: Optional Int
+      taxId: Int
+      socialSecurityId: Int
+      observers : PartiesMap
+    controller userProfileKey.operator
+    do
+      create' this arg

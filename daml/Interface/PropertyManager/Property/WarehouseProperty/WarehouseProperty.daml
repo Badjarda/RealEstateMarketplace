@@ -1,0 +1,341 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
+module Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty where
+import Interface.Common.Types (PropertyKey(..))
+import Interface.PropertyManager.Property.Common (WarehouseType(..))
+
+import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, Parties, InstrumentKey)
+import Daml.Finance.Interface.Util.Disclosure qualified as Disclosure (AddObservers(..), I, RemoveObservers(..), flattenObservers)
+import Daml.Finance.Interface.Util.InterfaceKey (createReferenceHelper, disclosureUpdateReferenceHelper, exerciseInterfaceByKeyHelper)
+import Daml.Finance.Interface.Util.InterfaceKey qualified as InterfaceKey (HasInterfaceKey(..))
+
+
+type I = WarehouseProperty
+
+type R = Reference
+
+type V = View
+
+data View = View
+  with
+    operator: Party
+    user: Party
+    id: Id
+    instrument: InstrumentKey
+    propertyAddress: Text
+    propertyPostalCode : Text
+    propertyDistrict : Text
+    propertyCounty : Text
+    warehouseType: WarehouseType 
+    grossArea: Decimal
+    usableArea: Decimal
+    floors: Int
+    buildDate: Date
+    installedEquipment: Text
+    additionalInformation: Text
+    description: Text
+  deriving (Eq, Show)
+
+toKey : View -> PropertyKey
+toKey v = PropertyKey with operator = v.operator, user = v.user, id = v.id
+
+propertyKey : (HasToInterface i WarehouseProperty) => i -> PropertyKey
+propertyKey = toKey . view . toInterface @WarehouseProperty
+
+
+interface WarehouseProperty requires Disclosure.I where
+  viewtype V
+
+  getKey : PropertyKey
+
+  getWarehouseInstrumentKey : GetWarehouseInstrumentKey -> Update(InstrumentKey)
+  setWarehouseInstrumentKey : SetWarehouseInstrumentKey -> Update(ContractId WarehouseProperty)
+
+  getWarehousePropertyAddress : GetWarehousePropertyAddress -> Update(Text)
+  setWarehousePropertyAddress : SetWarehousePropertyAddress -> Update(ContractId WarehouseProperty)
+
+  getWarehousePropertyPostalCode : GetWarehousePropertyPostalCode -> Update(Text)
+  setWarehousePropertyPostalCode : SetWarehousePropertyPostalCode -> Update(ContractId WarehouseProperty)
+
+  getWarehousePropertyDistrict : GetWarehousePropertyDistrict -> Update(Text)
+  setWarehousePropertyDistrict : SetWarehousePropertyDistrict -> Update(ContractId WarehouseProperty)
+
+  getWarehousePropertyCounty : GetWarehousePropertyCounty -> Update(Text)
+  setWarehousePropertyCounty : SetWarehousePropertyCounty -> Update(ContractId WarehouseProperty)
+
+  getWarehouseType : GetWarehouseType -> Update(WarehouseType)
+  setWarehouseType : SetWarehouseType -> Update(ContractId WarehouseProperty)
+
+  getWarehouseGrossArea : GetWarehouseGrossArea -> Update(Decimal)
+  setWarehouseGrossArea : SetWarehouseGrossArea -> Update(ContractId WarehouseProperty)
+
+  getWarehouseUsableArea : GetWarehouseUsableArea -> Update(Decimal)
+  setWarehouseUsableArea : SetWarehouseUsableArea -> Update(ContractId WarehouseProperty)
+
+  getWarehouseFloors : GetWarehouseFloors -> Update(Int)
+  setWarehouseFloors : SetWarehouseFloors -> Update(ContractId WarehouseProperty)
+
+  getWarehouseBuildDate : GetWarehouseBuildDate -> Update(Date)
+  setWarehouseBuildDate : SetWarehouseBuildDate -> Update(ContractId WarehouseProperty)
+
+  getWarehouseInstalledEquipment : GetWarehouseInstalledEquipment -> Update(Text)
+  setWarehouseInstalledEquipment : SetWarehouseInstalledEquipment -> Update(ContractId WarehouseProperty)
+
+  getWarehouseAdditionalInformation : GetWarehouseAdditionalInformation -> Update(Text)
+  setWarehouseAdditionalInformation : SetWarehouseAdditionalInformation -> Update(ContractId WarehouseProperty)
+
+  getWarehouseDescription : GetWarehouseDescription -> Update(Text)
+  setWarehouseDescription : SetWarehouseDescription -> Update(ContractId WarehouseProperty)
+
+  nonconsuming choice GetView : View
+    with
+      viewer : Party
+    controller viewer
+    do
+      pure $ view this
+  
+  nonconsuming choice GetWarehouseInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      getWarehouseInstrumentKey this arg
+
+  choice SetWarehouseInstrumentKey: ContractId WarehouseProperty
+    with
+      newWarehouseInstrumentKey : InstrumentKey
+    controller signatory this
+    do
+      setWarehouseInstrumentKey this arg
+  
+  nonconsuming choice GetWarehousePropertyAddress : Text
+    controller signatory this
+    do
+      getWarehousePropertyAddress this arg
+
+  choice SetWarehousePropertyAddress : ContractId WarehouseProperty
+    with
+      newWarehousePropertyAddress : Text
+    controller signatory this
+    do
+      setWarehousePropertyAddress this arg
+
+  nonconsuming choice GetWarehousePropertyPostalCode : Text
+    controller signatory this
+    do
+      getWarehousePropertyPostalCode this arg
+
+  choice SetWarehousePropertyPostalCode : ContractId WarehouseProperty
+    with
+      newWarehousePropertyPostalCode : Text
+    controller signatory this
+    do
+      setWarehousePropertyPostalCode this arg
+  
+  nonconsuming choice GetWarehousePropertyDistrict : Text
+    controller signatory this
+    do
+      getWarehousePropertyDistrict this arg
+
+  choice SetWarehousePropertyDistrict : ContractId WarehouseProperty
+    with
+      newWarehousePropertyDistrict : Text
+    controller signatory this
+    do
+      setWarehousePropertyDistrict this arg
+
+  nonconsuming choice GetWarehousePropertyCounty : Text
+    controller signatory this
+    do
+      getWarehousePropertyCounty this arg
+
+  choice SetWarehousePropertyCounty : ContractId WarehouseProperty
+    with
+      newWarehousePropertyCounty : Text
+    controller signatory this
+    do
+      setWarehousePropertyCounty this arg
+
+  nonconsuming choice GetWarehouseType : WarehouseType
+    controller signatory this
+    do
+      getWarehouseType this arg
+
+  choice SetWarehouseType : ContractId WarehouseProperty
+    with
+      newWarehouseType : WarehouseType
+    controller signatory this
+    do
+      setWarehouseType this arg
+
+  nonconsuming choice GetWarehouseGrossArea : Decimal
+    controller signatory this
+    do
+      getWarehouseGrossArea this arg
+
+  choice SetWarehouseGrossArea : ContractId WarehouseProperty
+    with
+      newWarehouseGrossArea : Decimal
+    controller signatory this
+    do
+      setWarehouseGrossArea this arg
+
+  nonconsuming choice GetWarehouseUsableArea : Decimal
+    controller signatory this
+    do
+      getWarehouseUsableArea this arg
+
+  choice SetWarehouseUsableArea : ContractId WarehouseProperty
+    with
+      newWarehouseUsableArea : Decimal
+    controller signatory this
+    do
+      setWarehouseUsableArea this arg
+
+  nonconsuming choice GetWarehouseFloors : Int
+    controller signatory this
+    do
+      getWarehouseFloors this arg
+
+  choice SetWarehouseFloors : ContractId WarehouseProperty
+    with
+      newWarehouseFloors : Int
+    controller signatory this
+    do
+      setWarehouseFloors this arg
+
+  nonconsuming choice GetWarehouseBuildDate : Date
+    controller signatory this
+    do
+      getWarehouseBuildDate this arg
+
+  choice SetWarehouseBuildDate : ContractId WarehouseProperty
+    with
+      newWarehouseBuildDate : Date
+    controller signatory this
+    do
+      setWarehouseBuildDate this arg
+  
+  nonconsuming choice GetWarehouseInstalledEquipment : Text
+    controller signatory this
+    do
+      getWarehouseInstalledEquipment this arg
+
+  choice SetWarehouseInstalledEquipment : ContractId WarehouseProperty
+    with
+      newWarehouseInstalledEquipment : Text
+    controller signatory this
+    do
+      setWarehouseInstalledEquipment this arg
+  
+  nonconsuming choice GetWarehouseAdditionalInformation : Text
+    controller signatory this
+    do
+      getWarehouseAdditionalInformation this arg
+
+  choice SetWarehouseAdditionalInformation : ContractId WarehouseProperty
+    with
+      newWarehouseAdditionalInformation : Text
+    controller signatory this
+    do
+      setWarehouseAdditionalInformation this arg
+
+  nonconsuming choice GetWarehouseDescription : Text
+    controller signatory this
+    do
+      getWarehouseDescription this arg
+
+  choice SetWarehouseDescription : ContractId WarehouseProperty
+    with
+      newWarehouseDescription : Text
+    controller signatory this
+    do
+      setWarehouseDescription this arg
+      
+  choice Remove : ()
+    controller signatory this
+    do
+      (refCid, _) <- fetchByKey @Reference $ getKey this
+      archive refCid
+
+
+template Reference
+  with
+    warehousePropertyView : View
+    cid : ContractId WarehouseProperty
+    observers : PartiesMap
+  where
+    signatory warehousePropertyView.operator
+    observer Disclosure.flattenObservers observers, warehousePropertyView.user
+
+    key toKey warehousePropertyView : PropertyKey
+    maintainer key.operator
+
+    nonconsuming choice GetCid : ContractId WarehouseProperty
+      with
+        viewer : Party
+      controller viewer
+      do
+        pure cid
+
+    choice SetCid : ContractId Reference
+      with
+        newCid : ContractId WarehouseProperty
+      controller signatory this
+      do
+        create this with cid = newCid
+
+    choice SetObservers : ContractId Reference
+      with
+        newObservers : PartiesMap
+      controller signatory this
+      do
+        create this with observers = newObservers
+
+disclose : (Text, Parties) -> Party -> Parties -> PropertyKey -> Update (ContractId WarehouseProperty)
+disclose observersToAdd actor disclosers warehouseProperty =
+  fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      warehouseProperty
+      actor
+      Disclosure.AddObservers with disclosers; observersToAdd
+
+undisclose : (Text, Parties) -> Party -> Parties -> PropertyKey ->
+  Update (Optional (ContractId WarehouseProperty))
+undisclose observersToRemove actor disclosers warehouseProperty =
+  fmap fromInterfaceContractId <$>
+    exerciseInterfaceByKey @Disclosure.I
+      warehouseProperty
+      actor
+      Disclosure.RemoveObservers with disclosers; observersToRemove
+
+exerciseInterfaceByKey : forall i c r.
+    ( HasInterfaceTypeRep i
+    , HasExercise i c r
+    )
+    => PropertyKey -- ^ The WarehouseProperty key.
+    -> Party      -- ^ The actor exercising.
+    -> c          -- ^ The choice arguments.
+    -> Update r
+exerciseInterfaceByKey k actor arg =
+  exerciseInterfaceByKeyHelper @Reference @GetCid @SetCid @SetObservers @GetView @i k actor arg
+
+-- | HIDE
+-- Create instance of HasInterfaceKey.
+instance InterfaceKey.HasInterfaceKey WarehouseProperty View PropertyKey Reference GetCid SetCid SetObservers
+  GetView where
+    createReference = Reference
+    getCid = GetCid
+    setCid = SetCid
+    setObservers = SetObservers
+    getView = GetView
+
+-- | HIDE
+-- Create Reference for the WarehouseProperty.
+createReference : Party -> ContractId WarehouseProperty -> Update (ContractId Reference)
+createReference = createReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView
+
+-- | HIDE
+-- Helper function to update the WarehouseProperty reference once observers are added to the WarehouseProperty.
+disclosureUpdateReference : PropertyKey -> PartiesMap -> ContractId WarehouseProperty ->
+  Update (ContractId Disclosure.I)
+disclosureUpdateReference =
+  disclosureUpdateReferenceHelper @Reference @GetCid @SetCid @SetObservers @GetView

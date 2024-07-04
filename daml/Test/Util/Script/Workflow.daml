@@ -1,0 +1,580 @@
+module Test.Util.Script.Workflow where
+
+import DA.Set (fromList, singleton)
+import DA.Optional (fromSome)
+
+import Interface.RoleManager.Service qualified as RoleManagerService (I, CreateUserRole(..), DeleteUserRole(..), AddPermissionToUserRole(..), RemovePermissionInUserRole(..), UpdateUserRole(..))
+import Interface.ProfileManager.Service qualified as ProfileManagerService(I, RequestCreateUserProfile(..), CreateUserProfile(..), UpdateUsername(..), UpdateFirstName(..), UpdateLastName(..), UpdateFullName(..), UpdateBirthday(..), UpdateGender(..), UpdateNationality(..), UpdateContactMail(..), UpdateCellphoneNumber(..), UpdateTaxId(..), UpdateSocialSecurityId(..))
+import Interface.PropertyManager.Service qualified as PropertyManagerService (I, RequestCreateApartmentProperty(..), RequestCreateLandProperty(..), RequestCreateResidenceProperty(..), RequestCreateGarageProperty(..), CreateApartmentProperty(..), UpdateApartmentInstrumentKey(..), UpdateApartmentPropertyAddress(..), UpdateApartmentPropertyPostalCode(..), UpdateApartmentPropertyDistrict(..), UpdateApartmentPropertyCounty(..), UpdateApartmentGrossArea(..), UpdateApartmentUsableArea(..), UpdateApartmentBedrooms(..), UpdateApartmentBathrooms(..), UpdateApartmentFloor(..), UpdateApartmentParkingSpaces(..), UpdateApartmentElevator(..), UpdateApartmentBuildDate(..), UpdateApartmentInstalledEquipment(..), UpdateApartmentAdditionalInformation(..), UpdateApartmentDescription(..), CreateLandProperty(..), UpdateLandPropertyAddress(..), UpdateLandPropertyPostalCode(..), UpdateLandPropertyDistrict(..), UpdateLandPropertyCounty(..), UpdateLandType(..), UpdateTotalLandArea(..), UpdateMinimumSurfaceForSale(..), UpdateLandBuildableArea(..), UpdateLandBuildableFloors(..), UpdateLandAccessByRoad(..), UpdateLandInstalledEquipment(..), UpdateLandViableConstructionTypes(..), UpdateLandAdditionalInformation(..), UpdateLandDescription(..), CreateResidenceProperty(..), UpdateResidencePropertyAddress(..), UpdateResidencePropertyPostalCode(..), UpdateResidencePropertyDistrict(..), UpdateResidencePropertyCounty(..), UpdateResidenceGrossArea(..), UpdateResidenceUsableArea(..), UpdateResidenceBedrooms(..), UpdateResidenceBathrooms(..), UpdateResidenceFloors(..), UpdateResidenceType(..), UpdateResidenceBackyard(..), UpdateResidenceInstalledEquipment(..), UpdateResidenceParking(..), UpdateResidenceBuildDate(..), UpdateResidenceOrientation(..), UpdateResidenceAdditionalInformation(..), UpdateResidenceDescription(..), CreateGarageProperty(..), UpdateGaragePropertyAddress(..), UpdateGaragePropertyPostalCode(..), UpdateGaragePropertyDistrict(..), UpdateGaragePropertyCounty(..), UpdateGarageArea(..), UpdateGarageType(..), UpdateVehicleCapacity(..), UpdateGarageInstalledEquipment(..), UpdateGarageAdditionalInformation(..), UpdateGarageDescription(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehousePropertyAddress(..), UpdateWarehousePropertyPostalCode(..), UpdateWarehousePropertyDistrict(..), UpdateWarehousePropertyCounty(..), UpdateWarehouseType(..), UpdateWarehouseGrossArea(..), UpdateWarehouseUsableArea(..), UpdateWarehouseFloors(..), UpdateWarehouseBuildDate(..), UpdateWarehouseInstalledEquipment(..), UpdateWarehouseAdditionalInformation(..), UpdateWarehouseDescription(..))
+import Interface.Custody.Service qualified as CustodyService (I, OpenAccount(..), RequestOpenAccount(..), RequestDeposit(..), Deposit(..), CloseAccount(..), RequestCloseAccount(..), Withdrawal(..), RequestWithdraw(..))
+import Interface.Issuance.Service qualified as IssuanceService (I, RequestIssue(..), Issue(..), RequestDeIssue(..), DeIssue(..))
+
+import Interface.Common.Types (UserRoleKey(..), PropertyKey(..), UserProfileKey(..))
+import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
+import Interface.PropertyManager.Property.Common (WarehouseType(..),GarageType(..), LandType(..), ViableConstructionTypes(..), ResidenceType(..), Parking(..), Orientation(..))
+import Interface.RoleManager.UserRole.Permission
+
+import Interface.Issuance.Issuance qualified as Issuance (I)
+
+import App.RoleManager.Service qualified as RoleManagerService (T)
+import App.PropertyManager.Service qualified as PropertyManagerService (T)
+import App.ProfileManager.Service qualified as ProfileManagerService (T)
+import App.Custody.Service qualified as CustodyService (T)
+import App.Issuance.Service qualified as IssuanceService (T)
+
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, Id(..), InstrumentQuantity, PartiesMap, InstrumentKey, HoldingStandard(..), Id)
+import Daml.Finance.Instrument.Token.Instrument qualified as Token (Instrument(..))
+import Daml.Finance.Interface.Instrument.Base.Instrument qualified as Instrument (GetView(..), I, Reference(..))
+import Daml.Finance.Interface.Account.Account qualified as Account (Controllers(..))
+import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I, Transfer(..))
+import Daml.Script
+
+-- Custody Service
+
+openAccount : Party -> Party -> Party -> Text -> PartiesMap -> Script (AccountKey)
+openAccount operator user public id observers = do
+  let controllers = Account.Controllers with outgoing = singleton user; incoming = singleton user
+  serviceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T user (operator, user)
+  openAccountRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid CustodyService.RequestOpenAccount with id = Id id; description = id; controllers; observers
+  submitMulti [operator] [public] do exerciseCmd serviceCid CustodyService.OpenAccount with openAccountRequestCid
+
+closeAccount : Party -> Party -> Party -> AccountKey -> PartiesMap -> Script ()
+closeAccount operator user public account observers = do
+  serviceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T user (operator, user)
+  closeAccountRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid CustodyService.RequestCloseAccount with account
+  submitMulti [operator] [public] do exerciseCmd serviceCid CustodyService.CloseAccount with closeAccountRequestCid
+
+deposit : Party -> Party -> Party -> InstrumentQuantity -> AccountKey -> Script (ContractId Holding.I)
+deposit operator user public quantity account = do
+  serviceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T user (operator, user)
+  depositRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid CustodyService.RequestDeposit with quantity; account
+  submitMulti [operator] [public] do exerciseCmd serviceCid CustodyService.Deposit with depositRequestCid
+
+withdrawal : Party -> Party -> Party -> ContractId Holding.I -> Script ()
+withdrawal operator user public holdingCid = do
+  serviceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T user (operator, user)
+  withdrawRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid CustodyService.RequestWithdraw with holdingCid
+  submitMulti [operator] [user] do exerciseCmd serviceCid CustodyService.Withdrawal with withdrawRequestCid
+
+originateToken : Party -> Party -> PartiesMap -> Time -> Text -> Text -> Script InstrumentKey
+originateToken depository issuer observers validAsOf id description = do
+  cid <- coerceContractId <$> submitMulti [depository, issuer] [] do
+    createCmd Token.Instrument with depository; issuer; id = Id id; version = "0"; observers; validAsOf; description; holdingStandard = TransferableFungible
+  createReference cid depository issuer observers
+
+createReference : ContractId Instrument.I -> Party -> Party -> PartiesMap -> Script InstrumentKey
+createReference cid depository issuer observers = do
+  instrumentView <- submitMulti [depository, issuer] [] do exerciseCmd cid Instrument.GetView with viewer = issuer
+  let ref = Instrument.Reference with instrumentView; cid; observers
+  submitMulti [depository, issuer] [] do createCmd ref
+  pure $ key ref
+
+issue : Party -> Party -> Party -> InstrumentQuantity -> AccountKey -> Script (ContractId Issuance.I, ContractId Holding.I)
+issue operator user public quantity account = do
+  let
+    issuanceId = Id $ "ISSUANCE-" <> show quantity.unit.id
+    description = "Issuance of " <> show quantity.amount <> " " <> show quantity.unit.id
+  serviceCid <- toInterfaceContractId @IssuanceService.I . fst . fromSome <$> queryContractKey @IssuanceService.T user (operator, user)
+  issueRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid IssuanceService.RequestIssue with issuanceId; description; quantity; account
+  submitMulti [operator] [public] do exerciseCmd serviceCid IssuanceService.Issue with issueRequestCid
+
+deIssue : Party -> Party -> Party -> InstrumentQuantity -> ContractId Holding.I -> Script (ContractId Issuance.I)
+deIssue operator user public quantity holdingCid = do
+  let
+    issuanceId = Id $ "ISSUANCE-" <> show quantity.unit.id
+    description = "Issuance of " <> show quantity.amount <> " " <> show quantity.unit.id
+  serviceCid <- toInterfaceContractId @IssuanceService.I . fst . fromSome <$> queryContractKey @IssuanceService.T user (operator, user)
+  deIssueRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid IssuanceService.RequestDeIssue with issuanceId; holdingCid
+  submitMulti [operator] [public] do exerciseCmd serviceCid IssuanceService.DeIssue with deIssueRequestCid
+
+transfer : Party -> AccountKey -> Party -> ContractId Transferable.I -> Script (ContractId Transferable.I)
+transfer from toAccount public depositCid = do
+  submitMulti [from, toAccount.owner] [public] do exerciseCmd depositCid Transferable.Transfer with actors = fromList [from, toAccount.owner]; newOwnerAccount = toAccount
+
+-- UserRoleManager Service
+
+createUserRole : Party -> Party -> Party -> Id -> Text -> [Permission] -> PartiesMap -> Script (UserRoleKey)
+createUserRole operator user public id description permissions observers = do
+  serviceCid <- toInterfaceContractId @RoleManagerService.I . fst . fromSome <$> queryContractKey @RoleManagerService.T user (operator, user)
+  submitMulti [operator] [public] do exerciseCmd serviceCid RoleManagerService.CreateUserRole with ..
+
+deleteUserRole : Party -> Party -> Party -> UserRoleKey -> Script ()
+deleteUserRole operator user public userRole = do
+  serviceCid <- toInterfaceContractId @RoleManagerService.I . fst . fromSome <$> queryContractKey @RoleManagerService.T user (operator, user)
+  submitMulti [operator] [public] do exerciseCmd serviceCid RoleManagerService.DeleteUserRole with ..
+
+addPermissionToUserRole : Party -> Party -> Party -> UserRoleKey -> Permission -> Script ()
+addPermissionToUserRole operator user public userRole permission = do
+  serviceCid <- toInterfaceContractId @RoleManagerService.I . fst . fromSome <$> queryContractKey @RoleManagerService.T user (operator, user)
+  submitMulti [operator] [public] do exerciseCmd serviceCid RoleManagerService.AddPermissionToUserRole with ..
+
+removePermissionInUserRole : Party -> Party -> Party -> UserRoleKey -> Permission -> Script ()
+removePermissionInUserRole operator user public userRole permission = do
+  serviceCid <- toInterfaceContractId @RoleManagerService.I . fst . fromSome <$> queryContractKey @RoleManagerService.T user (operator, user)
+  submitMulti [operator] [public] do exerciseCmd serviceCid RoleManagerService.RemovePermissionInUserRole with ..
+
+updateUserRole : Party -> Party -> Party -> UserRoleKey -> [Permission] -> Script ()
+updateUserRole operator user public userRole permissions = do
+  serviceCid <- toInterfaceContractId @RoleManagerService.I . fst . fromSome <$> queryContractKey @RoleManagerService.T user (operator, user)
+  submitMulti [operator] [public] do exerciseCmd serviceCid RoleManagerService.UpdateUserRole with ..
+
+addPermissionToUserRoleFail : Party -> Party -> Party -> UserRoleKey -> Permission -> Script ()
+addPermissionToUserRoleFail operator user public userRole permission  = do
+  serviceCid <- toInterfaceContractId @RoleManagerService.I . fst . fromSome <$> queryContractKey @RoleManagerService.T user (operator, user)
+  submitMultiMustFail [operator] [public] do exerciseCmd serviceCid RoleManagerService.AddPermissionToUserRole with ..
+
+removePermissionInUserRoleFail : Party -> Party -> Party -> UserRoleKey -> Permission -> Script ()
+removePermissionInUserRoleFail operator user public userRole permission = do
+  serviceCid <- toInterfaceContractId @RoleManagerService.I . fst . fromSome <$> queryContractKey @RoleManagerService.T user (operator, user)
+  submitMultiMustFail [operator] [public] do exerciseCmd serviceCid RoleManagerService.RemovePermissionInUserRole with ..
+
+-- User Profile Service
+
+createUserProfile : Party -> Party -> Party -> PartiesMap -> Id -> Text -> Text -> Text -> Text -> Date -> Optional Gender -> Nationality -> Text -> Optional Int -> Int -> Int -> Script(UserProfileKey)
+createUserProfile operator user public observers id username firstName lastName fullName birthday gender nationality contactMail cellphoneNumber taxId socialSecurityId = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  createUserProfileRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.RequestCreateUserProfile with ..
+  submitMulti [operator] [public] do exerciseCmd serviceCid ProfileManagerService.CreateUserProfile with createUserProfileRequest = createUserProfileRequestCid
+
+updateUserProfileUsername : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
+updateUserProfileUsername operator user public userProfileKey newUsername = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateUsername with ..
+
+updateUserProfileFirstName : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
+updateUserProfileFirstName operator user public userProfileKey newFirstName = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateFirstName with ..
+
+updateUserProfileLastName : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
+updateUserProfileLastName operator user public userProfileKey newLastName = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateLastName with ..
+
+updateUserProfileFullName : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
+updateUserProfileFullName operator user public userProfileKey newFullName = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateFullName with ..
+
+updateUserProfileContactMail : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
+updateUserProfileContactMail operator user public userProfileKey newContactMail = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateContactMail with ..
+
+updateUserProfileBirthday : Party -> Party -> Party -> UserProfileKey -> Date -> Script()
+updateUserProfileBirthday operator user public userProfileKey newBirthday = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateBirthday with ..
+
+updateUserProfileGender : Party -> Party -> Party -> UserProfileKey -> Optional Gender -> Script()
+updateUserProfileGender operator user public userProfileKey newGender = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateGender with ..
+
+updateUserProfileNationality : Party -> Party -> Party -> UserProfileKey -> Nationality -> Script()
+updateUserProfileNationality operator user public userProfileKey newNationality = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateNationality with ..
+
+updateUserProfileCellphoneNumber : Party -> Party -> Party -> UserProfileKey -> Optional Int -> Script()
+updateUserProfileCellphoneNumber operator user public userProfileKey newCellphoneNumber = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateCellphoneNumber with ..
+
+updateUserProfileTaxId : Party -> Party -> Party -> UserProfileKey -> Int -> Script()
+updateUserProfileTaxId operator user public userProfileKey newTaxId = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateTaxId with ..
+
+updateUserProfileSocialSecurityId : Party -> Party -> Party -> UserProfileKey -> Int -> Script()
+updateUserProfileSocialSecurityId operator user public userProfileKey newSocialSecurityId = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateSocialSecurityId with ..
+
+------ Apartment Property Manager
+
+createApartmentProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> Decimal -> Decimal -> Int -> Int -> Int -> Int -> Bool -> Date -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createApartmentProperty operator user public observers id apartmentInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty grossArea usableArea bedrooms bathrooms floor parkingSpaces elevator buildDate installedEquipment additionalInformation description = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  createApartmentPropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateApartmentProperty with ..
+  submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateApartmentProperty with createApartmentPropertyRequest = createApartmentPropertyRequestCid
+
+updateApartmentInstrumentKey : Party -> Party -> Party -> PropertyKey -> InstrumentKey -> Script()
+updateApartmentInstrumentKey operator user public propertyKey newApartmentInstrumentKey = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentInstrumentKey with ..
+
+updateApartmentPropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateApartmentPropertyAddress operator user public propertyKey newApartmentPropertyAddress = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentPropertyAddress with ..
+
+updateApartmentPropertyPostalCode : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateApartmentPropertyPostalCode operator user public propertyKey newApartmentPropertyPostalCode = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentPropertyPostalCode with ..
+
+updateApartmentPropertyDistrict : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateApartmentPropertyDistrict operator user public propertyKey newApartmentPropertyDistrict = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentPropertyDistrict with ..
+
+updateApartmentPropertyCounty : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateApartmentPropertyCounty operator user public propertyKey newApartmentPropertyCounty = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentPropertyCounty with ..
+
+updateApartmentGrossArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateApartmentGrossArea operator user public propertyKey newApartmentGrossArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentGrossArea with ..
+
+updateApartmentUsableArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateApartmentUsableArea operator user public propertyKey newApartmentUsableArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentUsableArea with ..
+
+updateApartmentBedrooms : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateApartmentBedrooms operator user public propertyKey newApartmentBedrooms = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentBedrooms with ..
+
+updateApartmentBathrooms : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateApartmentBathrooms operator user public propertyKey newApartmentBathrooms = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentBathrooms with ..
+
+updateFloor : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateFloor operator user public propertyKey newApartmentFloor = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentFloor with ..
+
+updateParkingSpaces : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateParkingSpaces operator user public propertyKey newApartmentParkingSpaces = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentParkingSpaces with ..
+
+updateElevator : Party -> Party -> Party -> PropertyKey -> Bool -> Script()
+updateElevator operator user public propertyKey newApartmentElevator = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentElevator with ..
+
+updateApartmentBuildDate : Party -> Party -> Party -> PropertyKey -> Date -> Script()
+updateApartmentBuildDate operator user public propertyKey newApartmentBuildDate = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentBuildDate with ..
+
+updateApartmentInstalledEquipment : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateApartmentInstalledEquipment operator user public propertyKey newApartmentInstalledEquipment = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentInstalledEquipment with ..
+
+updateApartmentAdditionalInformation : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateApartmentAdditionalInformation operator user public propertyKey newApartmentAdditionalInformation = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentAdditionalInformation with ..
+
+updateApartmentDescription : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateApartmentDescription operator user public propertyKey newApartmentDescription = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentDescription with ..
+
+------ Land Property Manager
+
+createLandProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> LandType -> Decimal -> Decimal -> Decimal -> Int -> Bool -> Text -> [ViableConstructionTypes] -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createLandProperty operator user public observers id landInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty landType totalLandArea minimumSurfaceForSale buildableArea buildableFloors accessByRoad installedEquipment viableConstructionTypes additionalInformation description = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  createLandPropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateLandProperty with ..
+  submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateLandProperty with createLandPropertyRequest = createLandPropertyRequestCid
+
+updateLandPropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateLandPropertyAddress operator user public propertyKey newLandPropertyAddress = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandPropertyAddress with ..
+
+updateLandPropertyPostalCode : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateLandPropertyPostalCode operator user public propertyKey newLandPropertyPostalCode = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandPropertyPostalCode with ..
+
+updateLandPropertyDistrict : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateLandPropertyDistrict operator user public propertyKey newLandPropertyDistrict = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandPropertyDistrict with ..
+
+updateLandPropertyCounty : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateLandPropertyCounty operator user public propertyKey newLandPropertyCounty = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandPropertyCounty with ..
+
+updateLandType : Party -> Party -> Party -> PropertyKey -> LandType -> Script()
+updateLandType operator user public propertyKey newLandType = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandType with ..
+
+updateTotalLandArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateTotalLandArea operator user public propertyKey newTotalLandArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateTotalLandArea with ..
+
+updateMinimumSurfaceForSale : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateMinimumSurfaceForSale operator user public propertyKey newLandMinimumSurfaceForSale = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateMinimumSurfaceForSale with ..
+
+updateBuildableArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateBuildableArea operator user public propertyKey newLandBuildableArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandBuildableArea with ..
+
+updateBuildableFloors : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateBuildableFloors operator user public propertyKey newLandBuildableFloors = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandBuildableFloors with ..
+
+updateAccessByRoad : Party -> Party -> Party -> PropertyKey -> Bool -> Script()
+updateAccessByRoad operator user public propertyKey newLandAccessByRoad = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandAccessByRoad with ..
+
+updateLandInstalledEquipment : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateLandInstalledEquipment operator user public propertyKey newLandInstalledEquipment = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandInstalledEquipment with ..
+
+updateViableConstructionTypes : Party -> Party -> Party -> PropertyKey -> [ViableConstructionTypes] -> Script()
+updateViableConstructionTypes operator user public propertyKey newLandViableConstructionTypes = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandViableConstructionTypes with ..
+
+updateLandAdditionalInformation : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateLandAdditionalInformation operator user public propertyKey newLandAdditionalInformation = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandAdditionalInformation with ..
+
+updateLandDescription : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateLandDescription operator user public propertyKey newLandDescription = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandDescription with ..
+
+---- Residence Property Manager
+
+createResidenceProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> Decimal -> Decimal -> Int -> Int -> Int -> ResidenceType -> Text -> Parking -> Date -> Orientation -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createResidenceProperty operator user public observers id residenceInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty grossArea usableArea bedrooms bathrooms floors residenceType backyard parking buildDate orientation installedEquipment additionalInformation description = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  createResidencePropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateResidenceProperty with ..
+  submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateResidenceProperty with createResidencePropertyRequest = createResidencePropertyRequestCid
+
+updateResidencePropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidencePropertyAddress operator user public propertyKey newResidencePropertyAddress = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidencePropertyAddress with ..
+
+updateResidencePropertyPostalCode : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidencePropertyPostalCode operator user public propertyKey newResidencePropertyPostalCode = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidencePropertyPostalCode with ..
+
+updateResidencePropertyDistrict : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidencePropertyDistrict operator user public propertyKey newResidencePropertyDistrict = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidencePropertyDistrict with ..
+
+updateResidencePropertyCounty : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidencePropertyCounty operator user public propertyKey newResidencePropertyCounty = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidencePropertyCounty with ..
+
+updateResidenceGrossArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateResidenceGrossArea operator user public propertyKey newResidenceGrossArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceGrossArea with ..
+
+updateResidenceUsableArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateResidenceUsableArea operator user public propertyKey newResidenceUsableArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceUsableArea with ..
+
+updateResidenceBedrooms : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateResidenceBedrooms operator user public propertyKey newResidenceBedrooms = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceBedrooms with ..
+
+updateResidenceBathrooms : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateResidenceBathrooms operator user public propertyKey newResidenceBathrooms = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceBathrooms with ..
+
+updateResidenceFloors : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateResidenceFloors operator user public propertyKey newResidenceFloors = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceFloors with ..
+
+updateResidenceType : Party -> Party -> Party -> PropertyKey -> ResidenceType -> Script()
+updateResidenceType operator user public propertyKey newResidenceType = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceType with ..
+
+updateResidenceBackyard : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidenceBackyard operator user public propertyKey newResidenceBackyardDescription = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceBackyard with ..
+
+updateResidenceParking : Party -> Party -> Party -> PropertyKey -> Parking -> Script()
+updateResidenceParking operator user public propertyKey newResidenceParking = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceParking with ..
+
+updateResidenceBuildDate : Party -> Party -> Party -> PropertyKey -> Date -> Script()
+updateResidenceBuildDate operator user public propertyKey newResidenceBuildDate = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceBuildDate with ..
+
+updateResidenceOrientation : Party -> Party -> Party -> PropertyKey -> Orientation -> Script()
+updateResidenceOrientation operator user public propertyKey newResidenceOrientation = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceOrientation with ..
+
+updateResidenceInstalledEquipment : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidenceInstalledEquipment operator user public propertyKey newResidenceInstalledEquipment = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceInstalledEquipment with ..
+
+updateResidenceAdditionalInformation : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidenceAdditionalInformation operator user public propertyKey newResidenceAdditionalInformation = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceAdditionalInformation with ..
+
+updateResidenceDescription : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateResidenceDescription operator user public propertyKey newResidenceDescription = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidenceDescription with ..
+
+---- Garage Property Manager
+
+createGarageProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> GarageType -> Decimal -> Int -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createGarageProperty operator user public observers id garageInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty garageType garageArea vehicleCapacity installedEquipment additionalInformation description = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  createGaragePropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateGarageProperty with ..
+  submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateGarageProperty with createGaragePropertyRequest = createGaragePropertyRequestCid
+
+updateGaragePropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateGaragePropertyAddress operator user public propertyKey newGaragePropertyAddress = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGaragePropertyAddress with ..
+
+updateGaragePropertyPostalCode : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateGaragePropertyPostalCode operator user public propertyKey newGaragePropertyPostalCode = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGaragePropertyPostalCode with ..
+
+updateGaragePropertyDistrict : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateGaragePropertyDistrict operator user public propertyKey newGaragePropertyDistrict = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGaragePropertyDistrict with ..
+
+updateGaragePropertyCounty : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateGaragePropertyCounty operator user public propertyKey newGaragePropertyCounty = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGaragePropertyCounty with ..
+
+updateGarageType : Party -> Party -> Party -> PropertyKey -> GarageType -> Script()
+updateGarageType operator user public propertyKey newGarageType = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGarageType with ..
+
+updateGarageArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateGarageArea operator user public propertyKey newGarageArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGarageArea with ..
+
+updateVehicleCapacity : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateVehicleCapacity operator user public propertyKey newVehicleCapacity = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateVehicleCapacity with ..
+
+updateGarageInstalledEquipment : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateGarageInstalledEquipment operator user public propertyKey newGarageInstalledEquipment = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGarageInstalledEquipment with ..
+
+updateGarageAdditionalInformation : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateGarageAdditionalInformation operator user public propertyKey newGarageAdditionalInformation = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGarageAdditionalInformation with ..
+
+updateGarageDescription : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateGarageDescription operator user public propertyKey newGarageDescription = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGarageDescription with ..
+
+----------------------------------------------------------------------------------------------
+
+---- Warehouse Property Manager
+
+createWarehouseProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> WarehouseType -> Decimal -> Decimal -> Int -> Date -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createWarehouseProperty operator user public observers id warehouseInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty warehouseType grossArea usableArea floors buildDate installedEquipment additionalInformation description = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  createWarehousePropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateWarehouseProperty with ..
+  submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateWarehouseProperty with createWarehousePropertyRequest = createWarehousePropertyRequestCid
+
+updateWarehousePropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateWarehousePropertyAddress operator user public propertyKey newWarehousePropertyAddress = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehousePropertyAddress with ..
+
+updateWarehousePropertyPostalCode : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateWarehousePropertyPostalCode operator user public propertyKey newWarehousePropertyPostalCode = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehousePropertyPostalCode with ..
+
+updateWarehousePropertyDistrict : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateWarehousePropertyDistrict operator user public propertyKey newWarehousePropertyDistrict = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehousePropertyDistrict with ..
+
+updateWarehousePropertyCounty : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateWarehousePropertyCounty operator user public propertyKey newWarehousePropertyCounty = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehousePropertyCounty with ..
+
+updateWarehouseType : Party -> Party -> Party -> PropertyKey -> WarehouseType -> Script()
+updateWarehouseType operator user public propertyKey newWarehouseType = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseType with ..
+
+updateWarehouseGrossArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateWarehouseGrossArea operator user public propertyKey newWarehouseGrossArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseGrossArea with ..
+
+updateWarehouseUsableArea : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateWarehouseUsableArea operator user public propertyKey newWarehouseUsableArea = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseUsableArea with ..
+
+updateWarehouseFloors : Party -> Party -> Party -> PropertyKey -> Int -> Script()
+updateWarehouseFloors operator user public propertyKey newWarehouseFloors = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseFloors with ..
+
+updateWarehouseBuildDate : Party -> Party -> Party -> PropertyKey -> Date -> Script()
+updateWarehouseBuildDate operator user public propertyKey newWarehouseBuildDate = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseBuildDate with ..
+
+updateWarehouseInstalledEquipment : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateWarehouseInstalledEquipment operator user public propertyKey newWarehouseInstalledEquipment = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseInstalledEquipment with ..
+
+updateWarehouseAdditionalInformation : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateWarehouseAdditionalInformation operator user public propertyKey newWarehouseAdditionalInformation = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseAdditionalInformation with ..
+
+updateWarehouseDescription : Party -> Party -> Party -> PropertyKey -> Text -> Script()
+updateWarehouseDescription operator user public propertyKey newWarehouseDescription = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehouseDescription with ..

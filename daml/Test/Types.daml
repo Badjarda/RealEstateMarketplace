@@ -1,0 +1,16 @@
+module Test.Types where
+
+import Interface.Base.Service qualified as Service (I)
+import Interface.Common.Types (UserRoleKey(..))
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Types.Common.Types (AccountKey, InstrumentKey)
+
+
+data Fixture = Fixture
+  with
+    instruments : [InstrumentKey]
+    accounts : [AccountKey]
+    holdings : [ContractId Holding.I]
+    services : [ContractId Service.I]
+    roles : [UserRoleKey]
+  deriving (Eq, Show)
