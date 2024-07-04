@@ -184,4 +184,227 @@ public final class UserProfile {
       return exerciseSetLastName(new SetLastName(newLastName));
     }
 
-    default Update<Exercised
+    default Update<Exercised<ContractId>> exerciseSetSocialSecurityId(SetSocialSecurityId arg) {
+      return makeExerciseCmd(CHOICE_SetSocialSecurityId, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetSocialSecurityId(Long newSocialSecurityId) {
+      return exerciseSetSocialSecurityId(new SetSocialSecurityId(newSocialSecurityId));
+    }
+
+    default Update<Exercised<View>> exerciseGetView(GetView arg) {
+      return makeExerciseCmd(CHOICE_GetView, arg);
+    }
+
+    default Update<Exercised<View>> exerciseGetView(String viewer) {
+      return exerciseGetView(new GetView(viewer));
+    }
+
+    default Update<Exercised<Long>> exerciseGetSocialSecurityId(GetSocialSecurityId arg) {
+      return makeExerciseCmd(CHOICE_GetSocialSecurityId, arg);
+    }
+
+    default Update<Exercised<Long>> exerciseGetSocialSecurityId() {
+      return exerciseGetSocialSecurityId(new GetSocialSecurityId());
+    }
+
+    default Update<Exercised<Unit>> exerciseRemove(Remove arg) {
+      return makeExerciseCmd(CHOICE_Remove, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseRemove() {
+      return exerciseRemove(new Remove());
+    }
+
+    default Update<Exercised<Nationality>> exerciseGetNationality(GetNationality arg) {
+      return makeExerciseCmd(CHOICE_GetNationality, arg);
+    }
+
+    default Update<Exercised<Nationality>> exerciseGetNationality() {
+      return exerciseGetNationality(new GetNationality());
+    }
+
+    default Update<Exercised<String>> exerciseGetFirstName(GetFirstName arg) {
+      return makeExerciseCmd(CHOICE_GetFirstName, arg);
+    }
+
+    default Update<Exercised<String>> exerciseGetFirstName() {
+      return exerciseGetFirstName(new GetFirstName());
+    }
+
+    default Update<Exercised<Optional<Gender>>> exerciseGetGender(GetGender arg) {
+      return makeExerciseCmd(CHOICE_GetGender, arg);
+    }
+
+    default Update<Exercised<Optional<Gender>>> exerciseGetGender() {
+      return exerciseGetGender(new GetGender());
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetTaxId(SetTaxId arg) {
+      return makeExerciseCmd(CHOICE_SetTaxId, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetTaxId(Long newTaxId) {
+      return exerciseSetTaxId(new SetTaxId(newTaxId));
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetUsername(SetUsername arg) {
+      return makeExerciseCmd(CHOICE_SetUsername, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetUsername(String newUsername) {
+      return exerciseSetUsername(new SetUsername(newUsername));
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetCellphoneNumber(SetCellphoneNumber arg) {
+      return makeExerciseCmd(CHOICE_SetCellphoneNumber, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetCellphoneNumber(
+        Optional<Long> newCellphoneNumber) {
+      return exerciseSetCellphoneNumber(new SetCellphoneNumber(newCellphoneNumber));
+    }
+
+    default Update<Exercised<String>> exerciseGetLastName(GetLastName arg) {
+      return makeExerciseCmd(CHOICE_GetLastName, arg);
+    }
+
+    default Update<Exercised<String>> exerciseGetLastName() {
+      return exerciseGetLastName(new GetLastName());
+    }
+
+    default Update<Exercised<String>> exerciseGetUsername(GetUsername arg) {
+      return makeExerciseCmd(CHOICE_GetUsername, arg);
+    }
+
+    default Update<Exercised<String>> exerciseGetUsername() {
+      return exerciseGetUsername(new GetUsername());
+    }
+
+    default Update<Exercised<Optional<Long>>> exerciseGetCellphoneNumber(GetCellphoneNumber arg) {
+      return makeExerciseCmd(CHOICE_GetCellphoneNumber, arg);
+    }
+
+    default Update<Exercised<Optional<Long>>> exerciseGetCellphoneNumber() {
+      return exerciseGetCellphoneNumber(new GetCellphoneNumber());
+    }
+
+    default Update<Exercised<String>> exerciseGetContactMail(GetContactMail arg) {
+      return makeExerciseCmd(CHOICE_GetContactMail, arg);
+    }
+
+    default Update<Exercised<String>> exerciseGetContactMail() {
+      return exerciseGetContactMail(new GetContactMail());
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetFirstName(SetFirstName arg) {
+      return makeExerciseCmd(CHOICE_SetFirstName, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetFirstName(String newFirstName) {
+      return exerciseSetFirstName(new SetFirstName(newFirstName));
+    }
+
+    default Update<Exercised<String>> exerciseGetFullName(GetFullName arg) {
+      return makeExerciseCmd(CHOICE_GetFullName, arg);
+    }
+
+    default Update<Exercised<String>> exerciseGetFullName() {
+      return exerciseGetFullName(new GetFullName());
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetGender(SetGender arg) {
+      return makeExerciseCmd(CHOICE_SetGender, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetGender(Optional<Gender> newGender) {
+      return exerciseSetGender(new SetGender(newGender));
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetBirthday(SetBirthday arg) {
+      return makeExerciseCmd(CHOICE_SetBirthday, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetBirthday(LocalDate newBirthday) {
+      return exerciseSetBirthday(new SetBirthday(newBirthday));
+    }
+
+    default Update<Exercised<Long>> exerciseGetTaxId(GetTaxId arg) {
+      return makeExerciseCmd(CHOICE_GetTaxId, arg);
+    }
+
+    default Update<Exercised<Long>> exerciseGetTaxId() {
+      return exerciseGetTaxId(new GetTaxId());
+    }
+
+    default Update<Exercised<Unit>> exerciseArchive(daml.da.internal.template.Archive arg) {
+      return makeExerciseCmd(CHOICE_Archive, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseArchive() {
+      return exerciseArchive(new daml.da.internal.template.Archive());
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetFullName(SetFullName arg) {
+      return makeExerciseCmd(CHOICE_SetFullName, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetFullName(String newFullName) {
+      return exerciseSetFullName(new SetFullName(newFullName));
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetNationality(SetNationality arg) {
+      return makeExerciseCmd(CHOICE_SetNationality, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetNationality(Nationality newNationality) {
+      return exerciseSetNationality(new SetNationality(newNationality));
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetContactMail(SetContactMail arg) {
+      return makeExerciseCmd(CHOICE_SetContactMail, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetContactMail(String newContactMail) {
+      return exerciseSetContactMail(new SetContactMail(newContactMail));
+    }
+  }
+
+  public static final class CreateAnd extends com.daml.ledger.javaapi.data.codegen.CreateAnd.ToInterface implements Exercises<CreateAndExerciseCommand> {
+    public CreateAnd(ContractCompanion<?, ?, ?> companion, Template createArguments) {
+      super(companion, createArguments);
+    }
+
+    @Override
+    protected ContractTypeCompanion<? extends Contract<ContractId, ?>, ContractId, UserProfile, ?> getCompanion(
+        ) {
+      return INTERFACE;
+    }
+  }
+
+  public static final class ByKey extends com.daml.ledger.javaapi.data.codegen.ByKey.ToInterface implements Exercises<ExerciseByKeyCommand> {
+    public ByKey(ContractCompanion<?, ?, ?> companion, Value key) {
+      super(companion, key);
+    }
+
+    @Override
+    protected ContractTypeCompanion<? extends Contract<ContractId, ?>, ContractId, UserProfile, ?> getCompanion(
+        ) {
+      return INTERFACE;
+    }
+  }
+
+  public static final class INTERFACE_ extends InterfaceCompanion<UserProfile, ContractId, View> {
+    INTERFACE_() {
+      super(
+            "daml.interface$.profilemanager.userprofile.userprofile.UserProfile", UserProfile.TEMPLATE_ID, ContractId::new, View.valueDecoder(),
+            View::fromJson,List.of(CHOICE_SetFirstName, CHOICE_SetUsername, CHOICE_Remove,
+            CHOICE_GetTaxId, CHOICE_SetContactMail, CHOICE_SetLastName, CHOICE_Archive,
+            CHOICE_GetBirthday, CHOICE_GetView, CHOICE_SetTaxId, CHOICE_GetSocialSecurityId,
+            CHOICE_SetCellphoneNumber, CHOICE_SetFullName, CHOICE_GetFullName, CHOICE_SetBirthday,
+            CHOICE_GetUsername, CHOICE_GetLastName, CHOICE_GetCellphoneNumber,
+            CHOICE_GetNationality, CHOICE_GetGender, CHOICE_GetFirstName, CHOICE_GetContactMail,
+            CHOICE_SetNationality, CHOICE_SetSocialSecurityId, CHOICE_SetGender));
+    }
+  }
+}
