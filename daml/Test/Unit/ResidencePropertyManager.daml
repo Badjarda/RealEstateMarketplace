@@ -10,7 +10,7 @@ import Interface.PropertyManager.Property.Common (ResidenceType(..), Parking(..)
 import Test.Util.Update.Service (createPropertyManagerService)
 import Test.Util.Update.Role (createOperatorRole, createRoleUser)
 import Test.Util.Update.Workflow (createInitialUserRole)
-import Test.Util.Script.Workflow (createResidenceProperty, updateResidencePropertyAddress, updateResidencePropertyPostalCode, updateResidencePropertyDistrict, updateResidencePropertyCounty, updateResidenceGrossArea, updateResidenceUsableArea, updateResidenceBedrooms, updateResidenceBathrooms, updateResidenceFloors, updateResidenceType, updateResidenceBackyard, updateResidenceParking, updateResidenceBuildDate, updateResidenceOrientation, updateResidenceInstalledEquipment, updateResidenceAdditionalInformation, updateResidenceDescription)
+import Test.Util.Script.Workflow (createResidenceProperty, updateResidencePrice, updateResidencePropertyAddress, updateResidencePropertyPostalCode, updateResidencePropertyDistrict, updateResidencePropertyCounty, updateResidenceGrossArea, updateResidenceUsableArea, updateResidenceBedrooms, updateResidenceBathrooms, updateResidenceFloors, updateResidenceType, updateResidenceBackyard, updateResidenceParking, updateResidenceBuildDate, updateResidenceOrientation, updateResidenceInstalledEquipment, updateResidenceAdditionalInformation, updateResidenceDescription)
 import Test.Types (Fixture(..))
 
 import Daml.Finance.Interface.Types.Common.Types (Id(..), InstrumentKey(..), HoldingStandard(..))
@@ -51,7 +51,24 @@ testCreateResidenceProperty = do
       id = Id "Custom Residence Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+
+  pure()
+
+testModifyResidencePrice : Script ()
+testModifyResidencePrice = do
+  parties@[marketplace, user, public] <-
+    mapA allocateParty ["Marketplace", "User", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  let 
+      single_observers = singleton marketplace
+      observers = fromList [("Default", single_observers)]
+      id = Id "Custom Residence Property"
+      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  updateResidencePrice marketplace user public propertyKey 1000000.0
 
   pure()
 
@@ -67,7 +84,7 @@ testModifyResidencePropertyAddress = do
       id = Id "Custom Residence Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidencePropertyAddress marketplace user public propertyKey "Updated Property Address"
 
   pure()
@@ -85,7 +102,7 @@ testModifyResidencePropertyPostalCode = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidencePropertyPostalCode marketplace user public propertyKey "Updated Property Postal Code"
 
   pure()
@@ -103,7 +120,7 @@ testModifyResidencePropertyDistrict = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidencePropertyDistrict marketplace user public propertyKey "Updated Property District"
 
   pure()
@@ -121,7 +138,7 @@ testModifyResidencePropertyCounty = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidencePropertyCounty marketplace user public propertyKey "Updated Property County"
 
   pure()
@@ -139,7 +156,7 @@ testModifyResidencePropertyGrossArea = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceGrossArea marketplace user public propertyKey 220.0
 
   pure()
@@ -157,7 +174,7 @@ testModifyResidencePropertyUsableArea = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceUsableArea marketplace user public propertyKey 200.0
 
   pure()
@@ -175,7 +192,7 @@ testModifyResidencePropertyBedrooms = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceBedrooms marketplace user public propertyKey 4
 
   pure()
@@ -193,7 +210,7 @@ testModifyResidencePropertyBathrooms = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceBathrooms marketplace user public propertyKey 3
 
   pure()
@@ -211,7 +228,7 @@ testModifyResidencePropertyFloors = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceFloors marketplace user public propertyKey 4
 
 testModifyResidenceType : Script ()
@@ -227,7 +244,7 @@ testModifyResidenceType = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceType marketplace user public propertyKey CornerLot
 
   pure()
@@ -245,7 +262,7 @@ testModifyResidencePropertyBackyard = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceBackyard marketplace user public propertyKey "Updated Backyard Description"
 
   pure()
@@ -263,7 +280,7 @@ testModifyResidencePropertyParking = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceParking marketplace user public propertyKey Street
 
   pure()
@@ -281,7 +298,7 @@ testModifyResidencePropertyBuildDate = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceBuildDate marketplace user public propertyKey (date 2023 Jan 01)
 
   pure()
@@ -299,7 +316,7 @@ testModifyResidencePropertyOrientation = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceOrientation marketplace user public propertyKey North
 
   pure()
@@ -317,7 +334,7 @@ testModifyResidencePropertyInstalledEquipment = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceInstalledEquipment marketplace user public propertyKey "Updated Installed Equipment Description"
 
   pure()
@@ -335,7 +352,7 @@ testModifyResidencePropertyAdditionalInformation = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceAdditionalInformation marketplace user public propertyKey "Updated Additional Information Description"
 
   pure()
@@ -353,7 +370,7 @@ testModifyResidencePropertyDescription = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ResidencePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
 
-  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
+  (_,propertyKey) <- createResidenceProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   updateResidenceDescription marketplace user public propertyKey "Updated Description"
 
   pure()

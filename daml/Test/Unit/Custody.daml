@@ -87,7 +87,7 @@ testDepositPropertyInstrument = do
 
   --eur <- originateToken bank bank (fromList [("Public", singleton public)]) yday "EUR" "Euro"
   userAccount <- openAccount marketplace user public "User@Marketplace" empty
-  (instrumentKey,_) <- createApartmentProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
+  (instrumentKey,_) <- createApartmentProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
   deposit marketplace user public (qty 1.0 instrumentKey) userAccount
 
   pure()
@@ -127,7 +127,7 @@ testWithdrawPropertyInstrument = do
     instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "ApartmentPropertInstrumentKey"; version = "0"; holdingStandard = Transferable
 
   userAccount <- openAccount marketplace user public "User@Marketplace" empty
-  (instrumentKey,_) <- createApartmentProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
+  (instrumentKey,_) <- createApartmentProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
   holdingCid <- deposit marketplace user public (qty 1.0 instrumentKey) userAccount
   withdrawal marketplace user public holdingCid
 

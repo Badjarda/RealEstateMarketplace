@@ -20,6 +20,7 @@ data View = View
     user: Party
     id: Id
     instrument: InstrumentKey
+    apartmentPrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -51,6 +52,9 @@ interface ApartmentProperty requires Disclosure.I where
 
   getApartmentInstrumentKey : GetApartmentInstrumentKey -> Update(InstrumentKey)
   setApartmentInstrumentKey : SetApartmentInstrumentKey -> Update(ContractId ApartmentProperty)
+
+  getApartmentPrice : GetApartmentPrice -> Update(Decimal)
+  setApartmentPrice : SetApartmentPrice -> Update(ContractId ApartmentProperty)
 
   getApartmentPropertyAddress : GetApartmentPropertyAddress -> Update(Text)
   setApartmentPropertyAddress : SetApartmentPropertyAddress -> Update(ContractId ApartmentProperty)
@@ -103,6 +107,18 @@ interface ApartmentProperty requires Disclosure.I where
     controller viewer
     do
       pure $ view this
+
+  nonconsuming choice GetApartmentPrice : Decimal
+    controller signatory this
+    do
+      getApartmentPrice this arg
+
+  choice SetApartmentPrice: ContractId ApartmentProperty
+    with
+      newApartmentPrice : Decimal
+    controller signatory this
+    do
+      setApartmentPrice this arg
 
   nonconsuming choice GetApartmentInstrumentKey : InstrumentKey
     controller signatory this

@@ -22,6 +22,7 @@ data View = View
     user: Party
     id: Id
     instrument: InstrumentKey
+    landPrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -52,6 +53,9 @@ interface LandProperty requires Disclosure.I where
 
   getLandInstrumentKey : GetLandInstrumentKey -> Update(InstrumentKey)
   setLandInstrumentKey : SetLandInstrumentKey -> Update(ContractId LandProperty)
+
+  getLandPrice : GetLandPrice -> Update(Decimal)
+  setLandPrice : SetLandPrice -> Update(ContractId LandProperty)
 
   getLandPropertyAddress : GetLandPropertyAddress -> Update(Text)
   setLandPropertyAddress : SetLandPropertyAddress -> Update(ContractId LandProperty)
@@ -113,6 +117,18 @@ interface LandProperty requires Disclosure.I where
     controller signatory this
     do
       setLandInstrumentKey this arg
+  
+  nonconsuming choice GetLandPrice : Decimal
+    controller signatory this
+    do
+      getLandPrice this arg
+
+  choice SetLandPrice: ContractId LandProperty
+    with
+      newLandPrice : Decimal
+    controller signatory this
+    do
+      setLandPrice this arg
   
   nonconsuming choice GetLandPropertyAddress : Text
     controller signatory this

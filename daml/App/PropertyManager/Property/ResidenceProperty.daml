@@ -2,7 +2,7 @@ module App.PropertyManager.Property.ResidenceProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty(I, View(..), GetResidenceInstrumentKey(..), GetResidencePropertyAddress(..), GetResidencePropertyPostalCode(..), GetResidencePropertyDistrict(..), GetResidencePropertyCounty(..), GetResidenceGrossArea(..), GetResidenceUsableArea(..), GetResidenceBedrooms(..), GetResidenceBathrooms(..), GetResidenceFloors(..), GetResidenceType(..), GetResidenceBackyard(..), GetResidenceParking(..), GetResidenceBuildDate(..), GetResidenceOrientation(..), GetResidenceInstalledEquipment(..), GetResidenceAdditionalInformation(..), GetResidenceDescription(..), SetResidenceInstrumentKey(..), SetResidencePropertyAddress(..), SetResidencePropertyPostalCode(..), SetResidencePropertyDistrict(..), SetResidencePropertyCounty(..), SetResidenceGrossArea(..), SetResidenceUsableArea(..), SetResidenceBedrooms(..), SetResidenceBathrooms(..), SetResidenceFloors(..), SetResidenceType(..), SetResidenceBackyard(..), SetResidenceParking(..), SetResidenceBuildDate(..), SetResidenceOrientation(..), SetResidenceInstalledEquipment(..), SetResidenceAdditionalInformation(..), SetResidenceDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty(I, View(..), GetResidenceInstrumentKey(..), GetResidencePrice(..), GetResidencePropertyAddress(..), GetResidencePropertyPostalCode(..), GetResidencePropertyDistrict(..), GetResidencePropertyCounty(..), GetResidenceGrossArea(..), GetResidenceUsableArea(..), GetResidenceBedrooms(..), GetResidenceBathrooms(..), GetResidenceFloors(..), GetResidenceType(..), GetResidenceBackyard(..), GetResidenceParking(..), GetResidenceBuildDate(..), GetResidenceOrientation(..), GetResidenceInstalledEquipment(..), GetResidenceAdditionalInformation(..), GetResidenceDescription(..), SetResidenceInstrumentKey(..), SetResidencePrice(..), SetResidencePropertyAddress(..), SetResidencePropertyPostalCode(..), SetResidencePropertyDistrict(..), SetResidencePropertyCounty(..), SetResidenceGrossArea(..), SetResidenceUsableArea(..), SetResidenceBedrooms(..), SetResidenceBathrooms(..), SetResidenceFloors(..), SetResidenceType(..), SetResidenceBackyard(..), SetResidenceParking(..), SetResidenceBuildDate(..), SetResidenceOrientation(..), SetResidenceInstalledEquipment(..), SetResidenceAdditionalInformation(..), SetResidenceDescription(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.ResidenceProperty.Factory qualified as ResidencePropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (ResidenceType, Parking, Orientation)
 
@@ -16,6 +16,7 @@ template ResidenceProperty
     user: Party
     id: Id
     instrument: InstrumentKey
+    residencePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -48,6 +49,9 @@ template ResidenceProperty
 
       getResidenceInstrumentKey ResidenceProperty.GetResidenceInstrumentKey{} = do 
         pure instrument
+      
+      getResidencePrice ResidenceProperty.GetResidencePrice{} = do 
+        pure residencePrice
 
       getResidencePropertyAddress ResidenceProperty.GetResidencePropertyAddress{} = do 
         pure propertyAddress
@@ -102,6 +106,9 @@ template ResidenceProperty
 
       setResidenceInstrumentKey ResidenceProperty.SetResidenceInstrumentKey{newResidenceInstrumentKey} = do 
         toInterfaceContractId <$> create this with instrument = newResidenceInstrumentKey
+      
+      setResidencePrice ResidenceProperty.SetResidencePrice{newResidencePrice} = do 
+        toInterfaceContractId <$> create this with residencePrice = newResidencePrice
 
       setResidencePropertyAddress ResidenceProperty.SetResidencePropertyAddress{newResidencePropertyAddress} = do 
         toInterfaceContractId <$> create this with propertyAddress = newResidencePropertyAddress
@@ -174,7 +181,7 @@ template Factory
     interface instance ResidencePropertyFactory.I for Factory where
       view = ResidencePropertyFactory.View with operator
       
-      create' ResidencePropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floors, residenceType, backyard, parking, buildDate, orientation, installedEquipment, additionalInformation, description, observers} =
+      create' ResidencePropertyFactory.Create{instrument, propertyKey, residencePrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floors, residenceType, backyard, parking, buildDate, orientation, installedEquipment, additionalInformation, description, observers} =
         do
           cid <- toInterfaceContractId <$> create ResidenceProperty with
             operator = propertyKey.operator

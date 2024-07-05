@@ -5,7 +5,7 @@ import DA.Optional (fromSome)
 
 import Interface.RoleManager.Service qualified as RoleManagerService (I, CreateUserRole(..), DeleteUserRole(..), AddPermissionToUserRole(..), RemovePermissionInUserRole(..), UpdateUserRole(..))
 import Interface.ProfileManager.Service qualified as ProfileManagerService(I, RequestCreateUserProfile(..), CreateUserProfile(..), UpdateUsername(..), UpdateFirstName(..), UpdateLastName(..), UpdateFullName(..), UpdateBirthday(..), UpdateGender(..), UpdateNationality(..), UpdateContactMail(..), UpdateCellphoneNumber(..), UpdateTaxId(..), UpdateSocialSecurityId(..))
-import Interface.PropertyManager.Service qualified as PropertyManagerService (I, RequestCreateApartmentProperty(..), RequestCreateLandProperty(..), RequestCreateResidenceProperty(..), RequestCreateGarageProperty(..), CreateApartmentProperty(..), UpdateApartmentInstrumentKey(..), UpdateApartmentPropertyAddress(..), UpdateApartmentPropertyPostalCode(..), UpdateApartmentPropertyDistrict(..), UpdateApartmentPropertyCounty(..), UpdateApartmentGrossArea(..), UpdateApartmentUsableArea(..), UpdateApartmentBedrooms(..), UpdateApartmentBathrooms(..), UpdateApartmentFloor(..), UpdateApartmentParkingSpaces(..), UpdateApartmentElevator(..), UpdateApartmentBuildDate(..), UpdateApartmentInstalledEquipment(..), UpdateApartmentAdditionalInformation(..), UpdateApartmentDescription(..), CreateLandProperty(..), UpdateLandPropertyAddress(..), UpdateLandPropertyPostalCode(..), UpdateLandPropertyDistrict(..), UpdateLandPropertyCounty(..), UpdateLandType(..), UpdateTotalLandArea(..), UpdateMinimumSurfaceForSale(..), UpdateLandBuildableArea(..), UpdateLandBuildableFloors(..), UpdateLandAccessByRoad(..), UpdateLandInstalledEquipment(..), UpdateLandViableConstructionTypes(..), UpdateLandAdditionalInformation(..), UpdateLandDescription(..), CreateResidenceProperty(..), UpdateResidencePropertyAddress(..), UpdateResidencePropertyPostalCode(..), UpdateResidencePropertyDistrict(..), UpdateResidencePropertyCounty(..), UpdateResidenceGrossArea(..), UpdateResidenceUsableArea(..), UpdateResidenceBedrooms(..), UpdateResidenceBathrooms(..), UpdateResidenceFloors(..), UpdateResidenceType(..), UpdateResidenceBackyard(..), UpdateResidenceInstalledEquipment(..), UpdateResidenceParking(..), UpdateResidenceBuildDate(..), UpdateResidenceOrientation(..), UpdateResidenceAdditionalInformation(..), UpdateResidenceDescription(..), CreateGarageProperty(..), UpdateGaragePropertyAddress(..), UpdateGaragePropertyPostalCode(..), UpdateGaragePropertyDistrict(..), UpdateGaragePropertyCounty(..), UpdateGarageArea(..), UpdateGarageType(..), UpdateVehicleCapacity(..), UpdateGarageInstalledEquipment(..), UpdateGarageAdditionalInformation(..), UpdateGarageDescription(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehousePropertyAddress(..), UpdateWarehousePropertyPostalCode(..), UpdateWarehousePropertyDistrict(..), UpdateWarehousePropertyCounty(..), UpdateWarehouseType(..), UpdateWarehouseGrossArea(..), UpdateWarehouseUsableArea(..), UpdateWarehouseFloors(..), UpdateWarehouseBuildDate(..), UpdateWarehouseInstalledEquipment(..), UpdateWarehouseAdditionalInformation(..), UpdateWarehouseDescription(..))
+import Interface.PropertyManager.Service qualified as PropertyManagerService (I, RequestCreateApartmentProperty(..), RequestCreateLandProperty(..), RequestCreateResidenceProperty(..), RequestCreateGarageProperty(..), CreateApartmentProperty(..), UpdateApartmentPrice(..), UpdateApartmentPropertyAddress(..), UpdateApartmentPropertyPostalCode(..), UpdateApartmentPropertyDistrict(..), UpdateApartmentPropertyCounty(..), UpdateApartmentGrossArea(..), UpdateApartmentUsableArea(..), UpdateApartmentBedrooms(..), UpdateApartmentBathrooms(..), UpdateApartmentFloor(..), UpdateApartmentParkingSpaces(..), UpdateApartmentElevator(..), UpdateApartmentBuildDate(..), UpdateApartmentInstalledEquipment(..), UpdateApartmentAdditionalInformation(..), UpdateApartmentDescription(..), CreateLandProperty(..), UpdateLandPrice(..), UpdateLandPropertyAddress(..), UpdateLandPropertyPostalCode(..), UpdateLandPropertyDistrict(..), UpdateLandPropertyCounty(..), UpdateLandType(..), UpdateTotalLandArea(..), UpdateMinimumSurfaceForSale(..), UpdateLandBuildableArea(..), UpdateLandBuildableFloors(..), UpdateLandAccessByRoad(..), UpdateLandInstalledEquipment(..), UpdateLandViableConstructionTypes(..), UpdateLandAdditionalInformation(..), UpdateLandDescription(..), CreateResidenceProperty(..), UpdateResidencePrice(..), UpdateResidencePropertyAddress(..), UpdateResidencePropertyPostalCode(..), UpdateResidencePropertyDistrict(..), UpdateResidencePropertyCounty(..), UpdateResidenceGrossArea(..), UpdateResidenceUsableArea(..), UpdateResidenceBedrooms(..), UpdateResidenceBathrooms(..), UpdateResidenceFloors(..), UpdateResidenceType(..), UpdateResidenceBackyard(..), UpdateResidenceInstalledEquipment(..), UpdateResidenceParking(..), UpdateResidenceBuildDate(..), UpdateResidenceOrientation(..), UpdateResidenceAdditionalInformation(..), UpdateResidenceDescription(..), CreateGarageProperty(..), UpdateGaragePrice(..), UpdateGaragePropertyAddress(..), UpdateGaragePropertyPostalCode(..), UpdateGaragePropertyDistrict(..), UpdateGaragePropertyCounty(..), UpdateGarageArea(..), UpdateGarageType(..), UpdateVehicleCapacity(..), UpdateGarageInstalledEquipment(..), UpdateGarageAdditionalInformation(..), UpdateGarageDescription(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehousePrice(..), UpdateWarehousePropertyAddress(..), UpdateWarehousePropertyPostalCode(..), UpdateWarehousePropertyDistrict(..), UpdateWarehousePropertyCounty(..), UpdateWarehouseType(..), UpdateWarehouseGrossArea(..), UpdateWarehouseUsableArea(..), UpdateWarehouseFloors(..), UpdateWarehouseBuildDate(..), UpdateWarehouseInstalledEquipment(..), UpdateWarehouseAdditionalInformation(..), UpdateWarehouseDescription(..))
 import Interface.Custody.Service qualified as CustodyService (I, OpenAccount(..), RequestOpenAccount(..), RequestDeposit(..), Deposit(..), CloseAccount(..), RequestCloseAccount(..), Withdrawal(..), RequestWithdraw(..))
 import Interface.Issuance.Service qualified as IssuanceService (I, RequestIssue(..), Issue(..), RequestDeIssue(..), DeIssue(..))
 
@@ -194,16 +194,16 @@ updateUserProfileSocialSecurityId operator user public userProfileKey newSocialS
 
 ------ Apartment Property Manager
 
-createApartmentProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> Decimal -> Decimal -> Int -> Int -> Int -> Int -> Bool -> Date -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
-createApartmentProperty operator user public observers id apartmentInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty grossArea usableArea bedrooms bathrooms floor parkingSpaces elevator buildDate installedEquipment additionalInformation description = do
+createApartmentProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Decimal -> Text -> Text -> Text -> Text -> Decimal -> Decimal -> Int -> Int -> Int -> Int -> Bool -> Date -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createApartmentProperty operator user public observers id apartmentInstrument apartmentPrice propertyAddress propertyPostalCode propertyDistrict propertyCounty grossArea usableArea bedrooms bathrooms floor parkingSpaces elevator buildDate installedEquipment additionalInformation description = do
   serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
   createApartmentPropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateApartmentProperty with ..
   submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateApartmentProperty with createApartmentPropertyRequest = createApartmentPropertyRequestCid
 
-updateApartmentInstrumentKey : Party -> Party -> Party -> PropertyKey -> InstrumentKey -> Script()
-updateApartmentInstrumentKey operator user public propertyKey newApartmentInstrumentKey = do
+updateApartmentPrice : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateApartmentPrice operator user public propertyKey newApartmentPrice = do
   serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentInstrumentKey with ..
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateApartmentPrice with ..
 
 updateApartmentPropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
 updateApartmentPropertyAddress operator user public propertyKey newApartmentPropertyAddress = do
@@ -282,11 +282,16 @@ updateApartmentDescription operator user public propertyKey newApartmentDescript
 
 ------ Land Property Manager
 
-createLandProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> LandType -> Decimal -> Decimal -> Decimal -> Int -> Bool -> Text -> [ViableConstructionTypes] -> Text -> Text -> Script(InstrumentKey, PropertyKey)
-createLandProperty operator user public observers id landInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty landType totalLandArea minimumSurfaceForSale buildableArea buildableFloors accessByRoad installedEquipment viableConstructionTypes additionalInformation description = do
+createLandProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Decimal -> Text -> Text -> Text -> Text -> LandType -> Decimal -> Decimal -> Decimal -> Int -> Bool -> Text -> [ViableConstructionTypes] -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createLandProperty operator user public observers id landInstrument landPrice propertyAddress propertyPostalCode propertyDistrict propertyCounty landType totalLandArea minimumSurfaceForSale buildableArea buildableFloors accessByRoad installedEquipment viableConstructionTypes additionalInformation description = do
   serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
   createLandPropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateLandProperty with ..
   submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateLandProperty with createLandPropertyRequest = createLandPropertyRequestCid
+
+updateLandPrice : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateLandPrice operator user public propertyKey newLandPrice = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateLandPrice with ..
 
 updateLandPropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
 updateLandPropertyAddress operator user public propertyKey newLandPropertyAddress = do
@@ -360,11 +365,16 @@ updateLandDescription operator user public propertyKey newLandDescription = do
 
 ---- Residence Property Manager
 
-createResidenceProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> Decimal -> Decimal -> Int -> Int -> Int -> ResidenceType -> Text -> Parking -> Date -> Orientation -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
-createResidenceProperty operator user public observers id residenceInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty grossArea usableArea bedrooms bathrooms floors residenceType backyard parking buildDate orientation installedEquipment additionalInformation description = do
+createResidenceProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Decimal -> Text -> Text -> Text -> Text -> Decimal -> Decimal -> Int -> Int -> Int -> ResidenceType -> Text -> Parking -> Date -> Orientation -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createResidenceProperty operator user public observers id residenceInstrument residencePrice propertyAddress propertyPostalCode propertyDistrict propertyCounty grossArea usableArea bedrooms bathrooms floors residenceType backyard parking buildDate orientation installedEquipment additionalInformation description = do
   serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
   createResidencePropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateResidenceProperty with ..
   submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateResidenceProperty with createResidencePropertyRequest = createResidencePropertyRequestCid
+
+updateResidencePrice : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateResidencePrice operator user public propertyKey newResidencePrice = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateResidencePrice with ..
 
 updateResidencePropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
 updateResidencePropertyAddress operator user public propertyKey newResidencePropertyAddress = do
@@ -453,11 +463,16 @@ updateResidenceDescription operator user public propertyKey newResidenceDescript
 
 ---- Garage Property Manager
 
-createGarageProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> GarageType -> Decimal -> Int -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
-createGarageProperty operator user public observers id garageInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty garageType garageArea vehicleCapacity installedEquipment additionalInformation description = do
+createGarageProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Decimal -> Text -> Text -> Text -> Text -> GarageType -> Decimal -> Int -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createGarageProperty operator user public observers id garageInstrument garagePrice propertyAddress propertyPostalCode propertyDistrict propertyCounty garageType garageArea vehicleCapacity installedEquipment additionalInformation description = do
   serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
   createGaragePropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateGarageProperty with ..
   submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateGarageProperty with createGaragePropertyRequest = createGaragePropertyRequestCid
+
+updateGaragePrice : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateGaragePrice operator user public propertyKey newGaragePrice = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateGaragePrice with ..
 
 updateGaragePropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
 updateGaragePropertyAddress operator user public propertyKey newGaragePropertyAddress = do
@@ -513,11 +528,16 @@ updateGarageDescription operator user public propertyKey newGarageDescription = 
 
 ---- Warehouse Property Manager
 
-createWarehouseProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Text -> Text -> Text -> Text -> WarehouseType -> Decimal -> Decimal -> Int -> Date -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
-createWarehouseProperty operator user public observers id warehouseInstrument propertyAddress propertyPostalCode propertyDistrict propertyCounty warehouseType grossArea usableArea floors buildDate installedEquipment additionalInformation description = do
+createWarehouseProperty : Party -> Party -> Party -> PartiesMap -> Id -> InstrumentKey -> Decimal -> Text -> Text -> Text -> Text -> WarehouseType -> Decimal -> Decimal -> Int -> Date -> Text -> Text -> Text -> Script(InstrumentKey, PropertyKey)
+createWarehouseProperty operator user public observers id warehouseInstrument warehousePrice propertyAddress propertyPostalCode propertyDistrict propertyCounty warehouseType grossArea usableArea floors buildDate installedEquipment additionalInformation description = do
   serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
   createWarehousePropertyRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.RequestCreateWarehouseProperty with ..
   submitMulti [operator] [public] do exerciseCmd serviceCid PropertyManagerService.CreateWarehouseProperty with createWarehousePropertyRequest = createWarehousePropertyRequestCid
+
+updateWarehousePrice : Party -> Party -> Party -> PropertyKey -> Decimal -> Script()
+updateWarehousePrice operator user public propertyKey newWarehousePrice = do
+  serviceCid <- toInterfaceContractId @PropertyManagerService.I . fst . fromSome <$> queryContractKey @PropertyManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid PropertyManagerService.UpdateWarehousePrice with ..
 
 updateWarehousePropertyAddress : Party -> Party -> Party -> PropertyKey -> Text -> Script()
 updateWarehousePropertyAddress operator user public propertyKey newWarehousePropertyAddress = do

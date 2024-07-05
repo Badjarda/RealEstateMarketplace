@@ -21,6 +21,7 @@ data View = View
     user: Party
     id: Id
     instrument: InstrumentKey
+    residencePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -54,6 +55,9 @@ interface ResidenceProperty requires Disclosure.I where
 
   getResidenceInstrumentKey : GetResidenceInstrumentKey -> Update(InstrumentKey)
   setResidenceInstrumentKey : SetResidenceInstrumentKey -> Update(ContractId ResidenceProperty)
+
+  getResidencePrice : GetResidencePrice -> Update(Decimal)
+  setResidencePrice : SetResidencePrice -> Update(ContractId ResidenceProperty)
 
   getResidencePropertyAddress : GetResidencePropertyAddress -> Update(Text)
   setResidencePropertyAddress : SetResidencePropertyAddress -> Update(ContractId ResidenceProperty)
@@ -124,6 +128,18 @@ interface ResidenceProperty requires Disclosure.I where
     controller signatory this
     do
       setResidenceInstrumentKey this arg
+  
+  nonconsuming choice GetResidencePrice : Decimal
+    controller signatory this
+    do
+      getResidencePrice this arg
+
+  choice SetResidencePrice: ContractId ResidenceProperty
+    with
+      newResidencePrice : Decimal
+    controller signatory this
+    do
+      setResidencePrice this arg
 
   nonconsuming choice GetResidencePropertyAddress : Text
     controller signatory this

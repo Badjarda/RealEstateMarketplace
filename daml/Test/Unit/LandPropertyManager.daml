@@ -10,7 +10,7 @@ import Interface.PropertyManager.Property.Common (LandType(..), ViableConstructi
 import Test.Util.Update.Service (createPropertyManagerService)
 import Test.Util.Update.Role (createOperatorRole, createRoleUser)
 import Test.Util.Update.Workflow (createInitialUserRole)
-import Test.Util.Script.Workflow (createLandProperty, updateLandPropertyAddress, updateLandPropertyPostalCode, updateLandPropertyDistrict, updateLandPropertyCounty, updateLandType, updateTotalLandArea, updateMinimumSurfaceForSale, updateBuildableArea, updateBuildableFloors, updateAccessByRoad, updateLandInstalledEquipment, updateViableConstructionTypes, updateLandAdditionalInformation, updateLandDescription)
+import Test.Util.Script.Workflow (createLandProperty, updateLandPrice, updateLandPropertyAddress, updateLandPropertyPostalCode, updateLandPropertyDistrict, updateLandPropertyCounty, updateLandType, updateTotalLandArea, updateMinimumSurfaceForSale, updateBuildableArea, updateBuildableFloors, updateAccessByRoad, updateLandInstalledEquipment, updateViableConstructionTypes, updateLandAdditionalInformation, updateLandDescription)
 import Test.Types (Fixture(..))
 
 import Daml.Finance.Interface.Types.Common.Types (Id(..), InstrumentKey(..), HoldingStandard(..))
@@ -51,7 +51,24 @@ testCreateLandProperty = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+
+  pure()
+
+testCreateAndModifyLandPrice : Script ()
+testCreateAndModifyLandPrice = do
+  parties@[marketplace, user, public] <-
+    mapA allocateParty ["Marketplace", "User", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  let 
+      single_observers = singleton marketplace
+      observers = fromList [("Default", single_observers)]
+      id = Id "Custom Land Property"
+      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
+
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  updateLandPrice marketplace user public propertyKey 1000000.0
 
   pure()
 
@@ -67,7 +84,7 @@ testCreateAndModifyLandPropertyAddress = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandPropertyAddress marketplace user public propertyKey "Updated Property Address"
 
   pure()
@@ -84,7 +101,7 @@ testCreateAndModifyLandPropertyPostalCode = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandPropertyPostalCode marketplace user public propertyKey "Updated Property Postal Code"
 
   pure()
@@ -101,7 +118,7 @@ testCreateAndModifyLandPropertyDistrict = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandPropertyDistrict marketplace user public propertyKey "Updated Property District"
 
   pure()
@@ -118,7 +135,7 @@ testCreateAndModifyLandPropertyCounty = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandPropertyCounty marketplace user public propertyKey "Updated Property County"
 
   pure()
@@ -135,7 +152,7 @@ testCreateAndModifyLandType = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandType marketplace user public propertyKey Rustic
 
   pure()
@@ -152,7 +169,7 @@ testCreateAndModifyTotalLandArea = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateTotalLandArea marketplace user public propertyKey 1200.0
 
   pure()
@@ -169,7 +186,7 @@ testCreateAndModifyMinimumSurfaceForSale = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateMinimumSurfaceForSale marketplace user public propertyKey 950.0
 
   pure()
@@ -186,7 +203,7 @@ testCreateAndModifyBuildableArea = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateBuildableArea marketplace user public propertyKey 850.0
 
   pure()
@@ -203,7 +220,7 @@ testCreateAndModifyBuildableFloors = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateBuildableFloors marketplace user public propertyKey 4
 
   pure()
@@ -220,7 +237,7 @@ testCreateAndModifyAccessByRoad = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateAccessByRoad marketplace user public propertyKey False
 
   pure()
@@ -237,7 +254,7 @@ testCreateAndModifyLandInstalledEquipment = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandInstalledEquipment marketplace user public propertyKey "Updated Installed Equipment"
 
   pure()
@@ -254,7 +271,7 @@ testCreateAndModifyViableConstructionTypes = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateViableConstructionTypes marketplace user public propertyKey [PublicInfrastructure]
 
   pure()
@@ -271,7 +288,7 @@ testCreateAndModifyLandAdditionalInformation = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandAdditionalInformation marketplace user public propertyKey "Updated Additional Information"
 
   pure()
@@ -288,7 +305,7 @@ testCreateAndModifyLandDescription = do
       id = Id "Custom Land Property"
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "LandPropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
-  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
+  (_,propertyKey) <- createLandProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   updateLandDescription marketplace user public propertyKey "Updated Description"
 
   pure()

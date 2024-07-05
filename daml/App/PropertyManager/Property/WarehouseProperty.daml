@@ -2,7 +2,7 @@ module App.PropertyManager.Property.WarehouseProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty(I, View(..), GetWarehouseInstrumentKey(..), GetWarehousePropertyAddress(..), GetWarehousePropertyPostalCode(..), GetWarehousePropertyDistrict(..), GetWarehousePropertyCounty(..), GetWarehouseType(..), GetWarehouseGrossArea(..), GetWarehouseUsableArea(..), GetWarehouseFloors(..), GetWarehouseBuildDate(..), GetWarehouseInstalledEquipment(..), GetWarehouseAdditionalInformation(..), GetWarehouseDescription(..), SetWarehouseInstrumentKey(..), SetWarehousePropertyAddress(..), SetWarehousePropertyPostalCode(..), SetWarehousePropertyDistrict(..), SetWarehousePropertyCounty(..), SetWarehouseGrossArea(..), SetWarehouseUsableArea(..), SetWarehouseFloors(..), SetWarehouseType(..), SetWarehouseBuildDate(..), SetWarehouseInstalledEquipment(..), SetWarehouseAdditionalInformation(..), SetWarehouseDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty(I, View(..), GetWarehouseInstrumentKey(..), GetWarehousePrice(..), GetWarehousePropertyAddress(..), GetWarehousePropertyPostalCode(..), GetWarehousePropertyDistrict(..), GetWarehousePropertyCounty(..), GetWarehouseType(..), GetWarehouseGrossArea(..), GetWarehouseUsableArea(..), GetWarehouseFloors(..), GetWarehouseBuildDate(..), GetWarehouseInstalledEquipment(..), GetWarehouseAdditionalInformation(..), GetWarehouseDescription(..), SetWarehouseInstrumentKey(..), SetWarehousePrice(..), SetWarehousePropertyAddress(..), SetWarehousePropertyPostalCode(..), SetWarehousePropertyDistrict(..), SetWarehousePropertyCounty(..), SetWarehouseGrossArea(..), SetWarehouseUsableArea(..), SetWarehouseFloors(..), SetWarehouseType(..), SetWarehouseBuildDate(..), SetWarehouseInstalledEquipment(..), SetWarehouseAdditionalInformation(..), SetWarehouseDescription(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.WarehouseProperty.Factory qualified as WarehousePropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (WarehouseType)
 
@@ -16,6 +16,7 @@ template WarehouseProperty
     user: Party
     id: Id
     instrument: InstrumentKey
+    warehousePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -43,6 +44,9 @@ template WarehouseProperty
 
       getWarehouseInstrumentKey WarehouseProperty.GetWarehouseInstrumentKey{} = do 
         pure instrument
+      
+      getWarehousePrice WarehouseProperty.GetWarehousePrice{} = do 
+        pure warehousePrice
 
       getWarehousePropertyAddress WarehouseProperty.GetWarehousePropertyAddress{} = do 
         pure propertyAddress
@@ -82,6 +86,9 @@ template WarehouseProperty
 
       setWarehouseInstrumentKey WarehouseProperty.SetWarehouseInstrumentKey{newWarehouseInstrumentKey} = do 
         toInterfaceContractId <$> create this with instrument = newWarehouseInstrumentKey
+      
+      setWarehousePrice WarehouseProperty.SetWarehousePrice{newWarehousePrice} = do 
+        toInterfaceContractId <$> create this with warehousePrice = newWarehousePrice
 
       setWarehousePropertyAddress WarehouseProperty.SetWarehousePropertyAddress{newWarehousePropertyAddress} = do 
         toInterfaceContractId <$> create this with propertyAddress = newWarehousePropertyAddress
@@ -139,7 +146,7 @@ template Factory
     interface instance WarehousePropertyFactory.I for Factory where
       view = WarehousePropertyFactory.View with operator
       
-      create' WarehousePropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, warehouseType, grossArea, usableArea, floors, buildDate, installedEquipment, additionalInformation, description, observers} =
+      create' WarehousePropertyFactory.Create{instrument, propertyKey, warehousePrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, warehouseType, grossArea, usableArea, floors, buildDate, installedEquipment, additionalInformation, description, observers} =
         do
           cid <- toInterfaceContractId <$> create WarehouseProperty with
             operator = propertyKey.operator

@@ -24,6 +24,7 @@ interface Factory requires Disclosure.I where
   nonconsuming choice Create : ContractId GarageProperty.I
     with
       instrument: InstrumentKey
+      garagePrice: Decimal
       propertyKey: PropertyKey
       propertyAddress: Text
       propertyPostalCode : Text

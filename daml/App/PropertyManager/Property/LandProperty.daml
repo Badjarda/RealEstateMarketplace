@@ -2,7 +2,7 @@ module App.PropertyManager.Property.LandProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(I, View(..), GetLandInstrumentKey(..), GetLandPropertyAddress(..), GetLandPropertyPostalCode(..), GetLandPropertyDistrict(..), GetLandPropertyCounty(..), GetLandType(..), GetTotalLandArea(..), GetLandMinimumSurfaceForSale(..), GetLandBuildableArea(..), GetLandBuildableFloors(..), GetLandAccessByRoad(..), GetLandInstalledEquipment(..), GetLandAdditionalInformation(..), GetLandViableConstructionTypes(..), GetLandDescription(..), SetLandInstrumentKey(..), SetLandPropertyAddress(..), SetLandPropertyPostalCode(..), SetLandPropertyDistrict(..), SetLandPropertyCounty(..), SetLandType(..), SetTotalLandArea(..), SetLandMinimumSurfaceForSale(..), SetLandBuildableArea(..), SetLandBuildableFloors(..), SetLandAccessByRoad(..), SetLandInstalledEquipment(..), SetLandAdditionalInformation(..), SetLandViableConstructionTypes(..), SetLandDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(I, View(..), GetLandInstrumentKey(..), GetLandPrice(..), GetLandPropertyAddress(..), GetLandPropertyPostalCode(..), GetLandPropertyDistrict(..), GetLandPropertyCounty(..), GetLandType(..), GetTotalLandArea(..), GetLandMinimumSurfaceForSale(..), GetLandBuildableArea(..), GetLandBuildableFloors(..), GetLandAccessByRoad(..), GetLandInstalledEquipment(..), GetLandAdditionalInformation(..), GetLandViableConstructionTypes(..), GetLandDescription(..), SetLandInstrumentKey(..), SetLandPrice(..), SetLandPropertyAddress(..), SetLandPropertyPostalCode(..), SetLandPropertyDistrict(..), SetLandPropertyCounty(..), SetLandType(..), SetTotalLandArea(..), SetLandMinimumSurfaceForSale(..), SetLandBuildableArea(..), SetLandBuildableFloors(..), SetLandAccessByRoad(..), SetLandInstalledEquipment(..), SetLandAdditionalInformation(..), SetLandViableConstructionTypes(..), SetLandDescription(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.LandProperty.Factory qualified as LandPropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (LandType, ViableConstructionTypes)
 
@@ -16,6 +16,7 @@ template LandProperty
     user: Party
     id: Id
     instrument: InstrumentKey
+    landPrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -45,6 +46,9 @@ template LandProperty
 
       getLandInstrumentKey LandProperty.GetLandInstrumentKey{} = do 
         pure instrument
+
+      getLandPrice LandProperty.GetLandPrice{} = do 
+        pure landPrice
 
       getLandPropertyAddress LandProperty.GetLandPropertyAddress{} = do 
         pure propertyAddress
@@ -90,6 +94,9 @@ template LandProperty
 
       setLandInstrumentKey LandProperty.SetLandInstrumentKey{newLandInstrumentKey} = do 
         toInterfaceContractId <$> create this with instrument = newLandInstrumentKey
+      
+      setLandPrice LandProperty.SetLandPrice{newLandPrice} = do 
+        toInterfaceContractId <$> create this with landPrice = newLandPrice
 
       setLandPropertyAddress LandProperty.SetLandPropertyAddress{newLandPropertyAddress} = do 
         toInterfaceContractId <$> create this with propertyAddress = newLandPropertyAddress
@@ -153,7 +160,7 @@ template Factory
     interface instance LandPropertyFactory.I for Factory where
       view = LandPropertyFactory.View with operator
       
-      create' LandPropertyFactory.Create{instrument, propertyKey, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, landType, totalLandArea, minimumSurfaceForSale, buildableArea, buildableFloors, accessByRoad, installedEquipment, viableConstructionTypes, additionalInformation, description, observers} =
+      create' LandPropertyFactory.Create{instrument, propertyKey, landPrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, landType, totalLandArea, minimumSurfaceForSale, buildableArea, buildableFloors, accessByRoad, installedEquipment, viableConstructionTypes, additionalInformation, description, observers} =
         do
           cid <- toInterfaceContractId <$> create LandProperty with
             operator = propertyKey.operator

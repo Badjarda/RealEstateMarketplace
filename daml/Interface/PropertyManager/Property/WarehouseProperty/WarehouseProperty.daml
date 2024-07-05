@@ -22,6 +22,7 @@ data View = View
     user: Party
     id: Id
     instrument: InstrumentKey
+    warehousePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -50,6 +51,9 @@ interface WarehouseProperty requires Disclosure.I where
 
   getWarehouseInstrumentKey : GetWarehouseInstrumentKey -> Update(InstrumentKey)
   setWarehouseInstrumentKey : SetWarehouseInstrumentKey -> Update(ContractId WarehouseProperty)
+
+  getWarehousePrice : GetWarehousePrice -> Update(Decimal)
+  setWarehousePrice : SetWarehousePrice -> Update(ContractId WarehouseProperty)
 
   getWarehousePropertyAddress : GetWarehousePropertyAddress -> Update(Text)
   setWarehousePropertyAddress : SetWarehousePropertyAddress -> Update(ContractId WarehouseProperty)
@@ -105,6 +109,18 @@ interface WarehouseProperty requires Disclosure.I where
     controller signatory this
     do
       setWarehouseInstrumentKey this arg
+
+  nonconsuming choice GetWarehousePrice : Decimal
+    controller signatory this
+    do
+      getWarehousePrice this arg
+
+  choice SetWarehousePrice: ContractId WarehouseProperty
+    with
+      newWarehousePrice : Decimal
+    controller signatory this
+    do
+      setWarehousePrice this arg
   
   nonconsuming choice GetWarehousePropertyAddress : Text
     controller signatory this

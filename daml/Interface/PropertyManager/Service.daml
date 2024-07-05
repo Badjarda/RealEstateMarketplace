@@ -71,6 +71,8 @@ interface Service where
 
     updateApartmentInstrumentKey : UpdateApartmentInstrumentKey -> Update()
 
+    updateApartmentPrice : UpdateApartmentPrice -> Update()
+
     updateApartmentPropertyAddress : UpdateApartmentPropertyAddress -> Update()
 
     updateApartmentPropertyPostalCode : UpdateApartmentPropertyPostalCode -> Update()
@@ -105,6 +107,8 @@ interface Service where
 
     updateLandInstrumentKey : UpdateLandInstrumentKey -> Update()
 
+    updateLandPrice : UpdateLandPrice -> Update()
+
     updateLandPropertyAddress : UpdateLandPropertyAddress -> Update()
 
     updateLandPropertyPostalCode : UpdateLandPropertyPostalCode -> Update()
@@ -136,6 +140,8 @@ interface Service where
 ------------------------------------------------
 
     updateResidenceInstrumentKey : UpdateResidenceInstrumentKey -> Update()
+
+    updateResidencePrice : UpdateResidencePrice -> Update()
 
     updateResidencePropertyAddress : UpdateResidencePropertyAddress -> Update()
 
@@ -175,6 +181,8 @@ interface Service where
 
     updateGarageInstrumentKey : UpdateGarageInstrumentKey -> Update()
 
+    updateGaragePrice : UpdateGaragePrice -> Update()
+
     updateGaragePropertyAddress : UpdateGaragePropertyAddress -> Update()
 
     updateGaragePropertyPostalCode : UpdateGaragePropertyPostalCode -> Update()
@@ -198,6 +206,8 @@ interface Service where
 ------------------------------------------------
 
     updateWarehouseInstrumentKey : UpdateWarehouseInstrumentKey -> Update()
+
+    updateWarehousePrice : UpdateWarehousePrice -> Update()
 
     updateWarehousePropertyAddress : UpdateWarehousePropertyAddress -> Update()
 
@@ -229,6 +239,7 @@ interface Service where
       with
           id: Id
           apartmentInstrument: InstrumentKey
+          apartmentPrice: Decimal
           propertyAddress: Text
           propertyPostalCode : Text
           propertyDistrict : Text
@@ -260,6 +271,7 @@ interface Service where
       with
           id: Id
           landInstrument: InstrumentKey
+          landPrice: Decimal
           propertyAddress: Text
           propertyPostalCode : Text
           propertyDistrict : Text
@@ -290,6 +302,7 @@ interface Service where
       with
           id: Id
           residenceInstrument: InstrumentKey
+          residencePrice: Decimal
           propertyAddress: Text
           propertyPostalCode : Text
           propertyDistrict : Text
@@ -323,6 +336,7 @@ interface Service where
       with
           id: Id
           garageInstrument: InstrumentKey
+          garagePrice: Decimal
           propertyAddress: Text
           propertyPostalCode : Text
           propertyDistrict : Text
@@ -349,6 +363,7 @@ interface Service where
       with
           id: Id
           warehouseInstrument: InstrumentKey
+          warehousePrice: Decimal
           propertyAddress: Text
           propertyPostalCode : Text
           propertyDistrict : Text
@@ -380,6 +395,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateApartmentInstrumentKey this arg
+
+    nonconsuming choice UpdateApartmentPrice : ()
+      with
+        newApartmentPrice : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentPrice this arg
 
     nonconsuming choice UpdateApartmentPropertyAddress : ()
       with
@@ -510,6 +533,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateLandInstrumentKey this arg
+    
+    nonconsuming choice UpdateLandPrice : ()
+      with
+        newLandPrice : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandPrice this arg
 
     nonconsuming choice UpdateLandPropertyAddress : ()
       with
@@ -632,6 +663,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateResidenceInstrumentKey this arg
+    
+    nonconsuming choice UpdateResidencePrice : ()
+      with
+        newResidencePrice : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidencePrice this arg
 
     nonconsuming choice UpdateResidencePropertyAddress : ()
       with
@@ -777,6 +816,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateGarageInstrumentKey this arg
+    
+    nonconsuming choice UpdateGaragePrice : ()
+      with
+        newGaragePrice : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGaragePrice this arg
 
     nonconsuming choice UpdateGaragePropertyAddress : ()
       with
@@ -867,6 +914,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateWarehouseInstrumentKey this arg
+    
+    nonconsuming choice UpdateWarehousePrice : ()
+      with
+        newWarehousePrice : Decimal
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehousePrice this arg
 
     nonconsuming choice UpdateWarehousePropertyAddress : ()
       with

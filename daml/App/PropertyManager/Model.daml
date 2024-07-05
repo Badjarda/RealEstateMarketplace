@@ -21,6 +21,7 @@ template RequestCreateApartmentProperty
     user: Party
     id: Id
     apartmentInstrument: InstrumentKey
+    apartmentPrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -58,6 +59,7 @@ template RequestCreateLandProperty
     user: Party
     id: Id
     landInstrument: InstrumentKey
+    landPrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -94,6 +96,7 @@ template RequestCreateResidenceProperty
     user: Party
     id: Id
     residenceInstrument: InstrumentKey
+    residencePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -133,6 +136,7 @@ template RequestCreateGarageProperty
     user: Party
     id: Id
     garageInstrument: InstrumentKey
+    garagePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -165,6 +169,7 @@ template RequestCreateWarehouseProperty
     user: Party
     id: Id
     warehouseInstrument: InstrumentKey
+    warehousePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text

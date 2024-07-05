@@ -22,6 +22,7 @@ data View = View
     user: Party
     id: Id
     instrument: InstrumentKey
+    garagePrice: Decimal
     propertyAddress: Text
     propertyPostalCode : Text
     propertyDistrict : Text
@@ -48,6 +49,9 @@ interface GarageProperty requires Disclosure.I where
 
   getGarageInstrumentKey : GetGarageInstrumentKey -> Update(InstrumentKey)
   setGarageInstrumentKey : SetGarageInstrumentKey -> Update(ContractId GarageProperty)
+
+  getGaragePrice : GetGaragePrice -> Update(Decimal)
+  setGaragePrice : SetGaragePrice -> Update(ContractId GarageProperty)
 
   getGaragePropertyAddress : GetGaragePropertyAddress -> Update(Text)
   setGaragePropertyAddress : SetGaragePropertyAddress -> Update(ContractId GarageProperty)
@@ -97,6 +101,18 @@ interface GarageProperty requires Disclosure.I where
     controller signatory this
     do
       setGarageInstrumentKey this arg
+
+  nonconsuming choice GetGaragePrice : Decimal
+    controller signatory this
+    do
+      getGaragePrice this arg
+
+  choice SetGaragePrice: ContractId GarageProperty
+    with
+      newGaragePrice : Decimal
+    controller signatory this
+    do
+      setGaragePrice this arg
   
   nonconsuming choice GetGaragePropertyAddress : Text
     controller signatory this
