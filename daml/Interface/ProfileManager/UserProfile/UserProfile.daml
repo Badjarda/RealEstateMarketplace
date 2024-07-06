@@ -25,11 +25,13 @@ data View = View
     firstName: Text
     lastName: Text
     fullName: Text
+    password: Text
     birthday: Date
     gender: Optional Gender
     nationality: Nationality
     contactMail: Text
     cellphoneNumber: Optional Int
+    idNumber: Int
     taxId: Int
     socialSecurityId: Int
   deriving (Eq, Show)
@@ -58,6 +60,9 @@ interface UserProfile requires Disclosure.I where
   getFullName : GetFullName -> Update (Text)
   setFullName : SetFullName -> Update (ContractId UserProfile)
 
+  getPassword : GetPassword -> Update (Text)
+  setPassword : SetPassword -> Update (ContractId UserProfile)
+
   getBirthday : GetBirthday -> Update (Date)
   setBirthday : SetBirthday -> Update (ContractId UserProfile)
 
@@ -72,6 +77,9 @@ interface UserProfile requires Disclosure.I where
 
   getCellphoneNumber : GetCellphoneNumber -> Update (Optional Int)
   setCellphoneNumber : SetCellphoneNumber -> Update (ContractId UserProfile)
+
+  getIdNumber : GetIdNumber -> Update (Int)
+  setIdNumber : SetIdNumber -> Update (ContractId UserProfile)
 
   getTaxId : GetTaxId -> Update (Int)
   setTaxId : SetTaxId -> Update (ContractId UserProfile)
@@ -138,6 +146,19 @@ interface UserProfile requires Disclosure.I where
     do
       setFullName this arg
 
+  -- Password
+  nonconsuming choice GetPassword : Text
+    controller signatory this
+    do
+      getPassword this arg
+  
+  choice SetPassword : ContractId UserProfile
+    with
+      newPassword : Text
+    controller signatory this
+    do
+      setPassword this arg
+
   -- Birthday
   nonconsuming choice GetBirthday : Date
     controller signatory this
@@ -202,6 +223,19 @@ interface UserProfile requires Disclosure.I where
     controller signatory this
     do
       setCellphoneNumber this arg
+
+  -- Id Number
+  nonconsuming choice GetIdNumber : Int
+    controller signatory this
+    do
+      getIdNumber this arg
+
+  choice SetIdNumber : ContractId UserProfile
+    with
+      newIdNumber : Int
+    controller signatory this
+    do
+      setIdNumber this arg
 
   -- Tax ID
   nonconsuming choice GetTaxId : Int

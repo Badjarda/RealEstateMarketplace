@@ -4,7 +4,7 @@ import DA.Set (fromList, singleton)
 import DA.Optional (fromSome)
 
 import Interface.RoleManager.Service qualified as RoleManagerService (I, CreateUserRole(..), DeleteUserRole(..), AddPermissionToUserRole(..), RemovePermissionInUserRole(..), UpdateUserRole(..))
-import Interface.ProfileManager.Service qualified as ProfileManagerService(I, RequestCreateUserProfile(..), CreateUserProfile(..), UpdateUsername(..), UpdateFirstName(..), UpdateLastName(..), UpdateFullName(..), UpdateBirthday(..), UpdateGender(..), UpdateNationality(..), UpdateContactMail(..), UpdateCellphoneNumber(..), UpdateTaxId(..), UpdateSocialSecurityId(..))
+import Interface.ProfileManager.Service qualified as ProfileManagerService(I, RequestCreateUserProfile(..), CreateUserProfile(..), UpdateUsername(..), UpdateFirstName(..), UpdateLastName(..), UpdateFullName(..), UpdatePassword(..), UpdateBirthday(..), UpdateGender(..), UpdateNationality(..), UpdateContactMail(..), UpdateCellphoneNumber(..), UpdateIdNumber(..), UpdateTaxId(..), UpdateSocialSecurityId(..))
 import Interface.PropertyManager.Service qualified as PropertyManagerService (I, RequestCreateApartmentProperty(..), RequestCreateLandProperty(..), RequestCreateResidenceProperty(..), RequestCreateGarageProperty(..), CreateApartmentProperty(..), UpdateApartmentPrice(..), UpdateApartmentPropertyAddress(..), UpdateApartmentPropertyPostalCode(..), UpdateApartmentPropertyDistrict(..), UpdateApartmentPropertyCounty(..), UpdateApartmentGrossArea(..), UpdateApartmentUsableArea(..), UpdateApartmentBedrooms(..), UpdateApartmentBathrooms(..), UpdateApartmentFloor(..), UpdateApartmentParkingSpaces(..), UpdateApartmentElevator(..), UpdateApartmentBuildDate(..), UpdateApartmentInstalledEquipment(..), UpdateApartmentAdditionalInformation(..), UpdateApartmentDescription(..), CreateLandProperty(..), UpdateLandPrice(..), UpdateLandPropertyAddress(..), UpdateLandPropertyPostalCode(..), UpdateLandPropertyDistrict(..), UpdateLandPropertyCounty(..), UpdateLandType(..), UpdateTotalLandArea(..), UpdateMinimumSurfaceForSale(..), UpdateLandBuildableArea(..), UpdateLandBuildableFloors(..), UpdateLandAccessByRoad(..), UpdateLandInstalledEquipment(..), UpdateLandViableConstructionTypes(..), UpdateLandAdditionalInformation(..), UpdateLandDescription(..), CreateResidenceProperty(..), UpdateResidencePrice(..), UpdateResidencePropertyAddress(..), UpdateResidencePropertyPostalCode(..), UpdateResidencePropertyDistrict(..), UpdateResidencePropertyCounty(..), UpdateResidenceGrossArea(..), UpdateResidenceUsableArea(..), UpdateResidenceBedrooms(..), UpdateResidenceBathrooms(..), UpdateResidenceFloors(..), UpdateResidenceType(..), UpdateResidenceBackyard(..), UpdateResidenceInstalledEquipment(..), UpdateResidenceParking(..), UpdateResidenceBuildDate(..), UpdateResidenceOrientation(..), UpdateResidenceAdditionalInformation(..), UpdateResidenceDescription(..), CreateGarageProperty(..), UpdateGaragePrice(..), UpdateGaragePropertyAddress(..), UpdateGaragePropertyPostalCode(..), UpdateGaragePropertyDistrict(..), UpdateGaragePropertyCounty(..), UpdateGarageArea(..), UpdateGarageType(..), UpdateVehicleCapacity(..), UpdateGarageInstalledEquipment(..), UpdateGarageAdditionalInformation(..), UpdateGarageDescription(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehousePrice(..), UpdateWarehousePropertyAddress(..), UpdateWarehousePropertyPostalCode(..), UpdateWarehousePropertyDistrict(..), UpdateWarehousePropertyCounty(..), UpdateWarehouseType(..), UpdateWarehouseGrossArea(..), UpdateWarehouseUsableArea(..), UpdateWarehouseFloors(..), UpdateWarehouseBuildDate(..), UpdateWarehouseInstalledEquipment(..), UpdateWarehouseAdditionalInformation(..), UpdateWarehouseDescription(..))
 import Interface.Custody.Service qualified as CustodyService (I, OpenAccount(..), RequestOpenAccount(..), RequestDeposit(..), Deposit(..), CloseAccount(..), RequestCloseAccount(..), Withdrawal(..), RequestWithdraw(..))
 import Interface.Issuance.Service qualified as IssuanceService (I, RequestIssue(..), Issue(..), RequestDeIssue(..), DeIssue(..))
@@ -131,8 +131,8 @@ removePermissionInUserRoleFail operator user public userRole permission = do
 
 -- User Profile Service
 
-createUserProfile : Party -> Party -> Party -> PartiesMap -> Id -> Text -> Text -> Text -> Text -> Date -> Optional Gender -> Nationality -> Text -> Optional Int -> Int -> Int -> Script(UserProfileKey)
-createUserProfile operator user public observers id username firstName lastName fullName birthday gender nationality contactMail cellphoneNumber taxId socialSecurityId = do
+createUserProfile : Party -> Party -> Party -> PartiesMap -> Id -> Text -> Text -> Text -> Text -> Text -> Date -> Optional Gender -> Nationality -> Text -> Optional Int -> Int -> Int -> Int -> Script(UserProfileKey)
+createUserProfile operator user public observers id username firstName lastName fullName password birthday gender nationality contactMail cellphoneNumber idNumber taxId socialSecurityId = do
   serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
   createUserProfileRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.RequestCreateUserProfile with ..
   submitMulti [operator] [public] do exerciseCmd serviceCid ProfileManagerService.CreateUserProfile with createUserProfileRequest = createUserProfileRequestCid
@@ -156,6 +156,11 @@ updateUserProfileFullName : Party -> Party -> Party -> UserProfileKey -> Text ->
 updateUserProfileFullName operator user public userProfileKey newFullName = do
   serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
   submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateFullName with ..
+
+updateUserProfilePassword : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
+updateUserProfilePassword operator user public userProfileKey newPassword = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdatePassword with ..
 
 updateUserProfileContactMail : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
 updateUserProfileContactMail operator user public userProfileKey newContactMail = do
@@ -181,6 +186,11 @@ updateUserProfileCellphoneNumber : Party -> Party -> Party -> UserProfileKey -> 
 updateUserProfileCellphoneNumber operator user public userProfileKey newCellphoneNumber = do
   serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
   submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateCellphoneNumber with ..
+
+updateUserProfileIdNumber : Party -> Party -> Party -> UserProfileKey -> Int -> Script()
+updateUserProfileIdNumber operator user public userProfileKey newIdNumber = do
+  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateIdNumber with ..
 
 updateUserProfileTaxId : Party -> Party -> Party -> UserProfileKey -> Int -> Script()
 updateUserProfileTaxId operator user public userProfileKey newTaxId = do

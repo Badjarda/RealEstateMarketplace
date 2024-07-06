@@ -49,6 +49,8 @@ interface Service where
 
     updateFullName : UpdateFullName -> Update ()
 
+    updatePassword : UpdatePassword -> Update ()
+
     updateBirthday: UpdateBirthday -> Update()
 
     updateGender: UpdateGender -> Update()
@@ -58,6 +60,8 @@ interface Service where
     updateContactMail : UpdateContactMail -> Update ()
 
     updateCellphoneNumber : UpdateCellphoneNumber -> Update ()
+
+    updateIdNumber : UpdateIdNumber -> Update ()
 
     updateTaxId : UpdateTaxId -> Update ()
 
@@ -71,11 +75,13 @@ interface Service where
           firstName: Text
           lastName: Text
           fullName: Text
+          password: Text
           birthday: Date
           gender: Optional Gender
           nationality: Nationality
           contactMail: Text
           cellphoneNumber: Optional Int
+          idNumber: Int
           taxId: Int
           socialSecurityId: Int
           observers : PartiesMap
@@ -122,6 +128,14 @@ interface Service where
       do
         updateFullName this arg
 
+    nonconsuming choice UpdatePassword : ()
+      with
+        newPassword : Text
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updatePassword this arg
+
     nonconsuming choice UpdateBirthday : ()
       with
         newBirthday : Date
@@ -161,6 +175,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateCellphoneNumber this arg
+
+    nonconsuming choice UpdateIdNumber : ()
+      with
+        newIdNumber : Int
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updateIdNumber this arg
 
     nonconsuming choice UpdateTaxId : ()
       with

@@ -4,7 +4,6 @@ import Interface.Common.Removable qualified as Removable (I, Implementation)
 import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap)
 import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
 
-
 type I = RequestCreateUserProfile
 
 type V = View
@@ -18,11 +17,13 @@ data View = View
     firstName: Text
     lastName: Text
     fullName: Text
+    password: Text
     birthday: Date
     gender: Optional Gender
     nationality: Nationality
     contactMail: Text
     cellphoneNumber: Optional Int
+    idNumber: Text
     taxId: Int
     socialSecurityId: Int
     observers : PartiesMap

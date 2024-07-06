@@ -2,7 +2,7 @@ module App.ProfileManager.UserProfile where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(I, View(..), GetUsername(..), SetUsername(..), GetFirstName(..), SetFirstName(..), GetLastName(..), SetLastName(..), GetFullName(..), SetFullName(..), GetContactMail(..), SetContactMail(..), GetBirthday(..), SetBirthday(..), GetGender(..), SetGender(..), GetNationality(..), SetNationality(..), GetCellphoneNumber(..), SetCellphoneNumber(..), GetTaxId(..), SetTaxId(..), GetSocialSecurityId(..), SetSocialSecurityId(..), userProfileKey, disclosureUpdateReference, createReference)
+import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(I, View(..), GetUsername(..), SetUsername(..), GetFirstName(..), SetFirstName(..), GetLastName(..), SetLastName(..), GetFullName(..), SetFullName(..), GetPassword(..), SetPassword(..), GetContactMail(..), SetContactMail(..), GetBirthday(..), SetBirthday(..), GetGender(..), SetGender(..), GetNationality(..), SetNationality(..), GetCellphoneNumber(..), SetCellphoneNumber(..), GetTaxId(..), SetTaxId(..), GetIdNumber(..), SetIdNumber(..), GetSocialSecurityId(..), SetSocialSecurityId(..), userProfileKey, disclosureUpdateReference, createReference)
 import Interface.ProfileManager.UserProfile.Factory qualified as UserProfileFactory(I, View(..), Create(..))
 import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
 
@@ -20,11 +20,13 @@ template UserProfile
     firstName: Text
     lastName: Text
     fullName: Text
+    password: Text
     birthday: Date
     gender: Optional Gender
     nationality: Nationality
     contactMail: Text
     cellphoneNumber: Optional Int
+    idNumber: Int
     taxId: Int
     socialSecurityId: Int
     observers : PartiesMap
@@ -64,6 +66,12 @@ template UserProfile
 
       setFullName UserProfile.SetFullName{newFullName} = do 
         toInterfaceContractId <$> create this with fullName = newFullName
+
+      getPassword UserProfile.GetPassword{} = do 
+        pure password
+
+      setPassword UserProfile.SetPassword{newPassword} = do 
+        toInterfaceContractId <$> create this with password = newPassword
 
       getBirthday UserProfile.GetBirthday{} = do 
         pure birthday
@@ -127,7 +135,7 @@ template Factory
     interface instance UserProfileFactory.I for Factory where
       view = UserProfileFactory.View with operator
       
-      create' UserProfileFactory.Create{userProfileKey, username, firstName, lastName, fullName, birthday, gender, nationality, contactMail, cellphoneNumber, taxId, socialSecurityId, observers} =
+      create' UserProfileFactory.Create{userProfileKey, username, firstName, lastName, fullName, password, birthday, gender, nationality, contactMail, cellphoneNumber, idNumber, taxId, socialSecurityId, observers} =
         do
           cid <- toInterfaceContractId <$> create UserProfile with
             operator = userProfileKey.operator

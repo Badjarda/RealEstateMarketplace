@@ -6,7 +6,7 @@ import Interface.Common.Types (UserProfileKey(..))
 import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
 import Interface.ProfileManager.Choices.RequestCreateUserProfile qualified as RequestCreateUserProfile (I, View(..))
 import Interface.ProfileManager.UserProfile.Factory qualified as UserRole (Create(..))
-import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(R(..), SetUsername(..), SetFirstName(..), SetLastName(..), SetFullName(..), SetContactMail(..), SetBirthday(..), SetGender(..), SetNationality(..), SetCellphoneNumber(..), SetTaxId(..), SetSocialSecurityId(..), SetCid(..))
+import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(R(..), SetUsername(..), SetFirstName(..), SetLastName(..), SetFullName(..), SetPassword(..), SetContactMail(..), SetBirthday(..), SetGender(..), SetNationality(..), SetCellphoneNumber(..), SetIdNumber(..), SetTaxId(..), SetSocialSecurityId(..), SetCid(..))
 
 import App.Util qualified as UserUtil (hasPermission)
 import App.ProfileManager.Model
@@ -25,11 +25,13 @@ data CreateUserProfileRequest = CreateUserProfileRequest
     firstName: Text
     lastName: Text
     fullName: Text
+    password: Text
     birthday: Date
     gender: Optional Gender
     nationality: Nationality
     contactMail: Text
     cellphoneNumber: Optional Int
+    idNumber: Int
     taxId: Int
     socialSecurityId: Int
     observers: PartiesMap
@@ -48,11 +50,13 @@ requestCreateUserProfileAux request = do
     firstName = request.firstName
     lastName = request.lastName
     fullName = request.fullName
+    password = request.password
     birthday = request.birthday
     gender = request.gender
     nationality = request.nationality
     contactMail = request.contactMail
     cellphoneNumber = request.cellphoneNumber
+    idNumber = request.idNumber
     taxId = request.taxId
     socialSecurityId = request.socialSecurityId
     observers = request.observers
@@ -66,7 +70,7 @@ data CreateUserProfile = CreateUserProfile
 
 createUserProfileAux : CreateUserProfile -> Update (UserProfileKey)
 createUserProfileAux request = do
-  RequestCreateUserProfile.View{id,username,firstName,lastName,fullName,birthday,gender,nationality,contactMail,cellphoneNumber,taxId,socialSecurityId,observers} <- view <$> fetchAndRemove request.createUserProfileRequest
+  RequestCreateUserProfile.View{id,username,firstName,lastName,fullName,password,birthday,gender,nationality,contactMail,cellphoneNumber,idNumber,taxId,socialSecurityId,observers} <- view <$> fetchAndRemove request.createUserProfileRequest
   let userProfile = UserProfileKey with operator = request.operator, user = request.user, id = id
   exercise request.userProfileFactoryCid UserProfile.Create with userProfileKey = userProfile, ..
   pure userProfile
@@ -96,6 +100,20 @@ updateFullNameAux: UpdateFullNameRequest -> Update ()
 updateFullNameAux request = do
   (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
   cid <- exercise ref.cid UserProfile.SetFullName with newFullName = request.newFullName
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdatePasswordRequest = UpdatePasswordRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newPassword: Text
+
+updatePasswordAux: UpdatePasswordRequest -> Update ()
+updatePasswordAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetPassword with newPassword = request.newPassword
   exercise refCid UserProfile.SetCid with newCid = cid
   pure()
 
@@ -194,6 +212,20 @@ updateCellphoneNumberAux: UpdateCellphoneNumberRequest -> Update ()
 updateCellphoneNumberAux request = do
   (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
   cid <- exercise ref.cid UserProfile.SetCellphoneNumber with newCellphoneNumber = request.newCellphoneNumber
+  exercise refCid UserProfile.SetCid with newCid = cid
+  pure()
+
+data UpdateIdNumberRequest = UpdateIdNumberRequest
+  with
+    operator: Party
+    user: Party
+    userProfileKey: UserProfileKey
+    newIdNumber: Int
+
+updateIdNumberAux: UpdateIdNumberRequest -> Update ()
+updateIdNumberAux request = do
+  (refCid, ref) <- fetchByKey @UserProfile.R (request.userProfileKey)
+  cid <- exercise ref.cid UserProfile.SetIdNumber with newIdNumber = request.newIdNumber
   exercise refCid UserProfile.SetCid with newCid = cid
   pure()
 

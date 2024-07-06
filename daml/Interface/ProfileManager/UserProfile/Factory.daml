@@ -28,11 +28,13 @@ interface Factory requires Disclosure.I where
       firstName: Text
       lastName: Text
       fullName: Text
+      password: Text
       birthday: Date
       gender: Optional Gender
       nationality: Nationality
       contactMail: Text
       cellphoneNumber: Optional Int
+      idNumber: Int
       taxId: Int
       socialSecurityId: Int
       observers : PartiesMap
