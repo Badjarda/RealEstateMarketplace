@@ -23,7 +23,7 @@ data View = View
     nationality: Nationality
     contactMail: Text
     cellphoneNumber: Optional Int
-    idNumber: Text
+    idNumber: Int
     taxId: Int
     socialSecurityId: Int
     observers : PartiesMap

@@ -103,6 +103,12 @@ template UserProfile
       setCellphoneNumber UserProfile.SetCellphoneNumber{newCellphoneNumber} = do 
         toInterfaceContractId <$> create this with cellphoneNumber = newCellphoneNumber
       
+      getIdNumber UserProfile.GetIdNumber{} = do 
+        pure idNumber
+
+      setIdNumber UserProfile.SetIdNumber{newIdNumber} = do 
+        toInterfaceContractId <$> create this with idNumber = newIdNumber
+
       getTaxId UserProfile.GetTaxId{} = do 
         pure taxId
 
