@@ -7,9 +7,11 @@ import Interface.Custody.Choices.OpenAccountRequest qualified as OpenAccountRequ
 import Interface.Custody.Choices.CloseAccountRequest qualified as CloseAccountRequest (HasImplementation, I, View(..))
 import Interface.Custody.Choices.DepositRequest qualified as DepositRequest (HasImplementation, I, View(..))
 import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest (HasImplementation, I, View(..))
+import Interface.Custody.Choices.TransferRequest qualified as TransferRequest (HasImplementation, I, View(..))
 
 import Daml.Finance.Interface.Account.Account qualified as Account (Controllers)
 import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I)
 import Daml.Finance.Interface.Types.Common.Types (AccountKey, Id, InstrumentQuantity, PartiesMap)
 
 instance OpenAccountRequest.HasImplementation OpenAccountRequest
@@ -101,5 +103,32 @@ template WithdrawRequest
         operator
         user
         holdingCid
+
+      asRemovable = toInterface @Removable.I this
+
+instance TransferRequest.HasImplementation TransferRequest
+
+template TransferRequest
+  with
+    operator : Party
+    buyer : Party
+    seller: Party
+    sellerAccount: AccountKey
+    buyerAccount : AccountKey
+    fungibleHoldingCid : ContractId Transferable.I
+  where
+    signatory operator, buyer
+
+    interface instance Removable.I for TransferRequest where
+      view = Removable.View with removers = fromList [operator, buyer, seller]
+
+    interface instance TransferRequest.I for TransferRequest where
+      view = TransferRequest.View with
+        operator
+        buyer
+        seller
+        sellerAccount
+        buyerAccount
+        fungibleHoldingCid
 
       asRemovable = toInterface @Removable.I this

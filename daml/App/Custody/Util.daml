@@ -1,21 +1,27 @@
 module App.Custody.Util where
 
 import DA.Assert ((===))
+import DA.Set (fromList)
 
 import Interface.RoleManager.UserRole.Permission
 import Interface.Custody.Choices.OpenAccountRequest qualified as OpenAccountRequest(I, View(..))
 import Interface.Custody.Choices.CloseAccountRequest qualified as CloseAccountRequest(I, View(..))
 import Interface.Custody.Choices.DepositRequest qualified as DepositRequest(I, View(..))
 import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest(I, View(..))
+import Interface.Custody.Choices.TransferRequest qualified as TransferRequest(I, View(..))
+
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (R)
+
 import Interface.Common.Util (fetchAndRemove)
 import App.Custody.Model qualified as CustodyModel
 import App.Util qualified as UserUtil (hasPermission)
 import App.Credential.Credential
 
 import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, AccountKey(..), InstrumentQuantity, HoldingFactoryKey)
-import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
 import Daml.Finance.Interface.Account.Factory qualified as AccountFactory (I, Create(..))
 import Daml.Finance.Interface.Account.Account qualified as Account (Remove(..), Credit(..), Debit(..), R, Controllers)
+import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
+import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I, Transfer(..))
 import Daml.Finance.Interface.Account.Util (getAccount)
 
 
@@ -152,3 +158,66 @@ withdrawAux request = do
   (_, ref) <- fetchByKey @Account.R account
   exercise ref.cid Account.Debit with holdingCid
 
+data TransferRequest = TransferRequest
+  with
+    operator : Party
+    buyer : Party
+    seller : Party
+    sellerAccount: AccountKey
+    buyerAccount : AccountKey
+    fungibleHoldingCid : ContractId Transferable.I
+    permission: Permission
+
+requestTransferAux : TransferRequest -> Update (ContractId TransferRequest.I)
+requestTransferAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.buyer)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to request the transfer between two accounts" permission 
+  toInterfaceContractId <$> create CustodyModel.TransferRequest with
+    operator = request.operator
+    buyer = request.buyer
+    seller = request.seller
+    sellerAccount = request.sellerAccount
+    buyerAccount = request.buyerAccount
+    fungibleHoldingCid = request.fungibleHoldingCid
+
+data AtomicSwap = AtomicSwap
+  with
+    operator : Party
+    seller : Party
+    buyer : Party
+    sellerAccount : AccountKey
+    transferableHoldingCid : ContractId Transferable.I
+    transferRequestCid : ContractId TransferRequest.I
+    permission : Permission
+
+atomicSwapAux : AtomicSwap -> Update (ContractId Transferable.I, ContractId Transferable.I)
+atomicSwapAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
+  TransferRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid} <- view <$> fetchAndRemove request.transferRequestCid
+  
+  holdingFungible <- fetch fungibleHoldingCid
+  let accountBuyer = getAccount holdingFungible
+  accountBuyer.custodian === request.operator
+  accountBuyer.owner === request.buyer
+  (_, ref) <- fetchByKey @Account.R accountBuyer
+
+  holdingTransferable <- fetch request.transferableHoldingCid
+  let accountSeller = getAccount holdingTransferable
+  accountSeller.custodian === request.operator
+  accountSeller.owner === request.seller
+  (_, ref) <- fetchByKey @Account.R accountSeller
+  
+  -- Compare fungible quantity vs price of property
+
+  transfer1 <- exercise fungibleHoldingCid Transferable.Transfer 
+    with actors = fromList [request.buyer, request.seller]; 
+          newOwnerAccount = accountSeller
+
+  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+    with actors = fromList [request.seller, request.buyer]; 
+          newOwnerAccount = accountBuyer
+
+  pure (transfer1, transfer2)

@@ -5,12 +5,14 @@ import Interface.Custody.Choices.OpenAccountRequest qualified as OpenAccountRequ
 import Interface.Custody.Choices.CloseAccountRequest qualified as CloseAccountRequest (I)
 import Interface.Custody.Choices.DepositRequest qualified as DepositRequest (I)
 import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest (I)
+import Interface.Custody.Choices.TransferRequest qualified as TransferRequest (I)
 
 import Daml.Finance.Interface.Account.Account qualified as Account (Controllers)
 import Daml.Finance.Interface.Account.Factory qualified as Account (I)
 import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
 import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
 import Daml.Finance.Interface.Types.Common.Types (AccountKey, HoldingFactoryKey(..), Id, InstrumentQuantity, PartiesMap)
+import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I)
 
 
 type I = Service
@@ -56,6 +58,9 @@ interface Service where
   closeAccount : CloseAccount -> Update ()
   deposit : Deposit -> Update (ContractId Holding.I)
   withdrawal : Withdrawal -> Update ()
+
+  requestTransfer: RequestTransfer -> Update (ContractId TransferRequest.I)
+  atomicSwap: AtomicSwap -> Update(ContractId Transferable.I, ContractId Transferable.I)
 
   nonconsuming choice RequestOpenAccount : ContractId OpenAccountRequest.I
     with
@@ -116,6 +121,27 @@ interface Service where
     controller (view $ asBase this).operator
     do
       withdrawal this arg
+  
+  nonconsuming choice RequestTransfer : ContractId TransferRequest.I
+    with
+      seller: Party
+      sellerAccount: AccountKey
+      buyerAccount : AccountKey
+      fungibleHoldingCid : ContractId Transferable.I
+    controller (view $ asBase this).user
+    do
+     requestTransfer this arg
+  
+  nonconsuming choice AtomicSwap : (ContractId Transferable.I,ContractId Transferable.I)
+    with
+      seller: Party
+      buyer: Party
+      sellerAccount : AccountKey
+      transferableHoldingCid : ContractId Transferable.I
+      transferRequestCid : ContractId TransferRequest.I
+    controller (view $ asBase this).user, buyer 
+    do
+     atomicSwap this arg
 
 interface Offer where
   viewtype OView

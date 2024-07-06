@@ -1,9 +1,9 @@
 module App.Custody.Service where
 
 import Interface.Base.Service qualified as Base (I, View(..))
-import Interface.Custody.Service qualified as Service(I, O, R, View(..), OView(..), RView(..), RequestOpenAccount(..), RequestCloseAccount(..), RequestDeposit(..), RequestWithdraw(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdrawal(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
+import Interface.Custody.Service qualified as Service(I, O, R, View(..), OView(..), RView(..), RequestOpenAccount(..), RequestCloseAccount(..), RequestDeposit(..), RequestWithdraw(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdrawal(..),RequestTransfer(..), AtomicSwap(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
 import Interface.RoleManager.UserRole.Permission
-import App.Custody.Util (OpenAccountRequest(..), CloseAccountRequest(..), DepositRequest(..), WithdrawRequest(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdraw(..),  requestOpenAccountAux, requestCloseAccountAux, requestDepositAux, requestWithdrawAux, openAccountAux, closeAccountAux, depositAux, withdrawAux)
+import App.Custody.Util (OpenAccountRequest(..), CloseAccountRequest(..), DepositRequest(..), WithdrawRequest(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdraw(..), TransferRequest(..), AtomicSwap(..), requestOpenAccountAux, requestCloseAccountAux, requestDepositAux, requestWithdrawAux, openAccountAux, closeAccountAux, depositAux, withdrawAux, requestTransferAux, atomicSwapAux)
 
 import Daml.Finance.Interface.Types.Common.Types (HoldingFactoryKey(..))
 import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
@@ -38,19 +38,19 @@ template Service
       asBase = toInterface @Base.I this
 
       requestOpenAccount Service.RequestOpenAccount{id; description; controllers; observers} = do
-        let openAccountRequestParams = OpenAccountRequest with permission = MANAGE_ROLE, ..
+        let openAccountRequestParams = OpenAccountRequest with permission = MANAGE_TRANSACTION, ..
         requestOpenAccountAux openAccountRequestParams
 
       requestCloseAccount Service.RequestCloseAccount{account} = do
-        let closeAccountRequestParams = CloseAccountRequest with permission = MANAGE_ROLE, ..
+        let closeAccountRequestParams = CloseAccountRequest with permission = MANAGE_TRANSACTION, ..
         requestCloseAccountAux closeAccountRequestParams
 
       requestDeposit Service.RequestDeposit{quantity; account} = do
-        let requestDepositParams = DepositRequest with permission = MANAGE_ROLE, ..
+        let requestDepositParams = DepositRequest with permission = MANAGE_TRANSACTION, ..
         requestDepositAux requestDepositParams
 
       requestWithdraw Service.RequestWithdraw{holdingCid} = do
-        let requestWithdrawParams = WithdrawRequest with permission = MANAGE_ROLE, ..
+        let requestWithdrawParams = WithdrawRequest with permission = MANAGE_TRANSACTION, ..
         requestWithdrawAux requestWithdrawParams
 
       openAccount Service.OpenAccount{openAccountRequestCid} = do
@@ -68,7 +68,14 @@ template Service
       withdrawal Service.Withdrawal{withdrawRequestCid} = do
         let withdrawParams = Withdraw with ..
         withdrawAux withdrawParams
+      
+      requestTransfer Service.RequestTransfer{seller, sellerAccount, buyerAccount, fungibleHoldingCid} = do
+        let requestTransferParams = TransferRequest with buyer = user, permission = MANAGE_TRANSACTION, ..
+        requestTransferAux requestTransferParams
 
+      atomicSwap Service.AtomicSwap{seller, buyer,sellerAccount, transferableHoldingCid, transferRequestCid} = do
+        let atomicSwapParams = AtomicSwap with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
+        atomicSwapAux atomicSwapParams
 
 template Offer
   with
