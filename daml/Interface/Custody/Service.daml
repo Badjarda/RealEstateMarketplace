@@ -128,6 +128,7 @@ interface Service where
       sellerAccount: AccountKey
       buyerAccount : AccountKey
       fungibleHoldingCid : ContractId Transferable.I
+      fungibleAmount: Decimal
     controller (view $ asBase this).user
     do
      requestTransfer this arg
@@ -139,6 +140,7 @@ interface Service where
       sellerAccount : AccountKey
       transferableHoldingCid : ContractId Transferable.I
       transferRequestCid : ContractId TransferRequest.I
+      propertyPrice: Decimal
     controller (view $ asBase this).user, buyer 
     do
      atomicSwap this arg

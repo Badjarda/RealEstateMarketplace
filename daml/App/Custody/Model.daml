@@ -116,6 +116,7 @@ template TransferRequest
     sellerAccount: AccountKey
     buyerAccount : AccountKey
     fungibleHoldingCid : ContractId Transferable.I
+    fungibleAmount: Decimal
   where
     signatory operator, buyer
 
@@ -130,5 +131,6 @@ template TransferRequest
         sellerAccount
         buyerAccount
         fungibleHoldingCid
+        fungibleAmount
 
       asRemovable = toInterface @Removable.I this

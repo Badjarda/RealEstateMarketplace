@@ -92,12 +92,12 @@ transfer : Party -> AccountKey -> Party -> ContractId Transferable.I -> Script (
 transfer from toAccount public depositCid = do
   submitMulti [from, toAccount.owner] [public] do exerciseCmd depositCid Transferable.Transfer with actors = fromList [from, toAccount.owner]; newOwnerAccount = toAccount
 
-atomicSwap : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I ->  AccountKey -> ContractId Transferable.I -> Script ()
-atomicSwap operator seller buyer public sellerAccount transferableHoldingCid buyerAccount fungibleHoldingCid = do
+atomicSwap : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> Decimal ->  AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
+atomicSwap operator seller buyer public sellerAccount transferableHoldingCid propertyPrice buyerAccount fungibleHoldingCid fungibleAmount = do
   sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
   buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
-  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestTransfer with seller, sellerAccount, buyerAccount, fungibleHoldingCid
-  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwap with seller, buyer, sellerAccount, transferableHoldingCid, transferRequestCid
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestTransfer with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwap with seller, buyer, sellerAccount, transferableHoldingCid, propertyPrice, transferRequestCid
   pure()
 
 -- UserRoleManager Service

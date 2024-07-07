@@ -17,6 +17,8 @@ import Test.Util.Update.Common (qty)
 import Test.Types (Fixture(..))
 
 import Daml.Finance.Interface.Types.Common.Types (HoldingStandard(..), Id(..), InstrumentKey(..))
+import Daml.Finance.Holding.Fungible()
+import Daml.Finance.Holding.TransferableFungible()
 
 import Daml.Finance.Settlement.Hierarchy qualified as Settlement (Hierarchy(..))
 
@@ -80,7 +82,7 @@ testTransferApartmentPropertyForAmount = do
   (instrumentKey, propertyKey) <- createApartmentProperty marketplace seller public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 100.0 100.0 2 2 1 1 True (date 2024 Apr 04) "Installed Equipment" "Additional Information" "Description"
   (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
 
-  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) buyerAccount (coerceContractId fundsHoldingCid)
+  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) 200000.0 buyerAccount (coerceContractId fundsHoldingCid) 250000.0
 
   pure()
 
@@ -111,7 +113,8 @@ testTransferLandPropertyForAmount = do
   (instrumentKey, propertyKey) <- createLandProperty marketplace seller public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" Urban 1000.0 900.0 800.0 3 True "Installed Equipment" [Building, Residence] "Additional Information" "Description"
   (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
 
-  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) buyerAccount (coerceContractId fundsHoldingCid)
+  let fungibleAmount = fetch fundsHoldingCid
+  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) 200000.0 buyerAccount (coerceContractId fundsHoldingCid) 250000.0
 
   pure()
 
@@ -141,7 +144,8 @@ testTransferResidencePropertyForAmount = do
   (instrumentKey, propertyKey) <- createResidenceProperty marketplace seller public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" 200.0 150.0 3 2 2 Townhouse "BackyardDescription" PrivateGarage (date 2024 Apr 04) South "InstalledEquipment" "AdditionalInformation" "Description"
   (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
 
-  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) buyerAccount (coerceContractId fundsHoldingCid)
+  let fungibleAmount = fetch fundsHoldingCid
+  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) 200000.0 buyerAccount (coerceContractId fundsHoldingCid) 250000.0
 
   pure()
 
@@ -171,7 +175,8 @@ testTransferGaragePropertyForAmount = do
   (instrumentKey, propertyKey) <- createGarageProperty marketplace seller public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description"
   (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
 
-  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) buyerAccount (coerceContractId fundsHoldingCid)
+  let fungibleAmount = fetch fundsHoldingCid
+  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) 200000.0 buyerAccount (coerceContractId fundsHoldingCid) 250000.0
 
   pure()
 
@@ -201,7 +206,8 @@ testTransferWarehousePropertyForAmount = do
   (instrumentKey, propertyKey) <- createWarehouseProperty marketplace seller public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" StorageRoom 200.0 150.0 1 (date 2024 Apr 04)  "InstalledEquipment" "AdditionalInformation" "Description"
   (_, propertyHoldingCid) <- issue marketplace seller public (qty 1.0 instrumentKey) sellerAccount
 
-  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) buyerAccount (coerceContractId fundsHoldingCid)
+  let fungibleAmount = fetch fundsHoldingCid
+  atomicSwap marketplace seller buyer public sellerAccount (coerceContractId propertyHoldingCid) 200000.0 buyerAccount (coerceContractId fundsHoldingCid) 250000.0
 
   pure()
 

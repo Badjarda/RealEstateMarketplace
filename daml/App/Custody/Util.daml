@@ -10,8 +10,6 @@ import Interface.Custody.Choices.DepositRequest qualified as DepositRequest(I, V
 import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest(I, View(..))
 import Interface.Custody.Choices.TransferRequest qualified as TransferRequest(I, View(..))
 
-import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (R)
-
 import Interface.Common.Util (fetchAndRemove)
 import App.Custody.Model qualified as CustodyModel
 import App.Util qualified as UserUtil (hasPermission)
@@ -21,7 +19,7 @@ import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, AccountKey(..)
 import Daml.Finance.Interface.Account.Factory qualified as AccountFactory (I, Create(..))
 import Daml.Finance.Interface.Account.Account qualified as Account (Remove(..), Credit(..), Debit(..), R, Controllers)
 import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
-import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I, Transfer(..))
+import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I, Transferable(..), Transfer(..))
 import Daml.Finance.Interface.Account.Util (getAccount)
 
 
@@ -166,6 +164,7 @@ data TransferRequest = TransferRequest
     sellerAccount: AccountKey
     buyerAccount : AccountKey
     fungibleHoldingCid : ContractId Transferable.I
+    fungibleAmount: Decimal
     permission: Permission
 
 requestTransferAux : TransferRequest -> Update (ContractId TransferRequest.I)
@@ -180,6 +179,7 @@ requestTransferAux request = do
     sellerAccount = request.sellerAccount
     buyerAccount = request.buyerAccount
     fungibleHoldingCid = request.fungibleHoldingCid
+    fungibleAmount = request.fungibleAmount
 
 data AtomicSwap = AtomicSwap
   with
@@ -188,6 +188,7 @@ data AtomicSwap = AtomicSwap
     buyer : Party
     sellerAccount : AccountKey
     transferableHoldingCid : ContractId Transferable.I
+    propertyPrice: Decimal
     transferRequestCid : ContractId TransferRequest.I
     permission : Permission
 
@@ -196,7 +197,7 @@ atomicSwapAux request = do
   (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
   permission <- UserUtil.hasPermission credential.roles request.permission
   assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
-  TransferRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid} <- view <$> fetchAndRemove request.transferRequestCid
+  TransferRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -210,7 +211,8 @@ atomicSwapAux request = do
   accountSeller.owner === request.seller
   (_, ref) <- fetchByKey @Account.R accountSeller
   
-  -- Compare fungible quantity vs price of property
+  --Compare fungible quantity vs price of property
+  assertMsg "Insufficient funds to complete the swap" (fungibleAmount >= request.propertyPrice)
 
   transfer1 <- exercise fungibleHoldingCid Transferable.Transfer 
     with actors = fromList [request.buyer, request.seller]; 
@@ -221,3 +223,4 @@ atomicSwapAux request = do
           newOwnerAccount = accountBuyer
 
   pure (transfer1, transfer2)
+

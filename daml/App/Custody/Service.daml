@@ -69,11 +69,11 @@ template Service
         let withdrawParams = Withdraw with ..
         withdrawAux withdrawParams
       
-      requestTransfer Service.RequestTransfer{seller, sellerAccount, buyerAccount, fungibleHoldingCid} = do
+      requestTransfer Service.RequestTransfer{seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} = do
         let requestTransferParams = TransferRequest with buyer = user, permission = MANAGE_TRANSACTION, ..
         requestTransferAux requestTransferParams
 
-      atomicSwap Service.AtomicSwap{seller, buyer,sellerAccount, transferableHoldingCid, transferRequestCid} = do
+      atomicSwap Service.AtomicSwap{seller, buyer,sellerAccount, transferableHoldingCid, propertyPrice, transferRequestCid} = do
         let atomicSwapParams = AtomicSwap with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
         atomicSwapAux atomicSwapParams
 
