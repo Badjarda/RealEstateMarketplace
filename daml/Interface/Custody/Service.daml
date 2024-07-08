@@ -13,6 +13,7 @@ import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
 import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
 import Daml.Finance.Interface.Types.Common.Types (AccountKey, HoldingFactoryKey(..), Id, InstrumentQuantity, PartiesMap)
 import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I)
+import Interface.Common.Types (PropertyKey(..))
 
 
 type I = Service
@@ -60,7 +61,11 @@ interface Service where
   withdrawal : Withdrawal -> Update ()
 
   requestTransfer: RequestTransfer -> Update (ContractId TransferRequest.I)
-  atomicSwap: AtomicSwap -> Update(ContractId Transferable.I, ContractId Transferable.I)
+  atomicSwapApartment: AtomicSwapApartment -> Update(ContractId Transferable.I, ContractId Transferable.I)
+  atomicSwapLand: AtomicSwapLand -> Update(ContractId Transferable.I, ContractId Transferable.I)
+  atomicSwapGarage: AtomicSwapGarage -> Update(ContractId Transferable.I, ContractId Transferable.I)
+  atomicSwapResidence: AtomicSwapResidence -> Update(ContractId Transferable.I, ContractId Transferable.I)
+  atomicSwapWarehouse: AtomicSwapWarehouse -> Update(ContractId Transferable.I, ContractId Transferable.I)
 
   nonconsuming choice RequestOpenAccount : ContractId OpenAccountRequest.I
     with
@@ -133,17 +138,65 @@ interface Service where
     do
      requestTransfer this arg
   
-  nonconsuming choice AtomicSwap : (ContractId Transferable.I,ContractId Transferable.I)
+  nonconsuming choice AtomicSwapApartment : (ContractId Transferable.I,ContractId Transferable.I)
     with
       seller: Party
       buyer: Party
       sellerAccount : AccountKey
       transferableHoldingCid : ContractId Transferable.I
       transferRequestCid : ContractId TransferRequest.I
-      propertyPrice: Decimal
+      propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
     do
-     atomicSwap this arg
+     atomicSwapApartment this arg
+    
+  nonconsuming choice AtomicSwapGarage : (ContractId Transferable.I,ContractId Transferable.I)
+    with
+      seller: Party
+      buyer: Party
+      sellerAccount : AccountKey
+      transferableHoldingCid : ContractId Transferable.I
+      transferRequestCid : ContractId TransferRequest.I
+      propertyKey: PropertyKey
+    controller (view $ asBase this).user, buyer 
+    do
+     atomicSwapGarage this arg
+  
+  nonconsuming choice AtomicSwapLand : (ContractId Transferable.I,ContractId Transferable.I)
+    with
+      seller: Party
+      buyer: Party
+      sellerAccount : AccountKey
+      transferableHoldingCid : ContractId Transferable.I
+      transferRequestCid : ContractId TransferRequest.I
+      propertyKey: PropertyKey
+    controller (view $ asBase this).user, buyer 
+    do
+     atomicSwapLand this arg
+    
+  nonconsuming choice AtomicSwapResidence : (ContractId Transferable.I,ContractId Transferable.I)
+    with
+      seller: Party
+      buyer: Party
+      sellerAccount : AccountKey
+      transferableHoldingCid : ContractId Transferable.I
+      transferRequestCid : ContractId TransferRequest.I
+      propertyKey: PropertyKey
+    controller (view $ asBase this).user, buyer 
+    do
+     atomicSwapResidence this arg
+  
+  nonconsuming choice AtomicSwapWarehouse : (ContractId Transferable.I,ContractId Transferable.I)
+    with
+      seller: Party
+      buyer: Party
+      sellerAccount : AccountKey
+      transferableHoldingCid : ContractId Transferable.I
+      transferRequestCid : ContractId TransferRequest.I
+      propertyKey: PropertyKey
+    controller (view $ asBase this).user, buyer 
+    do
+     atomicSwapWarehouse this arg
 
 interface Offer where
   viewtype OView

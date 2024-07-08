@@ -6,7 +6,7 @@ import DA.Optional (fromSome)
 import Interface.RoleManager.Service qualified as RoleManagerService (I, CreateUserRole(..), DeleteUserRole(..), AddPermissionToUserRole(..), RemovePermissionInUserRole(..), UpdateUserRole(..))
 import Interface.ProfileManager.Service qualified as ProfileManagerService(I, RequestCreateUserProfile(..), CreateUserProfile(..), UpdateUsername(..), UpdateFirstName(..), UpdateLastName(..), UpdateFullName(..), UpdatePassword(..), UpdateBirthday(..), UpdateGender(..), UpdateNationality(..), UpdateContactMail(..), UpdateCellphoneNumber(..), UpdateIdNumber(..), UpdateTaxId(..), UpdateSocialSecurityId(..))
 import Interface.PropertyManager.Service qualified as PropertyManagerService (I, RequestCreateApartmentProperty(..), RequestCreateLandProperty(..), RequestCreateResidenceProperty(..), RequestCreateGarageProperty(..), CreateApartmentProperty(..), UpdateApartmentPrice(..), UpdateApartmentPropertyAddress(..), UpdateApartmentPropertyPostalCode(..), UpdateApartmentPropertyDistrict(..), UpdateApartmentPropertyCounty(..), UpdateApartmentGrossArea(..), UpdateApartmentUsableArea(..), UpdateApartmentBedrooms(..), UpdateApartmentBathrooms(..), UpdateApartmentFloor(..), UpdateApartmentParkingSpaces(..), UpdateApartmentElevator(..), UpdateApartmentBuildDate(..), UpdateApartmentInstalledEquipment(..), UpdateApartmentAdditionalInformation(..), UpdateApartmentDescription(..), CreateLandProperty(..), UpdateLandPrice(..), UpdateLandPropertyAddress(..), UpdateLandPropertyPostalCode(..), UpdateLandPropertyDistrict(..), UpdateLandPropertyCounty(..), UpdateLandType(..), UpdateTotalLandArea(..), UpdateMinimumSurfaceForSale(..), UpdateLandBuildableArea(..), UpdateLandBuildableFloors(..), UpdateLandAccessByRoad(..), UpdateLandInstalledEquipment(..), UpdateLandViableConstructionTypes(..), UpdateLandAdditionalInformation(..), UpdateLandDescription(..), CreateResidenceProperty(..), UpdateResidencePrice(..), UpdateResidencePropertyAddress(..), UpdateResidencePropertyPostalCode(..), UpdateResidencePropertyDistrict(..), UpdateResidencePropertyCounty(..), UpdateResidenceGrossArea(..), UpdateResidenceUsableArea(..), UpdateResidenceBedrooms(..), UpdateResidenceBathrooms(..), UpdateResidenceFloors(..), UpdateResidenceType(..), UpdateResidenceBackyard(..), UpdateResidenceInstalledEquipment(..), UpdateResidenceParking(..), UpdateResidenceBuildDate(..), UpdateResidenceOrientation(..), UpdateResidenceAdditionalInformation(..), UpdateResidenceDescription(..), CreateGarageProperty(..), UpdateGaragePrice(..), UpdateGaragePropertyAddress(..), UpdateGaragePropertyPostalCode(..), UpdateGaragePropertyDistrict(..), UpdateGaragePropertyCounty(..), UpdateGarageArea(..), UpdateGarageType(..), UpdateVehicleCapacity(..), UpdateGarageInstalledEquipment(..), UpdateGarageAdditionalInformation(..), UpdateGarageDescription(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehousePrice(..), UpdateWarehousePropertyAddress(..), UpdateWarehousePropertyPostalCode(..), UpdateWarehousePropertyDistrict(..), UpdateWarehousePropertyCounty(..), UpdateWarehouseType(..), UpdateWarehouseGrossArea(..), UpdateWarehouseUsableArea(..), UpdateWarehouseFloors(..), UpdateWarehouseBuildDate(..), UpdateWarehouseInstalledEquipment(..), UpdateWarehouseAdditionalInformation(..), UpdateWarehouseDescription(..))
-import Interface.Custody.Service qualified as CustodyService (I, OpenAccount(..), RequestOpenAccount(..), RequestDeposit(..), Deposit(..), CloseAccount(..), RequestCloseAccount(..), Withdrawal(..), RequestWithdraw(..), RequestTransfer(..), AtomicSwap(..))
+import Interface.Custody.Service qualified as CustodyService (I, OpenAccount(..), RequestOpenAccount(..), RequestDeposit(..), Deposit(..), CloseAccount(..), RequestCloseAccount(..), Withdrawal(..), RequestWithdraw(..), RequestTransfer(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..))
 import Interface.Issuance.Service qualified as IssuanceService (I, RequestIssue(..), Issue(..), RequestDeIssue(..), DeIssue(..))
 
 import Interface.Common.Types (UserRoleKey(..), PropertyKey(..), UserProfileKey(..))
@@ -92,12 +92,44 @@ transfer : Party -> AccountKey -> Party -> ContractId Transferable.I -> Script (
 transfer from toAccount public depositCid = do
   submitMulti [from, toAccount.owner] [public] do exerciseCmd depositCid Transferable.Transfer with actors = fromList [from, toAccount.owner]; newOwnerAccount = toAccount
 
-atomicSwap : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> Decimal ->  AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
-atomicSwap operator seller buyer public sellerAccount transferableHoldingCid propertyPrice buyerAccount fungibleHoldingCid fungibleAmount = do
+atomicSwapApartment : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
+atomicSwapApartment operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
   sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
   buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
   transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestTransfer with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
-  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwap with seller, buyer, sellerAccount, transferableHoldingCid, propertyPrice, transferRequestCid
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapApartment with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  pure()
+
+atomicSwapLand : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
+atomicSwapLand operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
+  sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
+  buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestTransfer with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapLand with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  pure()
+
+atomicSwapGarage : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
+atomicSwapGarage operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
+  sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
+  buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestTransfer with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapGarage with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  pure()
+
+atomicSwapResidence : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
+atomicSwapResidence operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
+  sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
+  buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestTransfer with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapResidence with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  pure()
+
+atomicSwapWarehouse : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
+atomicSwapWarehouse operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
+  sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
+  buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestTransfer with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapWarehouse with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
   pure()
 
 -- UserRoleManager Service

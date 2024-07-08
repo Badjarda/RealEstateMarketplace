@@ -19,9 +19,15 @@ import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, AccountKey(..)
 import Daml.Finance.Interface.Account.Factory qualified as AccountFactory (I, Create(..))
 import Daml.Finance.Interface.Account.Account qualified as Account (Remove(..), Credit(..), Debit(..), R, Controllers)
 import Daml.Finance.Interface.Holding.Holding qualified as Holding (I)
-import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I, Transferable(..), Transfer(..))
-import Daml.Finance.Interface.Account.Util (getAccount)
+import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I, Transfer(..))
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (R(..), GetApartmentPrice(..))
+import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(R(..), GetLandPrice(..))
+import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty (R(..), GetResidencePrice(..))
+import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty (R(..), GetGaragePrice(..))
+import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty (R(..), GetWarehousePrice(..))
 
+import Daml.Finance.Interface.Account.Util (getAccount)
+import Interface.Common.Types (PropertyKey(..))
 
 data OpenAccountRequest = OpenAccountRequest
   with
@@ -171,7 +177,7 @@ requestTransferAux : TransferRequest -> Update (ContractId TransferRequest.I)
 requestTransferAux request = do
   (_, credential) <-  fetchByKey @Credential (request.operator, request.buyer)
   permission <- UserUtil.hasPermission credential.roles request.permission
-  assertMsg "You do not have permission to request the transfer between two accounts" permission 
+  assertMsg "You do not have permission to request the transfer between two accounts" permission
   toInterfaceContractId <$> create CustodyModel.TransferRequest with
     operator = request.operator
     buyer = request.buyer
@@ -181,19 +187,19 @@ requestTransferAux request = do
     fungibleHoldingCid = request.fungibleHoldingCid
     fungibleAmount = request.fungibleAmount
 
-data AtomicSwap = AtomicSwap
+data AtomicSwapApartment = AtomicSwapApartment
   with
     operator : Party
     seller : Party
     buyer : Party
     sellerAccount : AccountKey
     transferableHoldingCid : ContractId Transferable.I
-    propertyPrice: Decimal
+    propertyKey: PropertyKey
     transferRequestCid : ContractId TransferRequest.I
     permission : Permission
 
-atomicSwapAux : AtomicSwap -> Update (ContractId Transferable.I, ContractId Transferable.I)
-atomicSwapAux request = do
+atomicSwapApartmentAux : AtomicSwapApartment -> Update (ContractId Transferable.I, ContractId Transferable.I)
+atomicSwapApartmentAux request = do
   (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
   permission <- UserUtil.hasPermission credential.roles request.permission
   assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
@@ -211,8 +217,10 @@ atomicSwapAux request = do
   accountSeller.owner === request.seller
   (_, ref) <- fetchByKey @Account.R accountSeller
   
-  --Compare fungible quantity vs price of property
-  assertMsg "Insufficient funds to complete the swap" (fungibleAmount >= request.propertyPrice)
+  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
+  propertyPrice <- exercise ref.cid ApartmentProperty.GetApartmentPrice
+
+  assertMsg "Insufficient funds to complete the swap" (fungibleAmount >= propertyPrice)
 
   transfer1 <- exercise fungibleHoldingCid Transferable.Transfer 
     with actors = fromList [request.buyer, request.seller]; 
@@ -224,3 +232,183 @@ atomicSwapAux request = do
 
   pure (transfer1, transfer2)
 
+data AtomicSwapLand = AtomicSwapLand
+  with
+    operator : Party
+    seller : Party
+    buyer : Party
+    sellerAccount : AccountKey
+    transferableHoldingCid : ContractId Transferable.I
+    propertyKey: PropertyKey
+    transferRequestCid : ContractId TransferRequest.I
+    permission : Permission
+
+atomicSwapLandAux : AtomicSwapLand -> Update (ContractId Transferable.I, ContractId Transferable.I)
+atomicSwapLandAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
+  TransferRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  
+  holdingFungible <- fetch fungibleHoldingCid
+  let accountBuyer = getAccount holdingFungible
+  accountBuyer.custodian === request.operator
+  accountBuyer.owner === request.buyer
+  (_, ref) <- fetchByKey @Account.R accountBuyer
+
+  holdingTransferable <- fetch request.transferableHoldingCid
+  let accountSeller = getAccount holdingTransferable
+  accountSeller.custodian === request.operator
+  accountSeller.owner === request.seller
+  (_, ref) <- fetchByKey @Account.R accountSeller
+  
+  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
+  propertyPrice <- exercise ref.cid LandProperty.GetLandPrice
+      
+  assertMsg "Insufficient funds to complete the swap" (fungibleAmount >= propertyPrice)
+
+  transfer1 <- exercise fungibleHoldingCid Transferable.Transfer 
+    with actors = fromList [request.buyer, request.seller]; 
+          newOwnerAccount = accountSeller
+
+  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+    with actors = fromList [request.seller, request.buyer]; 
+          newOwnerAccount = accountBuyer
+
+  pure (transfer1, transfer2)
+
+data AtomicSwapGarage = AtomicSwapGarage
+  with
+    operator : Party
+    seller : Party
+    buyer : Party
+    sellerAccount : AccountKey
+    transferableHoldingCid : ContractId Transferable.I
+    propertyKey: PropertyKey
+    transferRequestCid : ContractId TransferRequest.I
+    permission : Permission
+
+atomicSwapGarageAux : AtomicSwapGarage -> Update (ContractId Transferable.I, ContractId Transferable.I)
+atomicSwapGarageAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
+  TransferRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  
+  holdingFungible <- fetch fungibleHoldingCid
+  let accountBuyer = getAccount holdingFungible
+  accountBuyer.custodian === request.operator
+  accountBuyer.owner === request.buyer
+  (_, ref) <- fetchByKey @Account.R accountBuyer
+
+  holdingTransferable <- fetch request.transferableHoldingCid
+  let accountSeller = getAccount holdingTransferable
+  accountSeller.custodian === request.operator
+  accountSeller.owner === request.seller
+  (_, ref) <- fetchByKey @Account.R accountSeller
+
+  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
+  propertyPrice <- exercise ref.cid GarageProperty.GetGaragePrice
+
+  assertMsg "Insufficient funds to complete the swap" (fungibleAmount >= propertyPrice)
+
+  transfer1 <- exercise fungibleHoldingCid Transferable.Transfer 
+    with actors = fromList [request.buyer, request.seller]; 
+          newOwnerAccount = accountSeller
+
+  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+    with actors = fromList [request.seller, request.buyer]; 
+          newOwnerAccount = accountBuyer
+
+  pure (transfer1, transfer2)
+
+data AtomicSwapResidence = AtomicSwapResidence
+  with
+    operator : Party
+    seller : Party
+    buyer : Party
+    sellerAccount : AccountKey
+    transferableHoldingCid : ContractId Transferable.I
+    propertyKey: PropertyKey
+    transferRequestCid : ContractId TransferRequest.I
+    permission : Permission
+
+atomicSwapResidenceAux : AtomicSwapResidence -> Update (ContractId Transferable.I, ContractId Transferable.I)
+atomicSwapResidenceAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
+  TransferRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  
+  holdingFungible <- fetch fungibleHoldingCid
+  let accountBuyer = getAccount holdingFungible
+  accountBuyer.custodian === request.operator
+  accountBuyer.owner === request.buyer
+  (_, ref) <- fetchByKey @Account.R accountBuyer
+
+  holdingTransferable <- fetch request.transferableHoldingCid
+  let accountSeller = getAccount holdingTransferable
+  accountSeller.custodian === request.operator
+  accountSeller.owner === request.seller
+  (_, ref) <- fetchByKey @Account.R accountSeller
+
+  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
+  propertyPrice <- exercise ref.cid ResidenceProperty.GetResidencePrice
+
+  assertMsg "Insufficient funds to complete the swap" (fungibleAmount >= propertyPrice)
+
+  transfer1 <- exercise fungibleHoldingCid Transferable.Transfer 
+    with actors = fromList [request.buyer, request.seller]; 
+          newOwnerAccount = accountSeller
+
+  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+    with actors = fromList [request.seller, request.buyer]; 
+          newOwnerAccount = accountBuyer
+
+  pure (transfer1, transfer2)
+
+
+data AtomicSwapWarehouse = AtomicSwapWarehouse
+  with
+    operator : Party
+    seller : Party
+    buyer : Party
+    sellerAccount : AccountKey
+    transferableHoldingCid : ContractId Transferable.I
+    propertyKey: PropertyKey
+    transferRequestCid : ContractId TransferRequest.I
+    permission : Permission
+
+atomicSwapWarehouseAux : AtomicSwapWarehouse -> Update (ContractId Transferable.I, ContractId Transferable.I)
+atomicSwapWarehouseAux request = do
+  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
+  permission <- UserUtil.hasPermission credential.roles request.permission
+  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
+  TransferRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  
+  holdingFungible <- fetch fungibleHoldingCid
+  let accountBuyer = getAccount holdingFungible
+  accountBuyer.custodian === request.operator
+  accountBuyer.owner === request.buyer
+  (_, ref) <- fetchByKey @Account.R accountBuyer
+
+  holdingTransferable <- fetch request.transferableHoldingCid
+  let accountSeller = getAccount holdingTransferable
+  accountSeller.custodian === request.operator
+  accountSeller.owner === request.seller
+  (_, ref) <- fetchByKey @Account.R accountSeller
+
+  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
+  propertyPrice <- exercise ref.cid WarehouseProperty.GetWarehousePrice
+
+  assertMsg "Insufficient funds to complete the swap" (fungibleAmount >= propertyPrice)
+
+  transfer1 <- exercise fungibleHoldingCid Transferable.Transfer 
+    with actors = fromList [request.buyer, request.seller]; 
+          newOwnerAccount = accountSeller
+
+  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+    with actors = fromList [request.seller, request.buyer]; 
+          newOwnerAccount = accountBuyer
+
+  pure (transfer1, transfer2)

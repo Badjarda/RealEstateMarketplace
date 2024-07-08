@@ -1,9 +1,9 @@
 module App.Custody.Service where
 
 import Interface.Base.Service qualified as Base (I, View(..))
-import Interface.Custody.Service qualified as Service(I, O, R, View(..), OView(..), RView(..), RequestOpenAccount(..), RequestCloseAccount(..), RequestDeposit(..), RequestWithdraw(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdrawal(..),RequestTransfer(..), AtomicSwap(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
+import Interface.Custody.Service qualified as Service(I, O, R, View(..), OView(..), RView(..), RequestOpenAccount(..), RequestCloseAccount(..), RequestDeposit(..), RequestWithdraw(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdrawal(..),RequestTransfer(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
 import Interface.RoleManager.UserRole.Permission
-import App.Custody.Util (OpenAccountRequest(..), CloseAccountRequest(..), DepositRequest(..), WithdrawRequest(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdraw(..), TransferRequest(..), AtomicSwap(..), requestOpenAccountAux, requestCloseAccountAux, requestDepositAux, requestWithdrawAux, openAccountAux, closeAccountAux, depositAux, withdrawAux, requestTransferAux, atomicSwapAux)
+import App.Custody.Util (OpenAccountRequest(..), CloseAccountRequest(..), DepositRequest(..), WithdrawRequest(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdraw(..), TransferRequest(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..), requestOpenAccountAux, requestCloseAccountAux, requestDepositAux, requestWithdrawAux, openAccountAux, closeAccountAux, depositAux, withdrawAux, requestTransferAux, atomicSwapApartmentAux, atomicSwapLandAux, atomicSwapGarageAux, atomicSwapResidenceAux, atomicSwapWarehouseAux)
 
 import Daml.Finance.Interface.Types.Common.Types (HoldingFactoryKey(..))
 import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
@@ -73,9 +73,25 @@ template Service
         let requestTransferParams = TransferRequest with buyer = user, permission = MANAGE_TRANSACTION, ..
         requestTransferAux requestTransferParams
 
-      atomicSwap Service.AtomicSwap{seller, buyer,sellerAccount, transferableHoldingCid, propertyPrice, transferRequestCid} = do
-        let atomicSwapParams = AtomicSwap with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
-        atomicSwapAux atomicSwapParams
+      atomicSwapApartment Service.AtomicSwapApartment{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+        let atomicSwapParams = AtomicSwapApartment with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
+        atomicSwapApartmentAux atomicSwapParams
+
+      atomicSwapLand Service.AtomicSwapLand{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+        let atomicSwapParams = AtomicSwapLand with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
+        atomicSwapLandAux atomicSwapParams
+
+      atomicSwapGarage Service.AtomicSwapGarage{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+        let atomicSwapParams = AtomicSwapGarage with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
+        atomicSwapGarageAux atomicSwapParams
+
+      atomicSwapResidence Service.AtomicSwapResidence{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+        let atomicSwapParams = AtomicSwapResidence with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
+        atomicSwapResidenceAux atomicSwapParams
+
+      atomicSwapWarehouse Service.AtomicSwapWarehouse{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+        let atomicSwapParams = AtomicSwapWarehouse with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
+        atomicSwapWarehouseAux atomicSwapParams
 
 template Offer
   with
