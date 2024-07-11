@@ -1,9 +1,9 @@
 module App.Custody.Service where
 
 import Interface.Base.Service qualified as Base (I, View(..))
-import Interface.Custody.Service qualified as Service(I, O, R, View(..), OView(..), RView(..), RequestOpenAccount(..), RequestCloseAccount(..), RequestDeposit(..), RequestWithdraw(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdrawal(..),RequestTransfer(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
+import Interface.Custody.Service qualified as Service(I, O, R, View(..), OView(..), RView(..), RequestOpenAccount(..), RequestCloseAccount(..), RequestDeposit(..), RequestWithdraw(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdrawal(..),RequestSwap(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..), Accept(..), Decline(..), Withdraw(..), Cancel(..), Reject(..), Approve(..), HasImplementation)
 import Interface.RoleManager.UserRole.Permission
-import App.Custody.Util (OpenAccountRequest(..), CloseAccountRequest(..), DepositRequest(..), WithdrawRequest(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdraw(..), TransferRequest(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..), requestOpenAccountAux, requestCloseAccountAux, requestDepositAux, requestWithdrawAux, openAccountAux, closeAccountAux, depositAux, withdrawAux, requestTransferAux, atomicSwapApartmentAux, atomicSwapLandAux, atomicSwapGarageAux, atomicSwapResidenceAux, atomicSwapWarehouseAux)
+import App.Custody.Util (OpenAccountRequest(..), CloseAccountRequest(..), DepositRequest(..), WithdrawRequest(..), OpenAccount(..), CloseAccount(..), Deposit(..), Withdraw(..), SwapRequest(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..), requestOpenAccountAux, requestCloseAccountAux, requestDepositAux, requestWithdrawAux, openAccountAux, closeAccountAux, depositAux, withdrawAux, requestSwapAux, atomicSwapApartmentAux, atomicSwapLandAux, atomicSwapGarageAux, atomicSwapResidenceAux, atomicSwapWarehouseAux)
 
 import Daml.Finance.Interface.Types.Common.Types (HoldingFactoryKey(..))
 import Daml.Finance.Interface.Lifecycle.Rule.Claim qualified as Lifecycle (Claim)
@@ -69,9 +69,9 @@ template Service
         let withdrawParams = Withdraw with ..
         withdrawAux withdrawParams
       
-      requestTransfer Service.RequestTransfer{seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} = do
-        let requestTransferParams = TransferRequest with buyer = user, permission = MANAGE_TRANSACTION, ..
-        requestTransferAux requestTransferParams
+      requestSwap Service.RequestSwap{seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} = do
+        let requestSwapParams = SwapRequest with buyer = user, permission = MANAGE_TRANSACTION, ..
+        requestSwapAux requestSwapParams
 
       atomicSwapApartment Service.AtomicSwapApartment{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
         let atomicSwapParams = AtomicSwapApartment with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..

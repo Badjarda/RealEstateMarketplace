@@ -1,10 +1,10 @@
-module Interface.Custody.Choices.TransferRequest where
+module Interface.Custody.Choices.SwapRequest where
 
 import Interface.Common.Removable qualified as Removable (I, Implementation)
 import Daml.Finance.Interface.Holding.Transferable qualified as Transferable (I)
 import Daml.Finance.Interface.Types.Common.Types (AccountKey)
 
-type I = TransferRequest
+type I = SwapRequest
 
 type V = View
 
@@ -19,12 +19,12 @@ data View = View
     fungibleAmount: Decimal
   deriving (Eq, Show)
 
-interface TransferRequest where
+interface SwapRequest where
   viewtype View
 
   asRemovable : Removable.I
 
-type Implementation t = (HasToInterface t TransferRequest, Removable.Implementation t)
+type Implementation t = (HasToInterface t SwapRequest, Removable.Implementation t)
 class (Implementation t) => HasImplementation t
-instance HasImplementation TransferRequest
-instance HasToInterface TransferRequest Removable.I where _toInterface = asRemovable
+instance HasImplementation SwapRequest
+instance HasToInterface SwapRequest Removable.I where _toInterface = asRemovable

@@ -5,7 +5,7 @@ import Interface.Custody.Choices.OpenAccountRequest qualified as OpenAccountRequ
 import Interface.Custody.Choices.CloseAccountRequest qualified as CloseAccountRequest (I)
 import Interface.Custody.Choices.DepositRequest qualified as DepositRequest (I)
 import Interface.Custody.Choices.WithdrawRequest qualified as WithdrawRequest (I)
-import Interface.Custody.Choices.TransferRequest qualified as TransferRequest (I)
+import Interface.Custody.Choices.SwapRequest qualified as SwapRequest (I)
 
 import Daml.Finance.Interface.Account.Account qualified as Account (Controllers)
 import Daml.Finance.Interface.Account.Factory qualified as Account (I)
@@ -60,7 +60,7 @@ interface Service where
   deposit : Deposit -> Update (ContractId Holding.I)
   withdrawal : Withdrawal -> Update ()
 
-  requestTransfer: RequestTransfer -> Update (ContractId TransferRequest.I)
+  requestSwap: RequestSwap -> Update (ContractId SwapRequest.I)
   atomicSwapApartment: AtomicSwapApartment -> Update(ContractId Transferable.I, ContractId Transferable.I)
   atomicSwapLand: AtomicSwapLand -> Update(ContractId Transferable.I, ContractId Transferable.I)
   atomicSwapGarage: AtomicSwapGarage -> Update(ContractId Transferable.I, ContractId Transferable.I)
@@ -127,7 +127,7 @@ interface Service where
     do
       withdrawal this arg
   
-  nonconsuming choice RequestTransfer : ContractId TransferRequest.I
+  nonconsuming choice RequestSwap : ContractId SwapRequest.I
     with
       seller: Party
       sellerAccount: AccountKey
@@ -136,7 +136,7 @@ interface Service where
       fungibleAmount: Decimal
     controller (view $ asBase this).user
     do
-     requestTransfer this arg
+     requestSwap this arg
   
   nonconsuming choice AtomicSwapApartment : (ContractId Transferable.I,ContractId Transferable.I)
     with
@@ -144,7 +144,7 @@ interface Service where
       buyer: Party
       sellerAccount : AccountKey
       transferableHoldingCid : ContractId Transferable.I
-      transferRequestCid : ContractId TransferRequest.I
+      transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
     do
@@ -156,7 +156,7 @@ interface Service where
       buyer: Party
       sellerAccount : AccountKey
       transferableHoldingCid : ContractId Transferable.I
-      transferRequestCid : ContractId TransferRequest.I
+      transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
     do
@@ -168,7 +168,7 @@ interface Service where
       buyer: Party
       sellerAccount : AccountKey
       transferableHoldingCid : ContractId Transferable.I
-      transferRequestCid : ContractId TransferRequest.I
+      transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
     do
@@ -180,7 +180,7 @@ interface Service where
       buyer: Party
       sellerAccount : AccountKey
       transferableHoldingCid : ContractId Transferable.I
-      transferRequestCid : ContractId TransferRequest.I
+      transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
     do
@@ -192,7 +192,7 @@ interface Service where
       buyer: Party
       sellerAccount : AccountKey
       transferableHoldingCid : ContractId Transferable.I
-      transferRequestCid : ContractId TransferRequest.I
+      transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
     do
