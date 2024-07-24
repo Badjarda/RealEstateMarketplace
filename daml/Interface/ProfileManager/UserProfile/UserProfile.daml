@@ -34,6 +34,7 @@ data View = View
     idNumber: Int
     taxId: Int
     socialSecurityId: Int
+    photoReferences: [Text]
   deriving (Eq, Show)
 
 toKey : View -> UserProfileKey
@@ -86,6 +87,9 @@ interface UserProfile requires Disclosure.I where
 
   getSocialSecurityId : GetSocialSecurityId -> Update (Int)
   setSocialSecurityId : SetSocialSecurityId -> Update (ContractId UserProfile)
+
+  getPhotoReferences : GetPhotoReferences -> Update ([Text])
+  setPhotoReferences : SetPhotoReferences -> Update (ContractId UserProfile)
 
   nonconsuming choice GetView : View
     with
@@ -262,6 +266,19 @@ interface UserProfile requires Disclosure.I where
     controller signatory this
     do
       setSocialSecurityId this arg
+  
+  -- Photo References
+  nonconsuming choice GetPhotoReferences : [Text]
+    controller signatory this
+    do
+      getPhotoReferences this arg
+
+  choice SetPhotoReferences : ContractId UserProfile
+    with
+      newPhotoReferences : [Text]
+    controller signatory this
+    do
+      setPhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

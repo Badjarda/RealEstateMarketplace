@@ -67,6 +67,8 @@ interface Service where
 
     updateSocialSecurityId : UpdateSocialSecurityId -> Update ()
 
+    updatePhotoReferences : UpdatePhotoReferences -> Update ()
+
 
     nonconsuming choice RequestCreateUserProfile : ContractId RequestCreateUserProfile.I
       with
@@ -84,6 +86,7 @@ interface Service where
           idNumber: Int
           taxId: Int
           socialSecurityId: Int
+          photoReferences: [Text]
           observers : PartiesMap
       controller (view $ asBase this).user
       do
@@ -199,6 +202,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateSocialSecurityId this arg
+    
+    nonconsuming choice UpdatePhotoReferences : ()
+      with
+        newPhotoReferences : [Text]
+        userProfileKey : UserProfileKey
+      controller (view $ asBase this).user
+      do
+        updatePhotoReferences this arg
 
 
 interface Offer where

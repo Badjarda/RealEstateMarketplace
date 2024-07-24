@@ -2,7 +2,7 @@ module App.ProfileManager.UserProfile where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(I, View(..), GetUsername(..), SetUsername(..), GetFirstName(..), SetFirstName(..), GetLastName(..), SetLastName(..), GetFullName(..), SetFullName(..), GetPassword(..), SetPassword(..), GetContactMail(..), SetContactMail(..), GetBirthday(..), SetBirthday(..), GetGender(..), SetGender(..), GetNationality(..), SetNationality(..), GetCellphoneNumber(..), SetCellphoneNumber(..), GetTaxId(..), SetTaxId(..), GetIdNumber(..), SetIdNumber(..), GetSocialSecurityId(..), SetSocialSecurityId(..), userProfileKey, disclosureUpdateReference, createReference)
+import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(I, View(..), GetUsername(..), SetUsername(..), GetFirstName(..), SetFirstName(..), GetLastName(..), SetLastName(..), GetFullName(..), SetFullName(..), GetPassword(..), SetPassword(..), GetContactMail(..), SetContactMail(..), GetBirthday(..), SetBirthday(..), GetGender(..), SetGender(..), GetNationality(..), SetNationality(..), GetCellphoneNumber(..), SetCellphoneNumber(..), GetTaxId(..), SetTaxId(..), GetIdNumber(..), SetIdNumber(..), GetSocialSecurityId(..), SetSocialSecurityId(..), GetPhotoReferences(..), SetPhotoReferences(..), userProfileKey, disclosureUpdateReference, createReference)
 import Interface.ProfileManager.UserProfile.Factory qualified as UserProfileFactory(I, View(..), Create(..))
 import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
 
@@ -29,6 +29,7 @@ template UserProfile
     idNumber: Int
     taxId: Int
     socialSecurityId: Int
+    photoReferences: [Text]
     observers : PartiesMap
   where
     signatory operator
@@ -120,6 +121,12 @@ template UserProfile
 
       setSocialSecurityId UserProfile.SetSocialSecurityId{newSocialSecurityId} = do 
         toInterfaceContractId <$> create this with socialSecurityId = newSocialSecurityId
+      
+      getPhotoReferences UserProfile.GetPhotoReferences{} = do 
+        pure photoReferences
+
+      setPhotoReferences UserProfile.SetPhotoReferences{newPhotoReferences} = do 
+        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
 
     interface instance Disclosure.I for UserProfile where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
@@ -141,7 +148,7 @@ template Factory
     interface instance UserProfileFactory.I for Factory where
       view = UserProfileFactory.View with operator
       
-      create' UserProfileFactory.Create{userProfileKey, username, firstName, lastName, fullName, password, birthday, gender, nationality, contactMail, cellphoneNumber, idNumber, taxId, socialSecurityId, observers} =
+      create' UserProfileFactory.Create{userProfileKey, username, firstName, lastName, fullName, password, birthday, gender, nationality, contactMail, cellphoneNumber, idNumber, taxId, socialSecurityId, photoReferences, observers} =
         do
           cid <- toInterfaceContractId <$> create UserProfile with
             operator = userProfileKey.operator

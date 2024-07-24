@@ -26,6 +26,7 @@ data View = View
     idNumber: Int
     taxId: Int
     socialSecurityId: Int
+    photoReferences: [Text]
     observers : PartiesMap
   deriving (Eq, Show)
 

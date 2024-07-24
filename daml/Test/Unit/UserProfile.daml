@@ -9,7 +9,7 @@ import DA.Date
 import Test.Util.Update.Role (createOperatorRole, createRoleUser)
 import Test.Util.Update.Service (createProfileManagerService)
 import Test.Util.Update.Workflow (createInitialUserRole)
-import Test.Util.Script.Workflow (createUserProfile, updateUserProfileUsername, updateUserProfileFullName, updateUserProfilePassword, updateUserProfileFirstName, updateUserProfileLastName, updateUserProfileContactMail, updateUserProfileBirthday, updateUserProfileGender, updateUserProfileNationality, updateUserProfileCellphoneNumber, updateUserProfileIdNumber, updateUserProfileTaxId, updateUserProfileSocialSecurityId)
+import Test.Util.Script.Workflow (createUserProfile, updateUserProfileUsername, updateUserProfileFullName, updateUserProfilePassword, updateUserProfileFirstName, updateUserProfileLastName, updateUserProfileContactMail, updateUserProfileBirthday, updateUserProfileGender, updateUserProfileNationality, updateUserProfileCellphoneNumber, updateUserProfileIdNumber, updateUserProfileTaxId, updateUserProfileSocialSecurityId, updateUserProfilePhotoReferences)
 import Test.Types (Fixture(..))
 import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
 
@@ -49,7 +49,7 @@ testCreateUserProfile = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""] 
 
   pure()
 
@@ -64,7 +64,7 @@ testCreateAndModifyUserProfileUsername = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileUsername marketplace user public userProfileKey "Custom Username"
 
   pure()
@@ -80,7 +80,7 @@ testCreateAndModifyUserProfileFullName = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileFullName marketplace user public userProfileKey "Rui Marvila Teste"
 
 testCreateAndModifyUserProfilePassword : Script ()
@@ -94,7 +94,7 @@ testCreateAndModifyUserProfilePassword = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfilePassword marketplace user public userProfileKey "updated_password"
 
   pure()
@@ -110,7 +110,7 @@ testCreateAndModifyUserProfileFirstName = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileFirstName marketplace user public userProfileKey "Rui"
 
   pure()
@@ -126,7 +126,7 @@ testCreateAndModifyUserProfileLastName = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileLastName marketplace user public userProfileKey "Teste"
 
   pure()
@@ -142,7 +142,7 @@ testCreateAndModifyUserProfileContactMail = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileContactMail marketplace user public userProfileKey "teste@gmail.com"
 
   pure()
@@ -158,7 +158,7 @@ testCreateAndModifyUserProfileBirthday = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileBirthday marketplace user public userProfileKey (date 1990 Jan 1)
 
   pure()
@@ -174,7 +174,7 @@ testCreateAndModifyUserProfileGender = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileGender marketplace user public userProfileKey (Some Female)
 
   pure()
@@ -190,7 +190,7 @@ testCreateAndModifyUserProfileNationality = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileNationality marketplace user public userProfileKey Russian
 
   pure()
@@ -206,7 +206,7 @@ testCreateAndModifyUserProfileCellphoneNumber = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileCellphoneNumber marketplace user public userProfileKey (Some 999999999)
 
   pure()
@@ -222,7 +222,7 @@ testCreateAndModifyUserProfileIdNumber = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileIdNumber marketplace user public userProfileKey 1010101010101
 
   pure()
@@ -238,7 +238,7 @@ testCreateAndModifyUserProfileTaxId = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileTaxId marketplace user public userProfileKey 123456789
 
   pure()
@@ -254,8 +254,24 @@ testCreateAndModifyUserProfileSocialSecurityId = do
       observers = fromList [("Default", single_observers)]
       id = Id "Custom User Profile"
 
-  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
   updateUserProfileSocialSecurityId marketplace user public userProfileKey 99999999999
+
+  pure()
+
+testCreateAndModifyUserProfilePhotoReferences : Script ()
+testCreateAndModifyUserProfilePhotoReferences = do
+  parties@[marketplace, user, public] <-
+    mapA allocateParty ["Marketplace", "User", "Public"]
+  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
+
+  let 
+      single_observers = singleton marketplace
+      observers = fromList [("Default", single_observers)]
+      id = Id "Custom User Profile"
+
+  userProfileKey <- createUserProfile marketplace user public observers id "Username" "Duarte" "Costa" "Duarte Ferreira da Costa" "password" (date 2001 Dec 19) (Some Male) Portuguese "duarte.ferreira.costa@tecnico.ulisboa.pt" (Some 912345678) 15122679 21235678 12345678910 [""]
+  updateUserProfilePhotoReferences marketplace user public userProfileKey ["", ""]
 
   pure()
 

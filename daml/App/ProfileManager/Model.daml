@@ -30,6 +30,7 @@ template RequestCreateUserProfile
     idNumber: Int
     taxId: Int
     socialSecurityId: Int
+    photoReferences: [Text]
     observers: PartiesMap
   where
     signatory operator, user
