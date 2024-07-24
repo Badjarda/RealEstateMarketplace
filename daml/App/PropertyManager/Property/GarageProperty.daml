@@ -2,7 +2,7 @@ module App.PropertyManager.Property.GarageProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty(I, View(..), GetGarageInstrumentKey(..), GetGaragePrice(..), GetGaragePropertyAddress(..), GetGaragePropertyPostalCode(..), GetGaragePropertyDistrict(..), GetGaragePropertyCounty(..), GetGarageType(..), GetGarageArea(..), GetVehicleCapacity(..), GetGarageInstalledEquipment(..), GetGarageAdditionalInformation(..), GetGarageDescription(..), SetGarageDescription(..), SetGarageAdditionalInformation(..), SetGarageInstalledEquipment(..), SetGarageType(..), SetGarageArea(..), SetVehicleCapacity(..), SetGaragePropertyCounty(..), SetGaragePropertyDistrict(..), SetGaragePropertyPostalCode(..), SetGaragePropertyAddress(..), SetGaragePrice(..), SetGarageInstrumentKey(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty(I, View(..), GetGarageInstrumentKey(..), GetGaragePrice(..), GetGaragePropertyAddress(..), GetGaragePropertyPostalCode(..), GetGaragePropertyDistrict(..), GetGaragePropertyCounty(..), GetGarageType(..), GetGarageArea(..), GetVehicleCapacity(..), GetGarageInstalledEquipment(..), GetGarageAdditionalInformation(..), GetGarageDescription(..), GetGaragePhotoReferences(..), SetGaragePhotoReferences(..), SetGarageDescription(..), SetGarageAdditionalInformation(..), SetGarageInstalledEquipment(..), SetGarageType(..), SetGarageArea(..), SetVehicleCapacity(..), SetGaragePropertyCounty(..), SetGaragePropertyDistrict(..), SetGaragePropertyPostalCode(..), SetGaragePropertyAddress(..), SetGaragePrice(..), SetGarageInstrumentKey(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.GarageProperty.Factory qualified as GaragePropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (GarageType)
 
@@ -27,6 +27,7 @@ template GarageProperty
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers: PartiesMap
   where
     signatory operator, user
@@ -76,6 +77,9 @@ template GarageProperty
       getGarageDescription GarageProperty.GetGarageDescription{} = do 
         pure description 
 
+      getGaragePhotoReferences GarageProperty.GetGaragePhotoReferences{} = do 
+        pure photoReferences 
+
       setGarageInstrumentKey GarageProperty.SetGarageInstrumentKey{newGarageInstrumentKey} = do 
         toInterfaceContractId <$> create this with instrument = newGarageInstrumentKey
       
@@ -111,6 +115,9 @@ template GarageProperty
       
       setGarageDescription GarageProperty.SetGarageDescription{newGarageDescription} = do 
         toInterfaceContractId <$> create this with description = newGarageDescription
+      
+      setGaragePhotoReferences GarageProperty.SetGaragePhotoReferences{newPhotoReferences} = do 
+        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
 
     interface instance Disclosure.I for GarageProperty where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
@@ -132,7 +139,7 @@ template Factory
     interface instance GaragePropertyFactory.I for Factory where
       view = GaragePropertyFactory.View with operator
       
-      create' GaragePropertyFactory.Create{instrument, propertyKey, garagePrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, garageType, garageArea, vehicleCapacity, installedEquipment, additionalInformation, description, observers} =
+      create' GaragePropertyFactory.Create{instrument, propertyKey, garagePrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, garageType, garageArea, vehicleCapacity, installedEquipment, additionalInformation, description, photoReferences, observers} =
         do
           cid <- toInterfaceContractId <$> create GarageProperty with
             operator = propertyKey.operator

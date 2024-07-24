@@ -103,6 +103,8 @@ interface Service where
 
     updateApartmentDescription : UpdateApartmentDescription -> Update()
 
+    updateApartmentPhotoReferences : UpdateApartmentPhotoReferences -> Update()
+
 ------------------------------------------------
 
     updateLandInstrumentKey : UpdateLandInstrumentKey -> Update()
@@ -136,6 +138,8 @@ interface Service where
     updateLandAdditionalInformation : UpdateLandAdditionalInformation -> Update()
 
     updateLandDescription : UpdateLandDescription -> Update()
+
+    updateLandPhotoReferences : UpdateLandPhotoReferences -> Update()
 
 ------------------------------------------------
 
@@ -177,6 +181,8 @@ interface Service where
 
     updateResidenceDescription : UpdateResidenceDescription -> Update()
 
+    updateResidencePhotoReferences : UpdateResidencePhotoReferences -> Update()
+
 ------------------------------------------------
 
     updateGarageInstrumentKey : UpdateGarageInstrumentKey -> Update()
@@ -202,6 +208,8 @@ interface Service where
     updateGarageAdditionalInformation : UpdateGarageAdditionalInformation -> Update()
 
     updateGarageDescription : UpdateGarageDescription -> Update()
+
+    updateGaragePhotoReferences : UpdateGaragePhotoReferences -> Update()
 
 ------------------------------------------------
 
@@ -233,6 +241,8 @@ interface Service where
 
     updateWarehouseDescription : UpdateWarehouseDescription -> Update()
 
+    updateWarehousePhotoReferences : UpdateWarehousePhotoReferences -> Update()
+
 --------------------------------------------------
 
     nonconsuming choice RequestCreateApartmentProperty : ContractId RequestCreateApartmentProperty.I
@@ -255,6 +265,7 @@ interface Service where
           installedEquipment: Text
           additionalInformation: Text
           description: Text
+          photoReferences:[Text]
           observers : PartiesMap
       controller (view $ asBase this).user
       do
@@ -286,6 +297,7 @@ interface Service where
           viableConstructionTypes: [ViableConstructionTypes]
           additionalInformation: Text
           description: Text
+          photoReferences:[Text]
           observers : PartiesMap
       controller (view $ asBase this).user
       do
@@ -320,6 +332,7 @@ interface Service where
           installedEquipment: Text
           additionalInformation: Text
           description: Text
+          photoReferences:[Text]
           observers : PartiesMap
       controller (view $ asBase this).user
       do
@@ -347,6 +360,7 @@ interface Service where
           installedEquipment: Text
           additionalInformation: Text
           description: Text
+          photoReferences:[Text]
           observers : PartiesMap
       controller (view $ asBase this).user
       do
@@ -376,6 +390,7 @@ interface Service where
           installedEquipment: Text
           additionalInformation: Text
           description: Text
+          photoReferences:[Text]
           observers : PartiesMap
       controller (view $ asBase this).user
       do
@@ -523,6 +538,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateApartmentDescription this arg
+    
+    nonconsuming choice UpdateApartmentPhotoReferences : ()
+      with
+        newApartmentPhotoReferences : [Text]
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateApartmentPhotoReferences this arg
 
 ----------------------
 
@@ -653,6 +676,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateLandDescription this arg
+    
+    nonconsuming choice UpdateLandPhotoReferences : ()
+      with
+        newLandPhotoReferences : [Text]
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateLandPhotoReferences this arg
 
 ------------------------
     
@@ -807,6 +838,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateResidenceDescription this arg
+    
+    nonconsuming choice UpdateResidencePhotoReferences : ()
+      with
+        newResidencePhotoReferences : [Text]
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateResidencePhotoReferences this arg
 -----------------------------------------------------------------------------
 
     nonconsuming choice UpdateGarageInstrumentKey : ()
@@ -904,6 +943,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateGarageDescription this arg
+    
+    nonconsuming choice UpdateGaragePhotoReferences : ()
+      with
+        newGaragePhotoReferences : [Text]
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateGaragePhotoReferences this arg
 
 ----------------------------------------------------------
 
@@ -1018,6 +1065,14 @@ interface Service where
       controller (view $ asBase this).user
       do
         updateWarehouseDescription this arg
+    
+    nonconsuming choice UpdateWarehousePhotoReferences : ()
+      with
+        newWarehousePhotoReferences : [Text]
+        propertyKey : PropertyKey
+      controller (view $ asBase this).user
+      do
+        updateWarehousePhotoReferences this arg
  
 interface Offer where
   viewtype OView

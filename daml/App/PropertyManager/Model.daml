@@ -37,6 +37,7 @@ template RequestCreateApartmentProperty
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
   where
     signatory operator, user
@@ -74,6 +75,7 @@ template RequestCreateLandProperty
     viableConstructionTypes: [ViableConstructionTypes]
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
   where
     signatory operator, user
@@ -114,6 +116,7 @@ template RequestCreateResidenceProperty
     installedEquipment: Text
     additionalInformation: Text -- Other relevant information
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
   where
     signatory operator, user
@@ -147,6 +150,7 @@ template RequestCreateGarageProperty
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
   where
     signatory operator, user
@@ -182,6 +186,7 @@ template RequestCreateWarehouseProperty
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
   where
     signatory operator, user

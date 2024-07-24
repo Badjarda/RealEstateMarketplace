@@ -29,6 +29,7 @@ data View = View
     viableConstructionTypes: [ViableConstructionTypes]
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
   deriving (Eq, Show)
 

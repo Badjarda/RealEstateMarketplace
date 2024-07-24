@@ -2,7 +2,7 @@ module App.PropertyManager.Property.ApartmentProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty(I, View(..), GetApartmentInstrumentKey(..), GetApartmentPrice(..), GetApartmentPropertyAddress(..), GetApartmentPropertyPostalCode(..), GetApartmentPropertyDistrict(..), GetApartmentPropertyCounty(..), GetApartmentGrossArea(..), GetApartmentUsableArea(..), GetApartmentBedrooms(..), GetApartmentBathrooms(..), GetApartmentBedrooms(..), GetApartmentFloor(..), GetApartmentParkingSpaces(..), GetApartmentElevator(..), GetApartmentBuildDate(..), GetApartmentInstalledEquipment(..), GetApartmentAdditionalInformation(..), GetApartmentBuildDate(..), GetApartmentDescription(..), SetApartmentInstrumentKey(..), SetApartmentPrice(..), SetApartmentPropertyAddress(..), SetApartmentPropertyPostalCode(..), SetApartmentPropertyDistrict(..), SetApartmentPropertyCounty(..), SetApartmentGrossArea(..), SetApartmentUsableArea(..), SetApartmentBedrooms(..), SetApartmentBathrooms(..), SetApartmentBedrooms(..), SetApartmentFloor(..), SetApartmentParkingSpaces(..), SetApartmentElevator(..), SetApartmentBuildDate(..), SetApartmentInstalledEquipment(..), SetApartmentAdditionalInformation(..), SetApartmentBuildDate(..), SetApartmentDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty(I, View(..), GetApartmentInstrumentKey(..), GetApartmentPrice(..), GetApartmentPropertyAddress(..), GetApartmentPropertyPostalCode(..), GetApartmentPropertyDistrict(..), GetApartmentPropertyCounty(..), GetApartmentGrossArea(..), GetApartmentUsableArea(..), GetApartmentBedrooms(..), GetApartmentBathrooms(..), GetApartmentBedrooms(..), GetApartmentFloor(..), GetApartmentParkingSpaces(..), GetApartmentElevator(..), GetApartmentBuildDate(..), GetApartmentInstalledEquipment(..), GetApartmentAdditionalInformation(..), GetApartmentBuildDate(..), GetApartmentDescription(..), GetApartmentPhotoReferences(..), SetApartmentInstrumentKey(..), SetApartmentPrice(..), SetApartmentPropertyAddress(..), SetApartmentPropertyPostalCode(..), SetApartmentPropertyDistrict(..), SetApartmentPropertyCounty(..), SetApartmentGrossArea(..), SetApartmentUsableArea(..), SetApartmentBedrooms(..), SetApartmentBathrooms(..), SetApartmentBedrooms(..), SetApartmentFloor(..), SetApartmentParkingSpaces(..), SetApartmentElevator(..), SetApartmentBuildDate(..), SetApartmentInstalledEquipment(..), SetApartmentAdditionalInformation(..), SetApartmentBuildDate(..), SetApartmentDescription(..), SetApartmentPhotoReferences(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.ApartmentProperty.Factory qualified as ApartmentPropertyFactory(I, View(..), Create(..))
 
 import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
@@ -31,6 +31,7 @@ template ApartmentProperty
     installedEquipment: Text
     additionalInformation: Text --Other relevant informations
     description: Text
+    photoReferences: [Text]
     observers: PartiesMap
   where
     signatory operator, user
@@ -94,6 +95,9 @@ template ApartmentProperty
 
       getApartmentDescription ApartmentProperty.GetApartmentDescription{} = do 
         pure description 
+      
+      getApartmentPhotoReferences ApartmentProperty.GetApartmentPhotoReferences{} = do 
+        pure photoReferences 
 
       setApartmentInstrumentKey ApartmentProperty.SetApartmentInstrumentKey{newApartmentInstrumentKey} = do 
         toInterfaceContractId <$> create this with instrument = newApartmentInstrumentKey
@@ -145,6 +149,9 @@ template ApartmentProperty
       
       setApartmentDescription ApartmentProperty.SetApartmentDescription{newApartmentDescription} = do 
         toInterfaceContractId <$> create this with description = newApartmentDescription
+      
+      setApartmentPhotoReferences ApartmentProperty.SetApartmentPhotoReferences{newPhotoReferences} = do 
+        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
 
     interface instance Disclosure.I for ApartmentProperty where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers
@@ -166,7 +173,7 @@ template Factory
     interface instance ApartmentPropertyFactory.I for Factory where
       view = ApartmentPropertyFactory.View with operator
       
-      create' ApartmentPropertyFactory.Create{instrument, propertyKey, apartmentPrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floor, parkingSpaces, elevator, buildDate, installedEquipment, additionalInformation, description, observers} =
+      create' ApartmentPropertyFactory.Create{instrument, propertyKey, apartmentPrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floor, parkingSpaces, elevator, buildDate, installedEquipment, additionalInformation, description, photoReferences, observers} =
         do
           cid <- toInterfaceContractId <$> create ApartmentProperty with
             operator = propertyKey.operator

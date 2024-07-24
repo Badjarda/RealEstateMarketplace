@@ -40,6 +40,7 @@ interface Factory requires Disclosure.I where
       viableConstructionTypes: [ViableConstructionTypes]
       additionalInformation: Text
       description: Text
+      photoReferences: [Text]
       observers : PartiesMap
     controller propertyKey.operator, propertyKey.user
     do

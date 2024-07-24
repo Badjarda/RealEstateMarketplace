@@ -37,6 +37,7 @@ data View = View
     viableConstructionTypes: [ViableConstructionTypes]
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
   deriving (Eq, Show)
 
 toKey : View -> PropertyKey
@@ -98,6 +99,9 @@ interface LandProperty requires Disclosure.I where
 
   getLandDescription : GetLandDescription -> Update(Text)
   setLandDescription : SetLandDescription -> Update(ContractId LandProperty)
+
+  getLandPhotoReferences : GetLandPhotoReferences -> Update([Text])
+  setLandPhotoReferences : SetLandPhotoReferences -> Update(ContractId LandProperty)
 
   nonconsuming choice GetView : View
     with
@@ -297,6 +301,18 @@ interface LandProperty requires Disclosure.I where
     controller signatory this
     do
       setLandDescription this arg
+  
+  nonconsuming choice GetLandPhotoReferences : [Text]
+    controller signatory this
+    do
+      getLandPhotoReferences this arg
+
+  choice SetLandPhotoReferences : ContractId LandProperty
+    with
+      newPhotoReferences : [Text]
+    controller signatory this
+    do
+      setLandPhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

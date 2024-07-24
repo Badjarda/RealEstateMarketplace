@@ -35,6 +35,7 @@ data View = View
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
   deriving (Eq, Show)
 
 toKey : View -> PropertyKey
@@ -90,6 +91,9 @@ interface WarehouseProperty requires Disclosure.I where
 
   getWarehouseDescription : GetWarehouseDescription -> Update(Text)
   setWarehouseDescription : SetWarehouseDescription -> Update(ContractId WarehouseProperty)
+
+  getWarehousePhotoReferences : GetWarehousePhotoReferences -> Update([Text])
+  setWarehousePhotoReferences : SetWarehousePhotoReferences -> Update(ContractId WarehouseProperty)
 
   nonconsuming choice GetView : View
     with
@@ -265,6 +269,18 @@ interface WarehouseProperty requires Disclosure.I where
     controller signatory this
     do
       setWarehouseDescription this arg
+  
+  nonconsuming choice GetWarehousePhotoReferences : [Text]
+    controller signatory this
+    do
+      getWarehousePhotoReferences this arg
+
+  choice SetWarehousePhotoReferences : ContractId WarehouseProperty
+    with
+      newPhotoReferences : [Text]
+    controller signatory this
+    do
+      setWarehousePhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

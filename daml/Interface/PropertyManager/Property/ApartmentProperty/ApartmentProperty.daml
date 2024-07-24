@@ -36,6 +36,7 @@ data View = View
     installedEquipment: Text
     additionalInformation: Text --Other relevant informations
     description: Text
+    photoReferences: [Text]
   deriving (Eq, Show)
 
 toKey : View -> PropertyKey
@@ -100,6 +101,9 @@ interface ApartmentProperty requires Disclosure.I where
 
   getApartmentDescription : GetApartmentDescription -> Update(Text)
   setApartmentDescription : SetApartmentDescription -> Update(ContractId ApartmentProperty)
+
+  getApartmentPhotoReferences : GetApartmentPhotoReferences -> Update([Text])
+  setApartmentPhotoReferences : SetApartmentPhotoReferences -> Update(ContractId ApartmentProperty)
 
   nonconsuming choice GetView : View
     with
@@ -311,6 +315,18 @@ interface ApartmentProperty requires Disclosure.I where
     controller signatory this
     do
       setApartmentDescription this arg
+
+  nonconsuming choice GetApartmentPhotoReferences : [Text]
+    controller signatory this
+    do
+      getApartmentPhotoReferences this arg
+
+  choice SetApartmentPhotoReferences : ContractId ApartmentProperty
+    with
+      newPhotoReferences : [Text]
+    controller signatory this
+    do
+      setApartmentPhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

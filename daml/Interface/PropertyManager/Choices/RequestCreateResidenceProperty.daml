@@ -32,6 +32,7 @@ data View = View
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
   deriving (Eq, Show)
 

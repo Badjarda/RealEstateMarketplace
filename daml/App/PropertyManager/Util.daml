@@ -5,11 +5,11 @@ import Interface.Common.Types (PropertyKey(..))
 import Interface.Common.Util (fetchAndRemove)
 import Interface.PropertyManager.Property.Common (GarageType, LandType, ViableConstructionTypes, ResidenceType, Parking, Orientation, WarehouseType)
 
-import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (R(..), SetApartmentInstrumentKey(..), GetApartmentPrice(..), SetApartmentPrice(..),SetApartmentPropertyAddress(..), SetApartmentPropertyPostalCode(..), SetApartmentPropertyDistrict(..), SetApartmentPropertyCounty(..), SetApartmentGrossArea(..), SetApartmentUsableArea(..), SetApartmentBedrooms(..), SetApartmentBathrooms(..), SetApartmentFloor(..), SetApartmentParkingSpaces(..), SetApartmentElevator(..), SetApartmentBuildDate(..), SetApartmentInstalledEquipment(..), SetApartmentAdditionalInformation(..), SetApartmentDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(R(..), SetLandInstrumentKey(..), SetLandPrice(..), SetLandPropertyAddress(..), SetLandPropertyPostalCode(..), SetLandPropertyDistrict(..), SetLandPropertyCounty(..), SetLandType(..), SetTotalLandArea(..), SetLandMinimumSurfaceForSale(..), SetLandBuildableArea(..), SetLandBuildableFloors(..), SetLandAccessByRoad(..), SetLandViableConstructionTypes(..), SetLandInstalledEquipment(..), SetLandAdditionalInformation(..), SetLandDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty (R(..), SetResidenceInstrumentKey(..), SetResidencePrice(..), SetResidencePropertyAddress(..), SetResidencePropertyPostalCode(..), SetResidencePropertyDistrict(..), SetResidencePropertyCounty(..), SetResidenceGrossArea(..), SetResidenceUsableArea(..), SetResidenceBedrooms(..), SetResidenceBathrooms(..), SetResidenceFloors(..), SetResidenceType(..), SetResidenceBackyard(..), SetResidenceParking(..), SetResidenceBuildDate(..), SetResidenceOrientation(..), SetResidenceInstalledEquipment(..), SetResidenceAdditionalInformation(..), SetResidenceDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty (R(..), SetGarageInstrumentKey(..), SetGaragePrice(..), SetGaragePropertyAddress(..), SetGaragePropertyPostalCode(..), SetGaragePropertyDistrict(..), SetGaragePropertyCounty(..), SetGarageArea(..), SetGarageType(..), SetVehicleCapacity(..), SetGarageInstalledEquipment(..), SetGarageAdditionalInformation(..), SetGarageDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty (R(..), SetWarehouseInstrumentKey(..), SetWarehousePrice(..), SetWarehousePropertyAddress(..), SetWarehousePropertyPostalCode(..), SetWarehousePropertyDistrict(..), SetWarehousePropertyCounty(..), SetWarehouseType(..), SetWarehouseGrossArea(..), SetWarehouseUsableArea(..), SetWarehouseFloors(..), SetWarehouseBuildDate(..), SetWarehouseInstalledEquipment(..), SetWarehouseAdditionalInformation(..), SetWarehouseDescription(..),SetCid(..))
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (R(..), SetApartmentInstrumentKey(..), GetApartmentPrice(..), SetApartmentPrice(..), SetApartmentPhotoReferences(..), SetApartmentPropertyAddress(..), SetApartmentPropertyPostalCode(..), SetApartmentPropertyDistrict(..), SetApartmentPropertyCounty(..), SetApartmentGrossArea(..), SetApartmentUsableArea(..), SetApartmentBedrooms(..), SetApartmentBathrooms(..), SetApartmentFloor(..), SetApartmentParkingSpaces(..), SetApartmentElevator(..), SetApartmentBuildDate(..), SetApartmentInstalledEquipment(..), SetApartmentAdditionalInformation(..), SetApartmentDescription(..), SetCid(..))
+import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(R(..), SetLandInstrumentKey(..), SetLandPrice(..), SetLandPhotoReferences(..), SetLandPropertyAddress(..), SetLandPropertyPostalCode(..), SetLandPropertyDistrict(..), SetLandPropertyCounty(..), SetLandType(..), SetTotalLandArea(..), SetLandMinimumSurfaceForSale(..), SetLandBuildableArea(..), SetLandBuildableFloors(..), SetLandAccessByRoad(..), SetLandViableConstructionTypes(..), SetLandInstalledEquipment(..), SetLandAdditionalInformation(..), SetLandDescription(..), SetCid(..))
+import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty (R(..), SetResidenceInstrumentKey(..), SetResidencePhotoReferences(..), SetResidencePrice(..), SetResidencePropertyAddress(..), SetResidencePropertyPostalCode(..), SetResidencePropertyDistrict(..), SetResidencePropertyCounty(..), SetResidenceGrossArea(..), SetResidenceUsableArea(..), SetResidenceBedrooms(..), SetResidenceBathrooms(..), SetResidenceFloors(..), SetResidenceType(..), SetResidenceBackyard(..), SetResidenceParking(..), SetResidenceBuildDate(..), SetResidenceOrientation(..), SetResidenceInstalledEquipment(..), SetResidenceAdditionalInformation(..), SetResidenceDescription(..), SetCid(..))
+import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty (R(..), SetGarageInstrumentKey(..), SetGaragePhotoReferences(..), SetGaragePrice(..), SetGaragePropertyAddress(..), SetGaragePropertyPostalCode(..), SetGaragePropertyDistrict(..), SetGaragePropertyCounty(..), SetGarageArea(..), SetGarageType(..), SetVehicleCapacity(..), SetGarageInstalledEquipment(..), SetGarageAdditionalInformation(..), SetGarageDescription(..), SetCid(..))
+import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty (R(..), SetWarehouseInstrumentKey(..), SetWarehousePhotoReferences(..), SetWarehousePrice(..), SetWarehousePropertyAddress(..), SetWarehousePropertyPostalCode(..), SetWarehousePropertyDistrict(..), SetWarehousePropertyCounty(..), SetWarehouseType(..), SetWarehouseGrossArea(..), SetWarehouseUsableArea(..), SetWarehouseFloors(..), SetWarehouseBuildDate(..), SetWarehouseInstalledEquipment(..), SetWarehouseAdditionalInformation(..), SetWarehouseDescription(..),SetCid(..))
 
 import Interface.PropertyManager.Choices.RequestCreateApartmentProperty qualified as RequestCreateApartmentProperty (I, View(..))
 import Interface.PropertyManager.Choices.RequestCreateLandProperty qualified as RequestCreateLandProperty (I, View(..))
@@ -51,6 +51,7 @@ data CreateApartmentPropertyRequest = CreateApartmentPropertyRequest
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
     permission: Permission
     apartmentPropertyFactoryCid: ContractId ApartmentProperty.Factory 
@@ -81,6 +82,7 @@ requestCreateApartmentPropertyAux request = do
       installedEquipment = request.installedEquipment
       additionalInformation = request.additionalInformation
       description = request.description
+      photoReferences = request.photoReferences
       observers = request.observers
 
 data CreateApartmentProperty = CreateApartmentProperty
@@ -92,7 +94,7 @@ data CreateApartmentProperty = CreateApartmentProperty
 
 createApartmentPropertyAux : CreateApartmentProperty -> Update (InstrumentKey, PropertyKey)
 createApartmentPropertyAux request = do
-  RequestCreateApartmentProperty.View{id,apartmentInstrument,apartmentPrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,grossArea,usableArea,bedrooms,bathrooms,floor,parkingSpaces,elevator,buildDate,installedEquipment,additionalInformation,description,observers} <- view <$> fetchAndRemove request.createApartmentPropertyRequest
+  RequestCreateApartmentProperty.View{id,apartmentInstrument,apartmentPrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,grossArea,usableArea,bedrooms,bathrooms,floor,parkingSpaces,elevator,buildDate,installedEquipment,additionalInformation,description,photoReferences,observers} <- view <$> fetchAndRemove request.createApartmentPropertyRequest
   let apartmentProperty = PropertyKey with operator = request.operator, user = request.user, id = id
   exercise request.apartmentPropertyFactoryCid ApartmentProperty.Create with instrument = apartmentInstrument, propertyKey = apartmentProperty, ..
   pure (apartmentInstrument,apartmentProperty)
@@ -337,6 +339,20 @@ updateApartmentDescriptionAux request = do
   exercise refCid ApartmentProperty.SetCid with newCid = cid
   pure()
 
+data UpdateApartmentPhotoReferences = UpdateApartmentPhotoReferences
+  with
+    operator: Party
+    user: Party
+    propertyKey: PropertyKey
+    newApartmentPhotoReferences: [Text]
+
+updateApartmentPhotoReferencesAux: UpdateApartmentPhotoReferences -> Update ()
+updateApartmentPhotoReferencesAux request = do
+  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
+  cid <- exercise ref.cid ApartmentProperty.SetApartmentPhotoReferences with newPhotoReferences = request.newApartmentPhotoReferences
+  exercise refCid ApartmentProperty.SetCid with newCid = cid
+  pure()
+
 ----------------------------------------------------------
 
 data CreateLandPropertyRequest = CreateLandPropertyRequest
@@ -360,6 +376,7 @@ data CreateLandPropertyRequest = CreateLandPropertyRequest
     viableConstructionTypes: [ViableConstructionTypes]
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
     permission: Permission
 
@@ -388,6 +405,7 @@ requestCreateLandPropertyAux request = do
     viableConstructionTypes= request.viableConstructionTypes
     additionalInformation= request.additionalInformation
     description= request.description
+    photoReferences = request.photoReferences
     observers = request.observers
 
 data CreateLandProperty = CreateLandProperty
@@ -399,7 +417,7 @@ data CreateLandProperty = CreateLandProperty
 
 createLandPropertyAux : CreateLandProperty -> Update (InstrumentKey, PropertyKey)
 createLandPropertyAux request = do
-  RequestCreateLandProperty.View{id,landInstrument,landPrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,landType,totalLandArea,minimumSurfaceForSale,buildableArea,buildableFloors,accessByRoad,installedEquipment,viableConstructionTypes,additionalInformation,description,observers} <- view <$> fetchAndRemove request.createLandPropertyRequest
+  RequestCreateLandProperty.View{id,landInstrument,landPrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,landType,totalLandArea,minimumSurfaceForSale,buildableArea,buildableFloors,accessByRoad,installedEquipment,viableConstructionTypes,additionalInformation,description,photoReferences,observers} <- view <$> fetchAndRemove request.createLandPropertyRequest
   let landProperty = PropertyKey with operator = request.operator, user = request.user, id = id
   exercise request.landPropertyFactoryCid LandProperty.Create with instrument = landInstrument, propertyKey = landProperty, ..
   pure (landInstrument,landProperty)
@@ -628,6 +646,20 @@ updateLandDescriptionAux request = do
   exercise refCid LandProperty.SetCid with newCid = cid
   pure()
 
+data UpdateLandPhotoReferences = UpdateLandPhotoReferences
+  with
+    operator: Party
+    user: Party
+    propertyKey: PropertyKey
+    newLandPhotoReferences: [Text]
+
+updateLandPhotoReferencesAux: UpdateLandPhotoReferences -> Update ()
+updateLandPhotoReferencesAux request = do
+  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
+  cid <- exercise ref.cid LandProperty.SetLandPhotoReferences with newPhotoReferences = request.newLandPhotoReferences
+  exercise refCid LandProperty.SetCid with newCid = cid
+  pure()
+
 
 ----------------------------------------------------------
 
@@ -655,6 +687,7 @@ data CreateResidencePropertyRequest = CreateResidencePropertyRequest
     installedEquipment: Text
     additionalInformation: Text 
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
     permission: Permission
 
@@ -686,6 +719,7 @@ requestCreateResidencePropertyAux request = do
     installedEquipment = request.installedEquipment
     additionalInformation = request.additionalInformation
     description = request.description
+    photoReferences = request.photoReferences
     observers = request.observers
 
 data CreateResidenceProperty = CreateResidenceProperty
@@ -697,7 +731,7 @@ data CreateResidenceProperty = CreateResidenceProperty
 
 createResidencePropertyAux : CreateResidenceProperty -> Update (InstrumentKey, PropertyKey)
 createResidencePropertyAux request = do
-  RequestCreateResidenceProperty.View{id,residenceInstrument,residencePrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,grossArea,usableArea,bedrooms,bathrooms,floors,residenceType,backyard,parking,buildDate,orientation,installedEquipment,additionalInformation,description,observers} <- view <$> fetchAndRemove request.createResidencePropertyRequest
+  RequestCreateResidenceProperty.View{id,residenceInstrument,residencePrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,grossArea,usableArea,bedrooms,bathrooms,floors,residenceType,backyard,parking,buildDate,orientation,installedEquipment,additionalInformation,description,photoReferences,observers} <- view <$> fetchAndRemove request.createResidencePropertyRequest
   let residenceProperty = PropertyKey with operator = request.operator, user = request.user, id = id
   exercise request.residencePropertyFactoryCid ResidenceProperty.Create with instrument = residenceInstrument, propertyKey = residenceProperty, ..
   pure (residenceInstrument, residenceProperty)
@@ -968,6 +1002,20 @@ updateResidenceDescriptionAux request = do
   exercise refCid ResidenceProperty.SetCid with newCid = cid
   pure()
 
+data UpdateResidencePhotoReferences = UpdateResidencePhotoReferences
+  with
+    operator: Party
+    user: Party
+    propertyKey: PropertyKey
+    newResidencePhotoReferences: [Text]
+
+updateResidencePhotoReferencesAux: UpdateResidencePhotoReferences -> Update ()
+updateResidencePhotoReferencesAux request = do
+  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
+  cid <- exercise ref.cid ResidenceProperty.SetResidencePhotoReferences with newPhotoReferences = request.newResidencePhotoReferences
+  exercise refCid ResidenceProperty.SetCid with newCid = cid
+  pure()
+
 ------------------------------------------------------------------------------
 
 data CreateGaragePropertyRequest = CreateGaragePropertyRequest
@@ -987,6 +1035,7 @@ data CreateGaragePropertyRequest = CreateGaragePropertyRequest
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
     permission: Permission
 
@@ -1011,6 +1060,7 @@ requestCreateGaragePropertyAux request = do
     installedEquipment = request.installedEquipment
     additionalInformation = request.additionalInformation
     description = request.description
+    photoReferences = request.photoReferences
     observers = request.observers
 
 data CreateGarageProperty = CreateGarageProperty
@@ -1022,7 +1072,7 @@ data CreateGarageProperty = CreateGarageProperty
 
 createGaragePropertyAux : CreateGarageProperty -> Update (InstrumentKey, PropertyKey)
 createGaragePropertyAux request = do
-  RequestCreateGarageProperty.View{id,garageInstrument,garagePrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,garageArea,garageType, vehicleCapacity,installedEquipment,additionalInformation,description,observers} <- view <$> fetchAndRemove request.createGaragePropertyRequest
+  RequestCreateGarageProperty.View{id,garageInstrument,garagePrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,garageArea,garageType, vehicleCapacity,installedEquipment,additionalInformation,description,photoReferences,observers} <- view <$> fetchAndRemove request.createGaragePropertyRequest
   let garageProperty = PropertyKey with operator = request.operator, user = request.user, id = id
   exercise request.garagePropertyFactoryCid GarageProperty.Create with instrument = garageInstrument, propertyKey = garageProperty, ..
   pure (garageInstrument, garageProperty)
@@ -1195,6 +1245,20 @@ updateGarageDescriptionAux request = do
   exercise refCid GarageProperty.SetCid with newCid = cid
   pure()
 
+data UpdateGaragePhotoReferences = UpdateGaragePhotoReferences
+  with
+    operator: Party
+    user: Party
+    propertyKey: PropertyKey
+    newGaragePhotoReferences: [Text]
+
+updateGaragePhotoReferencesAux: UpdateGaragePhotoReferences -> Update ()
+updateGaragePhotoReferencesAux request = do
+  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
+  cid <- exercise ref.cid GarageProperty.SetGaragePhotoReferences with newPhotoReferences = request.newGaragePhotoReferences
+  exercise refCid GarageProperty.SetCid with newCid = cid
+  pure()
+
 ----------------------------------------------------------
 
 data CreateWarehousePropertyRequest = CreateWarehousePropertyRequest
@@ -1216,6 +1280,7 @@ data CreateWarehousePropertyRequest = CreateWarehousePropertyRequest
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
     observers : PartiesMap
     permission: Permission
 
@@ -1242,6 +1307,7 @@ requestCreateWarehousePropertyAux request = do
     installedEquipment = request.installedEquipment
     additionalInformation = request.additionalInformation
     description = request.description
+    photoReferences = request.photoReferences
     observers = request.observers
 
 data CreateWarehouseProperty = CreateWarehouseProperty
@@ -1253,7 +1319,7 @@ data CreateWarehouseProperty = CreateWarehouseProperty
 
 createWarehousePropertyAux : CreateWarehouseProperty -> Update (InstrumentKey, PropertyKey)
 createWarehousePropertyAux request = do
-  RequestCreateWarehouseProperty.View{id,warehouseInstrument,warehousePrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,warehouseType,grossArea,usableArea,floors,buildDate,installedEquipment,additionalInformation,description,observers} <- view <$> fetchAndRemove request.createWarehousePropertyRequest
+  RequestCreateWarehouseProperty.View{id,warehouseInstrument,warehousePrice,propertyAddress,propertyPostalCode,propertyDistrict,propertyCounty,warehouseType,grossArea,usableArea,floors,buildDate,installedEquipment,additionalInformation,description,photoReferences,observers} <- view <$> fetchAndRemove request.createWarehousePropertyRequest
   let warehouseProperty = PropertyKey with operator = request.operator, user = request.user, id = id
   exercise request.warehousePropertyFactoryCid WarehouseProperty.Create with instrument = warehouseInstrument, propertyKey = warehouseProperty, ..
   pure (warehouseInstrument, warehouseProperty)
@@ -1451,5 +1517,19 @@ updateWarehouseDescriptionAux: UpdateWarehouseDescription -> Update ()
 updateWarehouseDescriptionAux request = do
   (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
   cid <- exercise ref.cid WarehouseProperty.SetWarehouseDescription with newWarehouseDescription = request.newWarehouseDescription
+  exercise refCid WarehouseProperty.SetCid with newCid = cid
+  pure()
+
+data UpdateWarehousePhotoReferences = UpdateWarehousePhotoReferences
+  with
+    operator: Party
+    user: Party
+    propertyKey: PropertyKey
+    newWarehousePhotoReferences: [Text]
+
+updateWarehousePhotoReferencesAux: UpdateWarehousePhotoReferences -> Update ()
+updateWarehousePhotoReferencesAux request = do
+  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
+  cid <- exercise ref.cid WarehouseProperty.SetWarehousePhotoReferences with newPhotoReferences = request.newWarehousePhotoReferences
   exercise refCid WarehouseProperty.SetCid with newCid = cid
   pure()

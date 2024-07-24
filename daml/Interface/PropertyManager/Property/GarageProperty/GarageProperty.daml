@@ -33,6 +33,7 @@ data View = View
     installedEquipment: Text
     additionalInformation: Text
     description: Text
+    photoReferences: [Text]
   deriving (Eq, Show)
 
 toKey : View -> PropertyKey
@@ -82,6 +83,9 @@ interface GarageProperty requires Disclosure.I where
 
   getGarageDescription : GetGarageDescription -> Update(Text)
   setGarageDescription : SetGarageDescription -> Update(ContractId GarageProperty)
+
+  getGaragePhotoReferences : GetGaragePhotoReferences -> Update([Text])
+  setGaragePhotoReferences : SetGaragePhotoReferences -> Update(ContractId GarageProperty)
 
   nonconsuming choice GetView : View
     with
@@ -233,6 +237,18 @@ interface GarageProperty requires Disclosure.I where
     controller signatory this
     do
       setGarageDescription this arg
+  
+  nonconsuming choice GetGaragePhotoReferences : [Text]
+    controller signatory this
+    do
+      getGaragePhotoReferences this arg
+
+  choice SetGaragePhotoReferences : ContractId GarageProperty
+    with
+      newPhotoReferences : [Text]
+    controller signatory this
+    do
+      setGaragePhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

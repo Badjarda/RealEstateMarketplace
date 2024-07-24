@@ -38,6 +38,7 @@ interface Factory requires Disclosure.I where
       installedEquipment: Text
       additionalInformation: Text
       description: Text
+      photoReferences: [Text]
       observers : PartiesMap
     controller propertyKey.operator, propertyKey.user
     do
