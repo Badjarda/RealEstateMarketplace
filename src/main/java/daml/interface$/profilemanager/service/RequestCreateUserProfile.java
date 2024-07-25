@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfile> {
-  public static final String _packageId = "f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d";
+  public static final String _packageId = "8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f";
 
   public final Id id;
 
@@ -66,12 +66,15 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
 
   public final Long socialSecurityId;
 
+  public final List<String> photoReferences;
+
   public final Map<String, Set<String>> observers;
 
   public RequestCreateUserProfile(Id id, String username, String firstName, String lastName,
       String fullName, String password, LocalDate birthday, Optional<Gender> gender,
       Nationality nationality, String contactMail, Optional<Long> cellphoneNumber, Long idNumber,
-      Long taxId, Long socialSecurityId, Map<String, Set<String>> observers) {
+      Long taxId, Long socialSecurityId, List<String> photoReferences,
+      Map<String, Set<String>> observers) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -86,6 +89,7 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
     this.idNumber = idNumber;
     this.taxId = taxId;
     this.socialSecurityId = socialSecurityId;
+    this.photoReferences = photoReferences;
     this.observers = observers;
   }
 
@@ -101,7 +105,7 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
       IllegalArgumentException {
     return value$ -> {
       Value recordValue$ = value$;
-      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(15,0,
+      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(16,0,
           recordValue$);
       Id id = Id.valueDecoder().decode(fields$.get(0).getValue());
       String username = PrimitiveValueDecoders.fromText.decode(fields$.get(1).getValue());
@@ -119,18 +123,20 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
       Long idNumber = PrimitiveValueDecoders.fromInt64.decode(fields$.get(11).getValue());
       Long taxId = PrimitiveValueDecoders.fromInt64.decode(fields$.get(12).getValue());
       Long socialSecurityId = PrimitiveValueDecoders.fromInt64.decode(fields$.get(13).getValue());
+      List<String> photoReferences = PrimitiveValueDecoders.fromList(
+            PrimitiveValueDecoders.fromText).decode(fields$.get(14).getValue());
       Map<String, Set<String>> observers = PrimitiveValueDecoders.fromGenMap(
             PrimitiveValueDecoders.fromText,
             Set.<java.lang.String>valueDecoder(PrimitiveValueDecoders.fromParty))
-          .decode(fields$.get(14).getValue());
+          .decode(fields$.get(15).getValue());
       return new RequestCreateUserProfile(id, username, firstName, lastName, fullName, password,
           birthday, gender, nationality, contactMail, cellphoneNumber, idNumber, taxId,
-          socialSecurityId, observers);
+          socialSecurityId, photoReferences, observers);
     } ;
   }
 
   public com.daml.ledger.javaapi.data.DamlRecord toValue() {
-    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(15);
+    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(16);
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("id", this.id.toValue()));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("username", new Text(this.username)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("firstName", new Text(this.firstName)));
@@ -145,6 +151,7 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("idNumber", new Int64(this.idNumber)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("taxId", new Int64(this.taxId)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("socialSecurityId", new Int64(this.socialSecurityId)));
+    fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("photoReferences", this.photoReferences.stream().collect(DamlCollectors.toDamlList(v$0 -> new Text(v$0)))));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("observers", this.observers.entrySet()
         .stream()
         .collect(DamlCollectors.toDamlGenMap(v$0 -> new Text(v$0.getKey()), v$0 -> v$0.getValue().toValue(v$1 -> new Party(v$1))))));
@@ -152,7 +159,7 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
   }
 
   public static JsonLfDecoder<RequestCreateUserProfile> jsonDecoder() {
-    return JsonLfDecoders.record(Arrays.asList("id", "username", "firstName", "lastName", "fullName", "password", "birthday", "gender", "nationality", "contactMail", "cellphoneNumber", "idNumber", "taxId", "socialSecurityId", "observers"), name -> {
+    return JsonLfDecoders.record(Arrays.asList("id", "username", "firstName", "lastName", "fullName", "password", "birthday", "gender", "nationality", "contactMail", "cellphoneNumber", "idNumber", "taxId", "socialSecurityId", "photoReferences", "observers"), name -> {
           switch (name) {
             case "id": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(0, daml.daml.finance.interface$.types.common.types.Id.jsonDecoder());
             case "username": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(1, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
@@ -168,11 +175,12 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
             case "idNumber": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(11, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.int64);
             case "taxId": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(12, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.int64);
             case "socialSecurityId": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(13, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.int64);
-            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(14, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
+            case "photoReferences": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(14, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.list(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text));
+            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(15, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
             default: return null;
           }
         }
-        , (Object[] args) -> new RequestCreateUserProfile(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14])));
+        , (Object[] args) -> new RequestCreateUserProfile(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15])));
   }
 
   public static RequestCreateUserProfile fromJson(String json) throws JsonLfDecoder.Error {
@@ -194,6 +202,7 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
         JsonLfEncoders.Field.of("idNumber", apply(JsonLfEncoders::int64, idNumber)),
         JsonLfEncoders.Field.of("taxId", apply(JsonLfEncoders::int64, taxId)),
         JsonLfEncoders.Field.of("socialSecurityId", apply(JsonLfEncoders::int64, socialSecurityId)),
+        JsonLfEncoders.Field.of("photoReferences", apply(JsonLfEncoders.list(JsonLfEncoders::text), photoReferences)),
         JsonLfEncoders.Field.of("observers", apply(JsonLfEncoders.genMap(JsonLfEncoders::text, _x1 -> _x1.jsonEncoder(JsonLfEncoders::party)), observers)));
   }
 
@@ -221,6 +230,7 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
         Objects.equals(this.cellphoneNumber, other.cellphoneNumber) &&
         Objects.equals(this.idNumber, other.idNumber) && Objects.equals(this.taxId, other.taxId) &&
         Objects.equals(this.socialSecurityId, other.socialSecurityId) &&
+        Objects.equals(this.photoReferences, other.photoReferences) &&
         Objects.equals(this.observers, other.observers);
   }
 
@@ -228,14 +238,15 @@ public class RequestCreateUserProfile extends DamlRecord<RequestCreateUserProfil
   public int hashCode() {
     return Objects.hash(this.id, this.username, this.firstName, this.lastName, this.fullName,
         this.password, this.birthday, this.gender, this.nationality, this.contactMail,
-        this.cellphoneNumber, this.idNumber, this.taxId, this.socialSecurityId, this.observers);
+        this.cellphoneNumber, this.idNumber, this.taxId, this.socialSecurityId,
+        this.photoReferences, this.observers);
   }
 
   @Override
   public String toString() {
-    return String.format("daml.interface$.profilemanager.service.RequestCreateUserProfile(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    return String.format("daml.interface$.profilemanager.service.RequestCreateUserProfile(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         this.id, this.username, this.firstName, this.lastName, this.fullName, this.password,
         this.birthday, this.gender, this.nationality, this.contactMail, this.cellphoneNumber,
-        this.idNumber, this.taxId, this.socialSecurityId, this.observers);
+        this.idNumber, this.taxId, this.socialSecurityId, this.photoReferences, this.observers);
   }
 }

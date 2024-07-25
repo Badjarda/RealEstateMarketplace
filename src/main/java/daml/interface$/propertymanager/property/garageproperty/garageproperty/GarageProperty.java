@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public final class GarageProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Property.GarageProperty.GarageProperty", "GarageProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Property.GarageProperty.GarageProperty", "GarageProperty");
 
   public static final Choice<GarageProperty, GetGaragePropertyAddress, String> CHOICE_GetGaragePropertyAddress = 
       Choice.create("GetGaragePropertyAddress", value$ -> value$.toValue(), value$ ->
@@ -47,10 +47,10 @@ public final class GarageProperty {
         GetGaragePropertyCounty.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromText.decode(value$));
 
-  public static final Choice<GarageProperty, GetGaragePrice, BigDecimal> CHOICE_GetGaragePrice = 
-      Choice.create("GetGaragePrice", value$ -> value$.toValue(), value$ ->
-        GetGaragePrice.valueDecoder().decode(value$), value$ -> PrimitiveValueDecoders.fromNumeric
-        .decode(value$));
+  public static final Choice<GarageProperty, SetGaragePhotoReferences, ContractId> CHOICE_SetGaragePhotoReferences = 
+      Choice.create("SetGaragePhotoReferences", value$ -> value$.toValue(), value$ ->
+        SetGaragePhotoReferences.valueDecoder().decode(value$), value$ ->
+        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
 
   public static final Choice<GarageProperty, GetGarageAdditionalInformation, String> CHOICE_GetGarageAdditionalInformation = 
       Choice.create("GetGarageAdditionalInformation", value$ -> value$.toValue(), value$ ->
@@ -129,6 +129,16 @@ public final class GarageProperty {
       Choice.create("SetGaragePropertyCounty", value$ -> value$.toValue(), value$ ->
         SetGaragePropertyCounty.valueDecoder().decode(value$), value$ ->
         new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
+
+  public static final Choice<GarageProperty, GetGaragePrice, BigDecimal> CHOICE_GetGaragePrice = 
+      Choice.create("GetGaragePrice", value$ -> value$.toValue(), value$ ->
+        GetGaragePrice.valueDecoder().decode(value$), value$ -> PrimitiveValueDecoders.fromNumeric
+        .decode(value$));
+
+  public static final Choice<GarageProperty, GetGaragePhotoReferences, List<String>> CHOICE_GetGaragePhotoReferences = 
+      Choice.create("GetGaragePhotoReferences", value$ -> value$.toValue(), value$ ->
+        GetGaragePhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromList(PrimitiveValueDecoders.fromText).decode(value$));
 
   public static final Choice<GarageProperty, SetVehicleCapacity, ContractId> CHOICE_SetVehicleCapacity = 
       Choice.create("SetVehicleCapacity", value$ -> value$.toValue(), value$ ->
@@ -217,12 +227,14 @@ public final class GarageProperty {
       return exerciseGetGaragePropertyCounty(new GetGaragePropertyCounty());
     }
 
-    default Update<Exercised<BigDecimal>> exerciseGetGaragePrice(GetGaragePrice arg) {
-      return makeExerciseCmd(CHOICE_GetGaragePrice, arg);
+    default Update<Exercised<ContractId>> exerciseSetGaragePhotoReferences(
+        SetGaragePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_SetGaragePhotoReferences, arg);
     }
 
-    default Update<Exercised<BigDecimal>> exerciseGetGaragePrice() {
-      return exerciseGetGaragePrice(new GetGaragePrice());
+    default Update<Exercised<ContractId>> exerciseSetGaragePhotoReferences(
+        List<String> newPhotoReferences) {
+      return exerciseSetGaragePhotoReferences(new SetGaragePhotoReferences(newPhotoReferences));
     }
 
     default Update<Exercised<String>> exerciseGetGarageAdditionalInformation(
@@ -368,6 +380,23 @@ public final class GarageProperty {
       return exerciseSetGaragePropertyCounty(new SetGaragePropertyCounty(newGaragePropertyCounty));
     }
 
+    default Update<Exercised<BigDecimal>> exerciseGetGaragePrice(GetGaragePrice arg) {
+      return makeExerciseCmd(CHOICE_GetGaragePrice, arg);
+    }
+
+    default Update<Exercised<BigDecimal>> exerciseGetGaragePrice() {
+      return exerciseGetGaragePrice(new GetGaragePrice());
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetGaragePhotoReferences(
+        GetGaragePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_GetGaragePhotoReferences, arg);
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetGaragePhotoReferences() {
+      return exerciseGetGaragePhotoReferences(new GetGaragePhotoReferences());
+    }
+
     default Update<Exercised<ContractId>> exerciseSetVehicleCapacity(SetVehicleCapacity arg) {
       return makeExerciseCmd(CHOICE_SetVehicleCapacity, arg);
     }
@@ -448,17 +477,18 @@ public final class GarageProperty {
     INTERFACE_() {
       super(
             "daml.interface$.propertymanager.property.garageproperty.garageproperty.GarageProperty", GarageProperty.TEMPLATE_ID, ContractId::new, View.valueDecoder(),
-            View::fromJson,List.of(CHOICE_GetGarageAdditionalInformation,
-            CHOICE_GetGarageDescription, CHOICE_GetGaragePropertyCounty,
+            View::fromJson,List.of(CHOICE_GetGarageDescription, CHOICE_GetGaragePropertyCounty,
             CHOICE_GetGaragePropertyPostalCode, CHOICE_GetGaragePropertyAddress, CHOICE_Archive,
             CHOICE_GetView, CHOICE_GetGarageInstrumentKey, CHOICE_SetGarageDescription,
-            CHOICE_GetGarageType, CHOICE_GetVehicleCapacity, CHOICE_SetGaragePropertyCounty,
+            CHOICE_GetGarageType, CHOICE_GetVehicleCapacity, CHOICE_SetGaragePhotoReferences,
+            CHOICE_GetGarageAdditionalInformation, CHOICE_SetGaragePropertyCounty,
             CHOICE_SetGaragePropertyDistrict, CHOICE_Remove, CHOICE_GetGaragePrice,
             CHOICE_SetGaragePropertyPostalCode, CHOICE_GetGarageInstalledEquipment,
             CHOICE_GetGaragePropertyDistrict, CHOICE_SetGarageAdditionalInformation,
-            CHOICE_SetGarageInstrumentKey, CHOICE_SetGaragePropertyAddress,
-            CHOICE_SetVehicleCapacity, CHOICE_GetGarageArea, CHOICE_SetGarageInstalledEquipment,
-            CHOICE_SetGarageArea, CHOICE_SetGarageType, CHOICE_SetGaragePrice));
+            CHOICE_GetGaragePhotoReferences, CHOICE_SetGarageInstrumentKey,
+            CHOICE_SetGaragePropertyAddress, CHOICE_SetVehicleCapacity, CHOICE_GetGarageArea,
+            CHOICE_SetGarageInstalledEquipment, CHOICE_SetGarageArea, CHOICE_SetGarageType,
+            CHOICE_SetGaragePrice));
     }
   }
 }

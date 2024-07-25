@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class GetBirthday extends DamlRecord<GetBirthday> {
-  public static final String _packageId = "f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d";
+  public static final String _packageId = "8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f";
 
   public GetBirthday() {
   }

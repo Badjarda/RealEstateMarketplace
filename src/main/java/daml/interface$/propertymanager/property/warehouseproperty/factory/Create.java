@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Create extends DamlRecord<Create> {
-  public static final String _packageId = "f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d";
+  public static final String _packageId = "8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f";
 
   public final InstrumentKey instrument;
 
@@ -68,13 +68,16 @@ public class Create extends DamlRecord<Create> {
 
   public final String description;
 
+  public final List<String> photoReferences;
+
   public final Map<String, Set<String>> observers;
 
   public Create(InstrumentKey instrument, BigDecimal warehousePrice, PropertyKey propertyKey,
       String propertyAddress, String propertyPostalCode, String propertyDistrict,
       String propertyCounty, WarehouseType warehouseType, BigDecimal grossArea,
       BigDecimal usableArea, Long floors, LocalDate buildDate, String installedEquipment,
-      String additionalInformation, String description, Map<String, Set<String>> observers) {
+      String additionalInformation, String description, List<String> photoReferences,
+      Map<String, Set<String>> observers) {
     this.instrument = instrument;
     this.warehousePrice = warehousePrice;
     this.propertyKey = propertyKey;
@@ -90,6 +93,7 @@ public class Create extends DamlRecord<Create> {
     this.installedEquipment = installedEquipment;
     this.additionalInformation = additionalInformation;
     this.description = description;
+    this.photoReferences = photoReferences;
     this.observers = observers;
   }
 
@@ -104,7 +108,7 @@ public class Create extends DamlRecord<Create> {
   public static ValueDecoder<Create> valueDecoder() throws IllegalArgumentException {
     return value$ -> {
       Value recordValue$ = value$;
-      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(16,0,
+      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(17,0,
           recordValue$);
       InstrumentKey instrument = InstrumentKey.valueDecoder().decode(fields$.get(0).getValue());
       BigDecimal warehousePrice = PrimitiveValueDecoders.fromNumeric
@@ -124,19 +128,21 @@ public class Create extends DamlRecord<Create> {
       String additionalInformation = PrimitiveValueDecoders.fromText
           .decode(fields$.get(13).getValue());
       String description = PrimitiveValueDecoders.fromText.decode(fields$.get(14).getValue());
+      List<String> photoReferences = PrimitiveValueDecoders.fromList(
+            PrimitiveValueDecoders.fromText).decode(fields$.get(15).getValue());
       Map<String, Set<String>> observers = PrimitiveValueDecoders.fromGenMap(
             PrimitiveValueDecoders.fromText,
             Set.<java.lang.String>valueDecoder(PrimitiveValueDecoders.fromParty))
-          .decode(fields$.get(15).getValue());
+          .decode(fields$.get(16).getValue());
       return new Create(instrument, warehousePrice, propertyKey, propertyAddress,
           propertyPostalCode, propertyDistrict, propertyCounty, warehouseType, grossArea,
           usableArea, floors, buildDate, installedEquipment, additionalInformation, description,
-          observers);
+          photoReferences, observers);
     } ;
   }
 
   public com.daml.ledger.javaapi.data.DamlRecord toValue() {
-    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(16);
+    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(17);
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("instrument", this.instrument.toValue()));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("warehousePrice", new Numeric(this.warehousePrice)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("propertyKey", this.propertyKey.toValue()));
@@ -152,6 +158,7 @@ public class Create extends DamlRecord<Create> {
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("installedEquipment", new Text(this.installedEquipment)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("additionalInformation", new Text(this.additionalInformation)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("description", new Text(this.description)));
+    fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("photoReferences", this.photoReferences.stream().collect(DamlCollectors.toDamlList(v$0 -> new Text(v$0)))));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("observers", this.observers.entrySet()
         .stream()
         .collect(DamlCollectors.toDamlGenMap(v$0 -> new Text(v$0.getKey()), v$0 -> v$0.getValue().toValue(v$1 -> new Party(v$1))))));
@@ -159,7 +166,7 @@ public class Create extends DamlRecord<Create> {
   }
 
   public static JsonLfDecoder<Create> jsonDecoder() {
-    return JsonLfDecoders.record(Arrays.asList("instrument", "warehousePrice", "propertyKey", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "warehouseType", "grossArea", "usableArea", "floors", "buildDate", "installedEquipment", "additionalInformation", "description", "observers"), name -> {
+    return JsonLfDecoders.record(Arrays.asList("instrument", "warehousePrice", "propertyKey", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "warehouseType", "grossArea", "usableArea", "floors", "buildDate", "installedEquipment", "additionalInformation", "description", "photoReferences", "observers"), name -> {
           switch (name) {
             case "instrument": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(0, daml.daml.finance.interface$.types.common.types.InstrumentKey.jsonDecoder());
             case "warehousePrice": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(1, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.numeric(10));
@@ -176,11 +183,12 @@ public class Create extends DamlRecord<Create> {
             case "installedEquipment": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(12, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "additionalInformation": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(13, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "description": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(14, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
-            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(15, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
+            case "photoReferences": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(15, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.list(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text));
+            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(16, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
             default: return null;
           }
         }
-        , (Object[] args) -> new Create(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15])));
+        , (Object[] args) -> new Create(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15]), JsonLfDecoders.cast(args[16])));
   }
 
   public static Create fromJson(String json) throws JsonLfDecoder.Error {
@@ -204,6 +212,7 @@ public class Create extends DamlRecord<Create> {
         JsonLfEncoders.Field.of("installedEquipment", apply(JsonLfEncoders::text, installedEquipment)),
         JsonLfEncoders.Field.of("additionalInformation", apply(JsonLfEncoders::text, additionalInformation)),
         JsonLfEncoders.Field.of("description", apply(JsonLfEncoders::text, description)),
+        JsonLfEncoders.Field.of("photoReferences", apply(JsonLfEncoders.list(JsonLfEncoders::text), photoReferences)),
         JsonLfEncoders.Field.of("observers", apply(JsonLfEncoders.genMap(JsonLfEncoders::text, _x1 -> _x1.jsonEncoder(JsonLfEncoders::party)), observers)));
   }
 
@@ -234,6 +243,7 @@ public class Create extends DamlRecord<Create> {
         Objects.equals(this.installedEquipment, other.installedEquipment) &&
         Objects.equals(this.additionalInformation, other.additionalInformation) &&
         Objects.equals(this.description, other.description) &&
+        Objects.equals(this.photoReferences, other.photoReferences) &&
         Objects.equals(this.observers, other.observers);
   }
 
@@ -242,15 +252,16 @@ public class Create extends DamlRecord<Create> {
     return Objects.hash(this.instrument, this.warehousePrice, this.propertyKey,
         this.propertyAddress, this.propertyPostalCode, this.propertyDistrict, this.propertyCounty,
         this.warehouseType, this.grossArea, this.usableArea, this.floors, this.buildDate,
-        this.installedEquipment, this.additionalInformation, this.description, this.observers);
+        this.installedEquipment, this.additionalInformation, this.description, this.photoReferences,
+        this.observers);
   }
 
   @Override
   public String toString() {
-    return String.format("daml.interface$.propertymanager.property.warehouseproperty.factory.Create(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    return String.format("daml.interface$.propertymanager.property.warehouseproperty.factory.Create(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         this.instrument, this.warehousePrice, this.propertyKey, this.propertyAddress,
         this.propertyPostalCode, this.propertyDistrict, this.propertyCounty, this.warehouseType,
         this.grossArea, this.usableArea, this.floors, this.buildDate, this.installedEquipment,
-        this.additionalInformation, this.description, this.observers);
+        this.additionalInformation, this.description, this.photoReferences, this.observers);
   }
 }

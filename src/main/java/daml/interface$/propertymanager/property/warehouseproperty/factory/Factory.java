@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class Factory {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Property.WarehouseProperty.Factory", "Factory");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Property.WarehouseProperty.Factory", "Factory");
 
   public static final Choice<Factory, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->
@@ -81,11 +81,11 @@ public final class Factory {
         String propertyPostalCode, String propertyDistrict, String propertyCounty,
         WarehouseType warehouseType, BigDecimal grossArea, BigDecimal usableArea, Long floors,
         LocalDate buildDate, String installedEquipment, String additionalInformation,
-        String description, Map<String, Set<String>> observers) {
+        String description, List<String> photoReferences, Map<String, Set<String>> observers) {
       return exerciseCreate(new Create(instrument, warehousePrice, propertyKey, propertyAddress,
           propertyPostalCode, propertyDistrict, propertyCounty, warehouseType, grossArea,
           usableArea, floors, buildDate, installedEquipment, additionalInformation, description,
-          observers));
+          photoReferences, observers));
     }
   }
 

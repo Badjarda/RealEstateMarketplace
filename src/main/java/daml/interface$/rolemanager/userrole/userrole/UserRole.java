@@ -22,7 +22,7 @@ import java.lang.String;
 import java.util.List;
 
 public final class UserRole {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.RoleManager.UserRole.UserRole", "UserRole");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.RoleManager.UserRole.UserRole", "UserRole");
 
   public static final Choice<UserRole, SetPermissions, ContractId> CHOICE_SetPermissions = 
       Choice.create("SetPermissions", value$ -> value$.toValue(), value$ ->

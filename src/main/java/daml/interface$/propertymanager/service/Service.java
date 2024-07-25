@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class Service {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Service", "Service");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Service", "Service");
 
   public static final Choice<Service, UpdateResidenceFloors, Unit> CHOICE_UpdateResidenceFloors = 
       Choice.create("UpdateResidenceFloors", value$ -> value$.toValue(), value$ ->
@@ -58,11 +58,6 @@ public final class Service {
   public static final Choice<Service, UpdateWarehousePrice, Unit> CHOICE_UpdateWarehousePrice = 
       Choice.create("UpdateWarehousePrice", value$ -> value$.toValue(), value$ ->
         UpdateWarehousePrice.valueDecoder().decode(value$), value$ ->
-        PrimitiveValueDecoders.fromUnit.decode(value$));
-
-  public static final Choice<Service, UpdateResidenceGrossArea, Unit> CHOICE_UpdateResidenceGrossArea = 
-      Choice.create("UpdateResidenceGrossArea", value$ -> value$.toValue(), value$ ->
-        UpdateResidenceGrossArea.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromUnit.decode(value$));
 
   public static final Choice<Service, UpdateApartmentParkingSpaces, Unit> CHOICE_UpdateApartmentParkingSpaces = 
@@ -103,6 +98,11 @@ public final class Service {
   public static final Choice<Service, UpdateResidenceBedrooms, Unit> CHOICE_UpdateResidenceBedrooms = 
       Choice.create("UpdateResidenceBedrooms", value$ -> value$.toValue(), value$ ->
         UpdateResidenceBedrooms.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromUnit.decode(value$));
+
+  public static final Choice<Service, UpdateResidencePhotoReferences, Unit> CHOICE_UpdateResidencePhotoReferences = 
+      Choice.create("UpdateResidencePhotoReferences", value$ -> value$.toValue(), value$ ->
+        UpdateResidencePhotoReferences.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromUnit.decode(value$));
 
   public static final Choice<Service, CreateGarageProperty, Tuple2<InstrumentKey, PropertyKey>> CHOICE_CreateGarageProperty = 
@@ -328,6 +328,11 @@ public final class Service {
         UpdateApartmentBedrooms.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromUnit.decode(value$));
 
+  public static final Choice<Service, UpdateGaragePhotoReferences, Unit> CHOICE_UpdateGaragePhotoReferences = 
+      Choice.create("UpdateGaragePhotoReferences", value$ -> value$.toValue(), value$ ->
+        UpdateGaragePhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromUnit.decode(value$));
+
   public static final Choice<Service, UpdateWarehousePropertyPostalCode, Unit> CHOICE_UpdateWarehousePropertyPostalCode = 
       Choice.create("UpdateWarehousePropertyPostalCode", value$ -> value$.toValue(), value$ ->
         UpdateWarehousePropertyPostalCode.valueDecoder().decode(value$), value$ ->
@@ -418,6 +423,11 @@ public final class Service {
         daml.da.internal.template.Archive.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromUnit.decode(value$));
 
+  public static final Choice<Service, UpdateLandPhotoReferences, Unit> CHOICE_UpdateLandPhotoReferences = 
+      Choice.create("UpdateLandPhotoReferences", value$ -> value$.toValue(), value$ ->
+        UpdateLandPhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromUnit.decode(value$));
+
   public static final Choice<Service, UpdateApartmentFloor, Unit> CHOICE_UpdateApartmentFloor = 
       Choice.create("UpdateApartmentFloor", value$ -> value$.toValue(), value$ ->
         UpdateApartmentFloor.valueDecoder().decode(value$), value$ ->
@@ -453,6 +463,11 @@ public final class Service {
         UpdateApartmentGrossArea.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromUnit.decode(value$));
 
+  public static final Choice<Service, UpdateWarehousePhotoReferences, Unit> CHOICE_UpdateWarehousePhotoReferences = 
+      Choice.create("UpdateWarehousePhotoReferences", value$ -> value$.toValue(), value$ ->
+        UpdateWarehousePhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromUnit.decode(value$));
+
   public static final Choice<Service, UpdateGarageInstrumentKey, Unit> CHOICE_UpdateGarageInstrumentKey = 
       Choice.create("UpdateGarageInstrumentKey", value$ -> value$.toValue(), value$ ->
         UpdateGarageInstrumentKey.valueDecoder().decode(value$), value$ ->
@@ -461,6 +476,16 @@ public final class Service {
   public static final Choice<Service, UpdateWarehousePropertyAddress, Unit> CHOICE_UpdateWarehousePropertyAddress = 
       Choice.create("UpdateWarehousePropertyAddress", value$ -> value$.toValue(), value$ ->
         UpdateWarehousePropertyAddress.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromUnit.decode(value$));
+
+  public static final Choice<Service, UpdateResidenceGrossArea, Unit> CHOICE_UpdateResidenceGrossArea = 
+      Choice.create("UpdateResidenceGrossArea", value$ -> value$.toValue(), value$ ->
+        UpdateResidenceGrossArea.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromUnit.decode(value$));
+
+  public static final Choice<Service, UpdateApartmentPhotoReferences, Unit> CHOICE_UpdateApartmentPhotoReferences = 
+      Choice.create("UpdateApartmentPhotoReferences", value$ -> value$.toValue(), value$ ->
+        UpdateApartmentPhotoReferences.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromUnit.decode(value$));
 
   public static final Choice<Service, UpdateResidenceUsableArea, Unit> CHOICE_UpdateResidenceUsableArea = 
@@ -558,16 +583,6 @@ public final class Service {
       return exerciseUpdateWarehousePrice(new UpdateWarehousePrice(newWarehousePrice, propertyKey));
     }
 
-    default Update<Exercised<Unit>> exerciseUpdateResidenceGrossArea(UpdateResidenceGrossArea arg) {
-      return makeExerciseCmd(CHOICE_UpdateResidenceGrossArea, arg);
-    }
-
-    default Update<Exercised<Unit>> exerciseUpdateResidenceGrossArea(
-        BigDecimal newResidenceGrossArea, PropertyKey propertyKey) {
-      return exerciseUpdateResidenceGrossArea(new UpdateResidenceGrossArea(newResidenceGrossArea,
-          propertyKey));
-    }
-
     default Update<Exercised<Unit>> exerciseUpdateApartmentParkingSpaces(
         UpdateApartmentParkingSpaces arg) {
       return makeExerciseCmd(CHOICE_UpdateApartmentParkingSpaces, arg);
@@ -652,6 +667,17 @@ public final class Service {
           propertyKey));
     }
 
+    default Update<Exercised<Unit>> exerciseUpdateResidencePhotoReferences(
+        UpdateResidencePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_UpdateResidencePhotoReferences, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateResidencePhotoReferences(
+        List<String> newResidencePhotoReferences, PropertyKey propertyKey) {
+      return exerciseUpdateResidencePhotoReferences(new UpdateResidencePhotoReferences(newResidencePhotoReferences,
+          propertyKey));
+    }
+
     default Update<Exercised<Tuple2<InstrumentKey, PropertyKey>>> exerciseCreateGarageProperty(
         CreateGarageProperty arg) {
       return makeExerciseCmd(CHOICE_CreateGarageProperty, arg);
@@ -673,12 +699,12 @@ public final class Service {
         BigDecimal grossArea, BigDecimal usableArea, Long bedrooms, Long bathrooms, Long floors,
         ResidenceType residenceType, String backyard, Parking parking, LocalDate buildDate,
         Orientation orientation, String installedEquipment, String additionalInformation,
-        String description, Map<String, Set<String>> observers) {
+        String description, List<String> photoReferences, Map<String, Set<String>> observers) {
       return exerciseRequestCreateResidenceProperty(new RequestCreateResidenceProperty(id,
           residenceInstrument, residencePrice, propertyAddress, propertyPostalCode,
           propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floors,
           residenceType, backyard, parking, buildDate, orientation, installedEquipment,
-          additionalInformation, description, observers));
+          additionalInformation, description, photoReferences, observers));
     }
 
     default Update<Exercised<daml.interface$.propertymanager.choices.requestcreatelandproperty.RequestCreateLandProperty.ContractId>> exerciseRequestCreateLandProperty(
@@ -692,12 +718,13 @@ public final class Service {
         LandType landType, BigDecimal totalLandArea, BigDecimal minimumSurfaceForSale,
         BigDecimal buildableArea, Long buildableFloors, Boolean accessByRoad,
         String installedEquipment, List<ViableConstructionTypes> viableConstructionTypes,
-        String additionalInformation, String description, Map<String, Set<String>> observers) {
+        String additionalInformation, String description, List<String> photoReferences,
+        Map<String, Set<String>> observers) {
       return exerciseRequestCreateLandProperty(new RequestCreateLandProperty(id, landInstrument,
           landPrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty,
           landType, totalLandArea, minimumSurfaceForSale, buildableArea, buildableFloors,
           accessByRoad, installedEquipment, viableConstructionTypes, additionalInformation,
-          description, observers));
+          description, photoReferences, observers));
     }
 
     default Update<Exercised<Unit>> exerciseUpdateLandAdditionalInformation(
@@ -1119,6 +1146,17 @@ public final class Service {
           propertyKey));
     }
 
+    default Update<Exercised<Unit>> exerciseUpdateGaragePhotoReferences(
+        UpdateGaragePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_UpdateGaragePhotoReferences, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateGaragePhotoReferences(
+        List<String> newGaragePhotoReferences, PropertyKey propertyKey) {
+      return exerciseUpdateGaragePhotoReferences(new UpdateGaragePhotoReferences(newGaragePhotoReferences,
+          propertyKey));
+    }
+
     default Update<Exercised<Unit>> exerciseUpdateWarehousePropertyPostalCode(
         UpdateWarehousePropertyPostalCode arg) {
       return makeExerciseCmd(CHOICE_UpdateWarehousePropertyPostalCode, arg);
@@ -1140,11 +1178,11 @@ public final class Service {
         String propertyPostalCode, String propertyDistrict, String propertyCounty,
         BigDecimal garageArea, GarageType garageType, Long vehicleCapacity,
         String installedEquipment, String additionalInformation, String description,
-        Map<String, Set<String>> observers) {
+        List<String> photoReferences, Map<String, Set<String>> observers) {
       return exerciseRequestCreateGarageProperty(new RequestCreateGarageProperty(id,
           garageInstrument, garagePrice, propertyAddress, propertyPostalCode, propertyDistrict,
           propertyCounty, garageArea, garageType, vehicleCapacity, installedEquipment,
-          additionalInformation, description, observers));
+          additionalInformation, description, photoReferences, observers));
     }
 
     default Update<Exercised<Unit>> exerciseUpdateResidenceBuildDate(UpdateResidenceBuildDate arg) {
@@ -1178,11 +1216,11 @@ public final class Service {
         String propertyPostalCode, String propertyDistrict, String propertyCounty,
         WarehouseType warehouseType, BigDecimal grossArea, BigDecimal usableArea, Long floors,
         LocalDate buildDate, String installedEquipment, String additionalInformation,
-        String description, Map<String, Set<String>> observers) {
+        String description, List<String> photoReferences, Map<String, Set<String>> observers) {
       return exerciseRequestCreateWarehouseProperty(new RequestCreateWarehouseProperty(id,
           warehouseInstrument, warehousePrice, propertyAddress, propertyPostalCode,
           propertyDistrict, propertyCounty, warehouseType, grossArea, usableArea, floors, buildDate,
-          installedEquipment, additionalInformation, description, observers));
+          installedEquipment, additionalInformation, description, photoReferences, observers));
     }
 
     default Update<Exercised<Unit>> exerciseUpdateResidenceType(UpdateResidenceType arg) {
@@ -1286,12 +1324,13 @@ public final class Service {
         String propertyPostalCode, String propertyDistrict, String propertyCounty,
         BigDecimal grossArea, BigDecimal usableArea, Long bedrooms, Long bathrooms, Long floor,
         Long parkingSpaces, Boolean elevator, LocalDate buildDate, String installedEquipment,
-        String additionalInformation, String description, Map<String, Set<String>> observers) {
+        String additionalInformation, String description, List<String> photoReferences,
+        Map<String, Set<String>> observers) {
       return exerciseRequestCreateApartmentProperty(new RequestCreateApartmentProperty(id,
           apartmentInstrument, apartmentPrice, propertyAddress, propertyPostalCode,
           propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms, bathrooms, floor,
           parkingSpaces, elevator, buildDate, installedEquipment, additionalInformation,
-          description, observers));
+          description, photoReferences, observers));
     }
 
     default Update<Exercised<Unit>> exerciseUpdateResidenceOrientation(
@@ -1322,6 +1361,17 @@ public final class Service {
 
     default Update<Exercised<Unit>> exerciseArchive() {
       return exerciseArchive(new daml.da.internal.template.Archive());
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateLandPhotoReferences(
+        UpdateLandPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_UpdateLandPhotoReferences, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateLandPhotoReferences(
+        List<String> newLandPhotoReferences, PropertyKey propertyKey) {
+      return exerciseUpdateLandPhotoReferences(new UpdateLandPhotoReferences(newLandPhotoReferences,
+          propertyKey));
     }
 
     default Update<Exercised<Unit>> exerciseUpdateApartmentFloor(UpdateApartmentFloor arg) {
@@ -1393,6 +1443,17 @@ public final class Service {
           propertyKey));
     }
 
+    default Update<Exercised<Unit>> exerciseUpdateWarehousePhotoReferences(
+        UpdateWarehousePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_UpdateWarehousePhotoReferences, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateWarehousePhotoReferences(
+        List<String> newWarehousePhotoReferences, PropertyKey propertyKey) {
+      return exerciseUpdateWarehousePhotoReferences(new UpdateWarehousePhotoReferences(newWarehousePhotoReferences,
+          propertyKey));
+    }
+
     default Update<Exercised<Unit>> exerciseUpdateGarageInstrumentKey(
         UpdateGarageInstrumentKey arg) {
       return makeExerciseCmd(CHOICE_UpdateGarageInstrumentKey, arg);
@@ -1412,6 +1473,27 @@ public final class Service {
     default Update<Exercised<Unit>> exerciseUpdateWarehousePropertyAddress(
         String newWarehousePropertyAddress, PropertyKey propertyKey) {
       return exerciseUpdateWarehousePropertyAddress(new UpdateWarehousePropertyAddress(newWarehousePropertyAddress,
+          propertyKey));
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateResidenceGrossArea(UpdateResidenceGrossArea arg) {
+      return makeExerciseCmd(CHOICE_UpdateResidenceGrossArea, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateResidenceGrossArea(
+        BigDecimal newResidenceGrossArea, PropertyKey propertyKey) {
+      return exerciseUpdateResidenceGrossArea(new UpdateResidenceGrossArea(newResidenceGrossArea,
+          propertyKey));
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateApartmentPhotoReferences(
+        UpdateApartmentPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_UpdateApartmentPhotoReferences, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdateApartmentPhotoReferences(
+        List<String> newApartmentPhotoReferences, PropertyKey propertyKey) {
+      return exerciseUpdateApartmentPhotoReferences(new UpdateApartmentPhotoReferences(newApartmentPhotoReferences,
           propertyKey));
     }
 
@@ -1507,9 +1589,9 @@ public final class Service {
       super(
             "daml.interface$.propertymanager.service.Service", Service.TEMPLATE_ID, ContractId::new, View.valueDecoder(),
             View::fromJson,List.of(CHOICE_UpdateApartmentInstalledEquipment,
-            CHOICE_UpdateLandViableConstructionTypes, CHOICE_UpdateLandType,
-            CHOICE_UpdateWarehouseInstalledEquipment, CHOICE_UpdateApartmentPrice,
-            CHOICE_UpdateApartmentPropertyDistrict, CHOICE_UpdateApartmentBedrooms,
+            CHOICE_UpdateLandViableConstructionTypes, CHOICE_UpdateWarehouseInstalledEquipment,
+            CHOICE_UpdateApartmentPrice, CHOICE_UpdateApartmentPropertyDistrict,
+            CHOICE_UpdateApartmentPhotoReferences, CHOICE_UpdateApartmentBedrooms,
             CHOICE_UpdateGaragePropertyAddress, CHOICE_RequestCreateResidenceProperty,
             CHOICE_UpdateApartmentPropertyCounty, CHOICE_UpdateApartmentPropertyAddress,
             CHOICE_UpdateGarageAdditionalInformation, CHOICE_UpdateWarehousePropertyPostalCode,
@@ -1530,26 +1612,28 @@ public final class Service {
             CHOICE_UpdateApartmentFloor, CHOICE_CreateGarageProperty,
             CHOICE_UpdateMinimumSurfaceForSale, CHOICE_UpdateApartmentUsableArea,
             CHOICE_UpdateGarageInstalledEquipment, CHOICE_UpdateGaragePropertyCounty,
-            CHOICE_UpdateGaragePrice, CHOICE_UpdateLandAccessByRoad, CHOICE_UpdateResidenceType,
+            CHOICE_UpdateLandPhotoReferences, CHOICE_UpdateGaragePrice,
+            CHOICE_UpdateLandAccessByRoad, CHOICE_UpdateResidenceType,
             CHOICE_UpdateResidenceDescription, CHOICE_CreateResidenceProperty,
-            CHOICE_UpdateWarehouseFloors, CHOICE_UpdateWarehousePrice,
-            CHOICE_UpdateLandPropertyCounty, CHOICE_UpdateLandBuildableFloors,
+            CHOICE_UpdateWarehouseFloors, CHOICE_UpdateResidencePhotoReferences,
+            CHOICE_UpdateWarehousePrice, CHOICE_UpdateLandPropertyCounty, CHOICE_UpdateLandType,
+            CHOICE_UpdateGaragePhotoReferences, CHOICE_UpdateLandBuildableFloors,
             CHOICE_UpdateLandDescription, CHOICE_UpdateResidenceFloors,
-            CHOICE_CreateWarehouseProperty, CHOICE_RequestCreateWarehouseProperty, CHOICE_Archive,
-            CHOICE_UpdateWarehouseType, CHOICE_UpdateResidenceBuildDate,
-            CHOICE_UpdateGarageDescription, CHOICE_UpdateResidenceBackyard,
-            CHOICE_UpdateWarehouseAdditionalInformation, CHOICE_RequestCreateGarageProperty,
-            CHOICE_UpdateWarehouseBuildDate, CHOICE_UpdateWarehousePropertyAddress,
-            CHOICE_UpdateLandBuildableArea, CHOICE_UpdateWarehousePropertyDistrict,
-            CHOICE_UpdateGarageType, CHOICE_UpdateApartmentAdditionalInformation,
-            CHOICE_UpdateResidenceInstalledEquipment, CHOICE_UpdateWarehousePropertyCounty,
-            CHOICE_UpdateResidenceGrossArea, CHOICE_UpdateLandPrice,
-            CHOICE_UpdateResidenceOrientation, CHOICE_RequestCreateApartmentProperty,
-            CHOICE_UpdateResidenceBathrooms, CHOICE_UpdateLandPropertyDistrict,
-            CHOICE_UpdateResidenceBedrooms, CHOICE_UpdateResidenceParking,
-            CHOICE_UpdateApartmentGrossArea, CHOICE_UpdateApartmentBuildDate,
-            CHOICE_UpdateGaragePropertyPostalCode, CHOICE_UpdateWarehouseInstrumentKey,
-            CHOICE_UpdateLandInstalledEquipment));
+            CHOICE_UpdateWarehousePhotoReferences, CHOICE_CreateWarehouseProperty,
+            CHOICE_RequestCreateWarehouseProperty, CHOICE_Archive, CHOICE_UpdateWarehouseType,
+            CHOICE_UpdateResidenceBuildDate, CHOICE_UpdateGarageDescription,
+            CHOICE_UpdateResidenceBackyard, CHOICE_UpdateWarehouseAdditionalInformation,
+            CHOICE_RequestCreateGarageProperty, CHOICE_UpdateWarehouseBuildDate,
+            CHOICE_UpdateWarehousePropertyAddress, CHOICE_UpdateLandBuildableArea,
+            CHOICE_UpdateWarehousePropertyDistrict, CHOICE_UpdateGarageType,
+            CHOICE_UpdateApartmentAdditionalInformation, CHOICE_UpdateResidenceInstalledEquipment,
+            CHOICE_UpdateWarehousePropertyCounty, CHOICE_UpdateResidenceGrossArea,
+            CHOICE_UpdateLandPrice, CHOICE_UpdateResidenceOrientation,
+            CHOICE_RequestCreateApartmentProperty, CHOICE_UpdateResidenceBathrooms,
+            CHOICE_UpdateLandPropertyDistrict, CHOICE_UpdateResidenceBedrooms,
+            CHOICE_UpdateResidenceParking, CHOICE_UpdateApartmentGrossArea,
+            CHOICE_UpdateApartmentBuildDate, CHOICE_UpdateGaragePropertyPostalCode,
+            CHOICE_UpdateWarehouseInstrumentKey, CHOICE_UpdateLandInstalledEquipment));
     }
   }
 }

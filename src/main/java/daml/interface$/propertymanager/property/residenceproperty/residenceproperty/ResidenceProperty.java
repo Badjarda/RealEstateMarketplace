@@ -28,7 +28,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public final class ResidenceProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty", "ResidenceProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty", "ResidenceProperty");
 
   public static final Choice<ResidenceProperty, SetResidencePropertyAddress, ContractId> CHOICE_SetResidencePropertyAddress = 
       Choice.create("SetResidencePropertyAddress", value$ -> value$.toValue(), value$ ->
@@ -69,6 +69,11 @@ public final class ResidenceProperty {
       Choice.create("GetResidencePropertyAddress", value$ -> value$.toValue(), value$ ->
         GetResidencePropertyAddress.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromText.decode(value$));
+
+  public static final Choice<ResidenceProperty, SetResidencePhotoReferences, ContractId> CHOICE_SetResidencePhotoReferences = 
+      Choice.create("SetResidencePhotoReferences", value$ -> value$.toValue(), value$ ->
+        SetResidencePhotoReferences.valueDecoder().decode(value$), value$ ->
+        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
 
   public static final Choice<ResidenceProperty, SetResidencePrice, ContractId> CHOICE_SetResidencePrice = 
       Choice.create("SetResidencePrice", value$ -> value$.toValue(), value$ ->
@@ -203,6 +208,11 @@ public final class ResidenceProperty {
         GetResidenceType.valueDecoder().decode(value$), value$ -> ResidenceType.valueDecoder()
         .decode(value$));
 
+  public static final Choice<ResidenceProperty, GetResidencePhotoReferences, List<String>> CHOICE_GetResidencePhotoReferences = 
+      Choice.create("GetResidencePhotoReferences", value$ -> value$.toValue(), value$ ->
+        GetResidencePhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromList(PrimitiveValueDecoders.fromText).decode(value$));
+
   public static final Choice<ResidenceProperty, GetResidenceDescription, String> CHOICE_GetResidenceDescription = 
       Choice.create("GetResidenceDescription", value$ -> value$.toValue(), value$ ->
         GetResidenceDescription.valueDecoder().decode(value$), value$ ->
@@ -325,6 +335,16 @@ public final class ResidenceProperty {
 
     default Update<Exercised<String>> exerciseGetResidencePropertyAddress() {
       return exerciseGetResidencePropertyAddress(new GetResidencePropertyAddress());
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetResidencePhotoReferences(
+        SetResidencePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_SetResidencePhotoReferences, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetResidencePhotoReferences(
+        List<String> newPhotoReferences) {
+      return exerciseSetResidencePhotoReferences(new SetResidencePhotoReferences(newPhotoReferences));
     }
 
     default Update<Exercised<ContractId>> exerciseSetResidencePrice(SetResidencePrice arg) {
@@ -564,6 +584,15 @@ public final class ResidenceProperty {
       return exerciseGetResidenceType(new GetResidenceType());
     }
 
+    default Update<Exercised<List<String>>> exerciseGetResidencePhotoReferences(
+        GetResidencePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_GetResidencePhotoReferences, arg);
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetResidencePhotoReferences() {
+      return exerciseGetResidencePhotoReferences(new GetResidencePhotoReferences());
+    }
+
     default Update<Exercised<String>> exerciseGetResidenceDescription(GetResidenceDescription arg) {
       return makeExerciseCmd(CHOICE_GetResidenceDescription, arg);
     }
@@ -646,17 +675,18 @@ public final class ResidenceProperty {
       super(
             "daml.interface$.propertymanager.property.residenceproperty.residenceproperty.ResidenceProperty", ResidenceProperty.TEMPLATE_ID, ContractId::new, View.valueDecoder(),
             View::fromJson,List.of(CHOICE_GetResidenceBedrooms, CHOICE_GetResidenceBathrooms,
-            CHOICE_GetResidenceOrientation, CHOICE_Archive, CHOICE_SetResidenceGrossArea,
-            CHOICE_GetResidenceInstrumentKey, CHOICE_SetResidenceBedrooms,
-            CHOICE_GetResidenceBuildDate, CHOICE_SetResidenceInstrumentKey,
-            CHOICE_GetResidenceInstalledEquipment, CHOICE_SetResidenceInstalledEquipment,
-            CHOICE_GetResidencePropertyPostalCode, CHOICE_GetResidenceFloors,
-            CHOICE_GetResidencePropertyCounty, CHOICE_SetResidenceUsableArea,
-            CHOICE_SetResidencePropertyAddress, CHOICE_SetResidenceParking, CHOICE_Remove,
-            CHOICE_GetResidencePrice, CHOICE_SetResidenceType, CHOICE_SetResidenceDescription,
-            CHOICE_GetResidenceBackyard, CHOICE_GetResidenceGrossArea,
-            CHOICE_GetResidenceUsableArea, CHOICE_GetResidenceAdditionalInformation,
-            CHOICE_SetResidenceBuildDate, CHOICE_SetResidencePropertyDistrict, CHOICE_GetView,
+            CHOICE_GetResidenceOrientation, CHOICE_GetResidencePhotoReferences, CHOICE_Archive,
+            CHOICE_SetResidenceGrossArea, CHOICE_GetResidenceInstrumentKey,
+            CHOICE_SetResidenceBedrooms, CHOICE_GetResidenceBuildDate,
+            CHOICE_SetResidenceInstrumentKey, CHOICE_GetResidenceInstalledEquipment,
+            CHOICE_SetResidenceInstalledEquipment, CHOICE_GetResidencePropertyPostalCode,
+            CHOICE_GetResidenceFloors, CHOICE_GetResidencePropertyCounty,
+            CHOICE_SetResidenceUsableArea, CHOICE_SetResidencePropertyAddress,
+            CHOICE_SetResidenceParking, CHOICE_Remove, CHOICE_GetResidencePrice,
+            CHOICE_SetResidenceType, CHOICE_SetResidenceDescription, CHOICE_GetResidenceBackyard,
+            CHOICE_GetResidenceGrossArea, CHOICE_GetResidenceUsableArea,
+            CHOICE_GetResidenceAdditionalInformation, CHOICE_SetResidenceBuildDate,
+            CHOICE_SetResidencePhotoReferences, CHOICE_SetResidencePropertyDistrict, CHOICE_GetView,
             CHOICE_SetResidenceFloors, CHOICE_SetResidenceOrientation,
             CHOICE_SetResidencePropertyPostalCode, CHOICE_GetResidencePropertyAddress,
             CHOICE_GetResidenceParking, CHOICE_SetResidenceBathrooms, CHOICE_GetResidenceType,

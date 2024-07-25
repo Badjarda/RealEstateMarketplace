@@ -55,7 +55,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class RequestCreateWarehouseProperty extends Template {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "App.PropertyManager.Model", "RequestCreateWarehouseProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "App.PropertyManager.Model", "RequestCreateWarehouseProperty");
 
   public static final Choice<RequestCreateWarehouseProperty, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->
@@ -105,6 +105,8 @@ public final class RequestCreateWarehouseProperty extends Template {
 
   public final String description;
 
+  public final List<String> photoReferences;
+
   public final Map<String, Set<String>> observers;
 
   public RequestCreateWarehouseProperty(String operator, String user, Id id,
@@ -112,7 +114,7 @@ public final class RequestCreateWarehouseProperty extends Template {
       String propertyPostalCode, String propertyDistrict, String propertyCounty,
       WarehouseType warehouseType, BigDecimal grossArea, BigDecimal usableArea, Long floors,
       LocalDate buildDate, String installedEquipment, String additionalInformation,
-      String description, Map<String, Set<String>> observers) {
+      String description, List<String> photoReferences, Map<String, Set<String>> observers) {
     this.operator = operator;
     this.user = user;
     this.id = id;
@@ -130,6 +132,7 @@ public final class RequestCreateWarehouseProperty extends Template {
     this.installedEquipment = installedEquipment;
     this.additionalInformation = additionalInformation;
     this.description = description;
+    this.photoReferences = photoReferences;
     this.observers = observers;
   }
 
@@ -176,11 +179,11 @@ public final class RequestCreateWarehouseProperty extends Template {
       String propertyPostalCode, String propertyDistrict, String propertyCounty,
       WarehouseType warehouseType, BigDecimal grossArea, BigDecimal usableArea, Long floors,
       LocalDate buildDate, String installedEquipment, String additionalInformation,
-      String description, Map<String, Set<String>> observers) {
+      String description, List<String> photoReferences, Map<String, Set<String>> observers) {
     return new RequestCreateWarehouseProperty(operator, user, id, warehouseInstrument,
         warehousePrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty,
         warehouseType, grossArea, usableArea, floors, buildDate, installedEquipment,
-        additionalInformation, description, observers).create();
+        additionalInformation, description, photoReferences, observers).create();
   }
 
   @Override
@@ -209,7 +212,7 @@ public final class RequestCreateWarehouseProperty extends Template {
   }
 
   public DamlRecord toValue() {
-    ArrayList<DamlRecord.Field> fields = new ArrayList<DamlRecord.Field>(18);
+    ArrayList<DamlRecord.Field> fields = new ArrayList<DamlRecord.Field>(19);
     fields.add(new DamlRecord.Field("operator", new Party(this.operator)));
     fields.add(new DamlRecord.Field("user", new Party(this.user)));
     fields.add(new DamlRecord.Field("id", this.id.toValue()));
@@ -227,6 +230,7 @@ public final class RequestCreateWarehouseProperty extends Template {
     fields.add(new DamlRecord.Field("installedEquipment", new Text(this.installedEquipment)));
     fields.add(new DamlRecord.Field("additionalInformation", new Text(this.additionalInformation)));
     fields.add(new DamlRecord.Field("description", new Text(this.description)));
+    fields.add(new DamlRecord.Field("photoReferences", this.photoReferences.stream().collect(DamlCollectors.toDamlList(v$0 -> new Text(v$0)))));
     fields.add(new DamlRecord.Field("observers", this.observers.entrySet().stream()
         .collect(DamlCollectors.toDamlGenMap(v$0 -> new Text(v$0.getKey()), v$0 -> v$0.getValue().toValue(v$1 -> new Party(v$1))))));
     return new DamlRecord(fields);
@@ -236,7 +240,7 @@ public final class RequestCreateWarehouseProperty extends Template {
       IllegalArgumentException {
     return value$ -> {
       Value recordValue$ = value$;
-      List<DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(18,0, recordValue$);
+      List<DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(19,0, recordValue$);
       String operator = PrimitiveValueDecoders.fromParty.decode(fields$.get(0).getValue());
       String user = PrimitiveValueDecoders.fromParty.decode(fields$.get(1).getValue());
       Id id = Id.valueDecoder().decode(fields$.get(2).getValue());
@@ -258,19 +262,21 @@ public final class RequestCreateWarehouseProperty extends Template {
       String additionalInformation = PrimitiveValueDecoders.fromText
           .decode(fields$.get(15).getValue());
       String description = PrimitiveValueDecoders.fromText.decode(fields$.get(16).getValue());
+      List<String> photoReferences = PrimitiveValueDecoders.fromList(
+            PrimitiveValueDecoders.fromText).decode(fields$.get(17).getValue());
       Map<String, Set<String>> observers = PrimitiveValueDecoders.fromGenMap(
             PrimitiveValueDecoders.fromText,
             Set.<java.lang.String>valueDecoder(PrimitiveValueDecoders.fromParty))
-          .decode(fields$.get(17).getValue());
+          .decode(fields$.get(18).getValue());
       return new RequestCreateWarehouseProperty(operator, user, id, warehouseInstrument,
           warehousePrice, propertyAddress, propertyPostalCode, propertyDistrict, propertyCounty,
           warehouseType, grossArea, usableArea, floors, buildDate, installedEquipment,
-          additionalInformation, description, observers);
+          additionalInformation, description, photoReferences, observers);
     } ;
   }
 
   public static JsonLfDecoder<RequestCreateWarehouseProperty> jsonDecoder() {
-    return JsonLfDecoders.record(Arrays.asList("operator", "user", "id", "warehouseInstrument", "warehousePrice", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "warehouseType", "grossArea", "usableArea", "floors", "buildDate", "installedEquipment", "additionalInformation", "description", "observers"), name -> {
+    return JsonLfDecoders.record(Arrays.asList("operator", "user", "id", "warehouseInstrument", "warehousePrice", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "warehouseType", "grossArea", "usableArea", "floors", "buildDate", "installedEquipment", "additionalInformation", "description", "photoReferences", "observers"), name -> {
           switch (name) {
             case "operator": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(0, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party);
             case "user": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(1, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party);
@@ -289,11 +295,12 @@ public final class RequestCreateWarehouseProperty extends Template {
             case "installedEquipment": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(14, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "additionalInformation": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(15, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "description": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(16, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
-            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(17, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
+            case "photoReferences": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(17, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.list(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text));
+            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(18, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
             default: return null;
           }
         }
-        , (Object[] args) -> new RequestCreateWarehouseProperty(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15]), JsonLfDecoders.cast(args[16]), JsonLfDecoders.cast(args[17])));
+        , (Object[] args) -> new RequestCreateWarehouseProperty(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15]), JsonLfDecoders.cast(args[16]), JsonLfDecoders.cast(args[17]), JsonLfDecoders.cast(args[18])));
   }
 
   public static RequestCreateWarehouseProperty fromJson(String json) throws JsonLfDecoder.Error {
@@ -319,6 +326,7 @@ public final class RequestCreateWarehouseProperty extends Template {
         JsonLfEncoders.Field.of("installedEquipment", apply(JsonLfEncoders::text, installedEquipment)),
         JsonLfEncoders.Field.of("additionalInformation", apply(JsonLfEncoders::text, additionalInformation)),
         JsonLfEncoders.Field.of("description", apply(JsonLfEncoders::text, description)),
+        JsonLfEncoders.Field.of("photoReferences", apply(JsonLfEncoders.list(JsonLfEncoders::text), photoReferences)),
         JsonLfEncoders.Field.of("observers", apply(JsonLfEncoders.genMap(JsonLfEncoders::text, _x1 -> _x1.jsonEncoder(JsonLfEncoders::party)), observers)));
   }
 
@@ -354,6 +362,7 @@ public final class RequestCreateWarehouseProperty extends Template {
         Objects.equals(this.installedEquipment, other.installedEquipment) &&
         Objects.equals(this.additionalInformation, other.additionalInformation) &&
         Objects.equals(this.description, other.description) &&
+        Objects.equals(this.photoReferences, other.photoReferences) &&
         Objects.equals(this.observers, other.observers);
   }
 
@@ -363,16 +372,17 @@ public final class RequestCreateWarehouseProperty extends Template {
         this.warehousePrice, this.propertyAddress, this.propertyPostalCode, this.propertyDistrict,
         this.propertyCounty, this.warehouseType, this.grossArea, this.usableArea, this.floors,
         this.buildDate, this.installedEquipment, this.additionalInformation, this.description,
-        this.observers);
+        this.photoReferences, this.observers);
   }
 
   @Override
   public String toString() {
-    return String.format("daml.app.propertymanager.model.RequestCreateWarehouseProperty(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    return String.format("daml.app.propertymanager.model.RequestCreateWarehouseProperty(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         this.operator, this.user, this.id, this.warehouseInstrument, this.warehousePrice,
         this.propertyAddress, this.propertyPostalCode, this.propertyDistrict, this.propertyCounty,
         this.warehouseType, this.grossArea, this.usableArea, this.floors, this.buildDate,
-        this.installedEquipment, this.additionalInformation, this.description, this.observers);
+        this.installedEquipment, this.additionalInformation, this.description, this.photoReferences,
+        this.observers);
   }
 
   /**

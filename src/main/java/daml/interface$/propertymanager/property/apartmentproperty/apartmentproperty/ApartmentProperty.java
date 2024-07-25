@@ -26,12 +26,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 public final class ApartmentProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty", "ApartmentProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty", "ApartmentProperty");
 
   public static final Choice<ApartmentProperty, GetApartmentBathrooms, Long> CHOICE_GetApartmentBathrooms = 
       Choice.create("GetApartmentBathrooms", value$ -> value$.toValue(), value$ ->
         GetApartmentBathrooms.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromInt64.decode(value$));
+
+  public static final Choice<ApartmentProperty, SetApartmentPhotoReferences, ContractId> CHOICE_SetApartmentPhotoReferences = 
+      Choice.create("SetApartmentPhotoReferences", value$ -> value$.toValue(), value$ ->
+        SetApartmentPhotoReferences.valueDecoder().decode(value$), value$ ->
+        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
 
   public static final Choice<ApartmentProperty, GetApartmentUsableArea, BigDecimal> CHOICE_GetApartmentUsableArea = 
       Choice.create("GetApartmentUsableArea", value$ -> value$.toValue(), value$ ->
@@ -77,6 +82,11 @@ public final class ApartmentProperty {
       Choice.create("GetApartmentPropertyDistrict", value$ -> value$.toValue(), value$ ->
         GetApartmentPropertyDistrict.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromText.decode(value$));
+
+  public static final Choice<ApartmentProperty, GetApartmentPhotoReferences, List<String>> CHOICE_GetApartmentPhotoReferences = 
+      Choice.create("GetApartmentPhotoReferences", value$ -> value$.toValue(), value$ ->
+        GetApartmentPhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromList(PrimitiveValueDecoders.fromText).decode(value$));
 
   public static final Choice<ApartmentProperty, GetApartmentInstalledEquipment, String> CHOICE_GetApartmentInstalledEquipment = 
       Choice.create("GetApartmentInstalledEquipment", value$ -> value$.toValue(), value$ ->
@@ -241,6 +251,16 @@ public final class ApartmentProperty {
       return exerciseGetApartmentBathrooms(new GetApartmentBathrooms());
     }
 
+    default Update<Exercised<ContractId>> exerciseSetApartmentPhotoReferences(
+        SetApartmentPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_SetApartmentPhotoReferences, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetApartmentPhotoReferences(
+        List<String> newPhotoReferences) {
+      return exerciseSetApartmentPhotoReferences(new SetApartmentPhotoReferences(newPhotoReferences));
+    }
+
     default Update<Exercised<BigDecimal>> exerciseGetApartmentUsableArea(
         GetApartmentUsableArea arg) {
       return makeExerciseCmd(CHOICE_GetApartmentUsableArea, arg);
@@ -317,6 +337,15 @@ public final class ApartmentProperty {
 
     default Update<Exercised<String>> exerciseGetApartmentPropertyDistrict() {
       return exerciseGetApartmentPropertyDistrict(new GetApartmentPropertyDistrict());
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetApartmentPhotoReferences(
+        GetApartmentPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_GetApartmentPhotoReferences, arg);
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetApartmentPhotoReferences() {
+      return exerciseGetApartmentPhotoReferences(new GetApartmentPhotoReferences());
     }
 
     default Update<Exercised<String>> exerciseGetApartmentInstalledEquipment(
@@ -594,10 +623,11 @@ public final class ApartmentProperty {
             View::fromJson,List.of(CHOICE_SetApartmentPropertyCounty, CHOICE_GetApartmentFloor,
             CHOICE_GetApartmentElevator, CHOICE_GetView, CHOICE_SetApartmentBedrooms,
             CHOICE_SetApartmentElevator, CHOICE_SetApartmentUsableArea,
-            CHOICE_SetApartmentGrossArea, CHOICE_GetApartmentInstrumentKey,
-            CHOICE_SetApartmentBuildDate, CHOICE_Remove, CHOICE_GetApartmentBuildDate,
-            CHOICE_GetApartmentParkingSpaces, CHOICE_SetApartmentPropertyDistrict,
-            CHOICE_GetApartmentInstalledEquipment, CHOICE_SetApartmentPrice,
+            CHOICE_SetApartmentPhotoReferences, CHOICE_SetApartmentGrossArea,
+            CHOICE_GetApartmentInstrumentKey, CHOICE_SetApartmentBuildDate, CHOICE_Remove,
+            CHOICE_GetApartmentBuildDate, CHOICE_SetApartmentPropertyDistrict,
+            CHOICE_GetApartmentInstalledEquipment, CHOICE_GetApartmentPhotoReferences,
+            CHOICE_GetApartmentParkingSpaces, CHOICE_SetApartmentPrice,
             CHOICE_SetApartmentPropertyPostalCode, CHOICE_SetApartmentBathrooms,
             CHOICE_GetApartmentAdditionalInformation, CHOICE_SetApartmentInstalledEquipment,
             CHOICE_Archive, CHOICE_GetApartmentPropertyDistrict, CHOICE_SetApartmentParkingSpaces,

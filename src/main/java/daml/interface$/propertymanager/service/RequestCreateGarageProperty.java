@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageProperty> {
-  public static final String _packageId = "f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d";
+  public static final String _packageId = "8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f";
 
   public final Id id;
 
@@ -62,13 +62,15 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
 
   public final String description;
 
+  public final List<String> photoReferences;
+
   public final Map<String, Set<String>> observers;
 
   public RequestCreateGarageProperty(Id id, InstrumentKey garageInstrument, BigDecimal garagePrice,
       String propertyAddress, String propertyPostalCode, String propertyDistrict,
       String propertyCounty, BigDecimal garageArea, GarageType garageType, Long vehicleCapacity,
       String installedEquipment, String additionalInformation, String description,
-      Map<String, Set<String>> observers) {
+      List<String> photoReferences, Map<String, Set<String>> observers) {
     this.id = id;
     this.garageInstrument = garageInstrument;
     this.garagePrice = garagePrice;
@@ -82,6 +84,7 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
     this.installedEquipment = installedEquipment;
     this.additionalInformation = additionalInformation;
     this.description = description;
+    this.photoReferences = photoReferences;
     this.observers = observers;
   }
 
@@ -98,7 +101,7 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
       IllegalArgumentException {
     return value$ -> {
       Value recordValue$ = value$;
-      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(14,0,
+      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(15,0,
           recordValue$);
       Id id = Id.valueDecoder().decode(fields$.get(0).getValue());
       InstrumentKey garageInstrument = InstrumentKey.valueDecoder()
@@ -116,18 +119,21 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
       String additionalInformation = PrimitiveValueDecoders.fromText
           .decode(fields$.get(11).getValue());
       String description = PrimitiveValueDecoders.fromText.decode(fields$.get(12).getValue());
+      List<String> photoReferences = PrimitiveValueDecoders.fromList(
+            PrimitiveValueDecoders.fromText).decode(fields$.get(13).getValue());
       Map<String, Set<String>> observers = PrimitiveValueDecoders.fromGenMap(
             PrimitiveValueDecoders.fromText,
             Set.<java.lang.String>valueDecoder(PrimitiveValueDecoders.fromParty))
-          .decode(fields$.get(13).getValue());
+          .decode(fields$.get(14).getValue());
       return new RequestCreateGarageProperty(id, garageInstrument, garagePrice, propertyAddress,
           propertyPostalCode, propertyDistrict, propertyCounty, garageArea, garageType,
-          vehicleCapacity, installedEquipment, additionalInformation, description, observers);
+          vehicleCapacity, installedEquipment, additionalInformation, description, photoReferences,
+          observers);
     } ;
   }
 
   public com.daml.ledger.javaapi.data.DamlRecord toValue() {
-    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(14);
+    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(15);
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("id", this.id.toValue()));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("garageInstrument", this.garageInstrument.toValue()));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("garagePrice", new Numeric(this.garagePrice)));
@@ -141,6 +147,7 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("installedEquipment", new Text(this.installedEquipment)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("additionalInformation", new Text(this.additionalInformation)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("description", new Text(this.description)));
+    fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("photoReferences", this.photoReferences.stream().collect(DamlCollectors.toDamlList(v$0 -> new Text(v$0)))));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("observers", this.observers.entrySet()
         .stream()
         .collect(DamlCollectors.toDamlGenMap(v$0 -> new Text(v$0.getKey()), v$0 -> v$0.getValue().toValue(v$1 -> new Party(v$1))))));
@@ -148,7 +155,7 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
   }
 
   public static JsonLfDecoder<RequestCreateGarageProperty> jsonDecoder() {
-    return JsonLfDecoders.record(Arrays.asList("id", "garageInstrument", "garagePrice", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "garageArea", "garageType", "vehicleCapacity", "installedEquipment", "additionalInformation", "description", "observers"), name -> {
+    return JsonLfDecoders.record(Arrays.asList("id", "garageInstrument", "garagePrice", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "garageArea", "garageType", "vehicleCapacity", "installedEquipment", "additionalInformation", "description", "photoReferences", "observers"), name -> {
           switch (name) {
             case "id": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(0, daml.daml.finance.interface$.types.common.types.Id.jsonDecoder());
             case "garageInstrument": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(1, daml.daml.finance.interface$.types.common.types.InstrumentKey.jsonDecoder());
@@ -163,11 +170,12 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
             case "installedEquipment": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(10, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "additionalInformation": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(11, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "description": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(12, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
-            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(13, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
+            case "photoReferences": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(13, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.list(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text));
+            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(14, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
             default: return null;
           }
         }
-        , (Object[] args) -> new RequestCreateGarageProperty(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13])));
+        , (Object[] args) -> new RequestCreateGarageProperty(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14])));
   }
 
   public static RequestCreateGarageProperty fromJson(String json) throws JsonLfDecoder.Error {
@@ -188,6 +196,7 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
         JsonLfEncoders.Field.of("installedEquipment", apply(JsonLfEncoders::text, installedEquipment)),
         JsonLfEncoders.Field.of("additionalInformation", apply(JsonLfEncoders::text, additionalInformation)),
         JsonLfEncoders.Field.of("description", apply(JsonLfEncoders::text, description)),
+        JsonLfEncoders.Field.of("photoReferences", apply(JsonLfEncoders.list(JsonLfEncoders::text), photoReferences)),
         JsonLfEncoders.Field.of("observers", apply(JsonLfEncoders.genMap(JsonLfEncoders::text, _x1 -> _x1.jsonEncoder(JsonLfEncoders::party)), observers)));
   }
 
@@ -216,6 +225,7 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
         Objects.equals(this.installedEquipment, other.installedEquipment) &&
         Objects.equals(this.additionalInformation, other.additionalInformation) &&
         Objects.equals(this.description, other.description) &&
+        Objects.equals(this.photoReferences, other.photoReferences) &&
         Objects.equals(this.observers, other.observers);
   }
 
@@ -224,15 +234,15 @@ public class RequestCreateGarageProperty extends DamlRecord<RequestCreateGarageP
     return Objects.hash(this.id, this.garageInstrument, this.garagePrice, this.propertyAddress,
         this.propertyPostalCode, this.propertyDistrict, this.propertyCounty, this.garageArea,
         this.garageType, this.vehicleCapacity, this.installedEquipment, this.additionalInformation,
-        this.description, this.observers);
+        this.description, this.photoReferences, this.observers);
   }
 
   @Override
   public String toString() {
-    return String.format("daml.interface$.propertymanager.service.RequestCreateGarageProperty(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    return String.format("daml.interface$.propertymanager.service.RequestCreateGarageProperty(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         this.id, this.garageInstrument, this.garagePrice, this.propertyAddress,
         this.propertyPostalCode, this.propertyDistrict, this.propertyCounty, this.garageArea,
         this.garageType, this.vehicleCapacity, this.installedEquipment, this.additionalInformation,
-        this.description, this.observers);
+        this.description, this.photoReferences, this.observers);
   }
 }

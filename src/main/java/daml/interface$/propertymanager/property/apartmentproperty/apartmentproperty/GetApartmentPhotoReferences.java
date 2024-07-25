@@ -1,4 +1,4 @@
-package daml.test.unit.garagepropertymanager;
+package daml.interface$.propertymanager.property.apartmentproperty.apartmentproperty;
 
 import static com.daml.ledger.javaapi.data.codegen.json.JsonLfEncoders.apply;
 
@@ -21,26 +21,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Setup extends DamlRecord<Setup> {
-  public static final String _packageId = "f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d";
+public class GetApartmentPhotoReferences extends DamlRecord<GetApartmentPhotoReferences> {
+  public static final String _packageId = "8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f";
 
-  public Setup() {
+  public GetApartmentPhotoReferences() {
   }
 
   /**
    * @deprecated since Daml 2.5.0; use {@code valueDecoder} instead
    */
   @Deprecated
-  public static Setup fromValue(Value value$) throws IllegalArgumentException {
+  public static GetApartmentPhotoReferences fromValue(Value value$) throws
+      IllegalArgumentException {
     return valueDecoder().decode(value$);
   }
 
-  public static ValueDecoder<Setup> valueDecoder() throws IllegalArgumentException {
+  public static ValueDecoder<GetApartmentPhotoReferences> valueDecoder() throws
+      IllegalArgumentException {
     return value$ -> {
       Value recordValue$ = value$;
       List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(0,0,
           recordValue$);
-      return new Setup();
+      return new GetApartmentPhotoReferences();
     } ;
   }
 
@@ -49,16 +51,16 @@ public class Setup extends DamlRecord<Setup> {
     return new com.daml.ledger.javaapi.data.DamlRecord(fields);
   }
 
-  public static JsonLfDecoder<Setup> jsonDecoder() {
+  public static JsonLfDecoder<GetApartmentPhotoReferences> jsonDecoder() {
     return JsonLfDecoders.record(Arrays.asList(), name -> {
           switch (name) {
             default: return null;
           }
         }
-        , (Object[] args) -> new Setup());
+        , (Object[] args) -> new GetApartmentPhotoReferences());
   }
 
-  public static Setup fromJson(String json) throws JsonLfDecoder.Error {
+  public static GetApartmentPhotoReferences fromJson(String json) throws JsonLfDecoder.Error {
     return jsonDecoder().decode(new JsonLfReader(json));
   }
 
@@ -74,7 +76,7 @@ public class Setup extends DamlRecord<Setup> {
     if (object == null) {
       return false;
     }
-    if (!(object instanceof Setup)) {
+    if (!(object instanceof GetApartmentPhotoReferences)) {
       return false;
     }
     return true;
@@ -87,6 +89,6 @@ public class Setup extends DamlRecord<Setup> {
 
   @Override
   public String toString() {
-    return "daml.test.unit.garagepropertymanager.Setup";
+    return "daml.interface$.propertymanager.property.apartmentproperty.apartmentproperty.GetApartmentPhotoReferences";
   }
 }

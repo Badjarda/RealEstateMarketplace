@@ -54,7 +54,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class UserProfile extends Template {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "App.ProfileManager.UserProfile", "UserProfile");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "App.ProfileManager.UserProfile", "UserProfile");
 
   public static final Choice<UserProfile, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->
@@ -101,13 +101,15 @@ public final class UserProfile extends Template {
 
   public final Long socialSecurityId;
 
+  public final List<String> photoReferences;
+
   public final Map<String, Set<String>> observers;
 
   public UserProfile(String operator, String user, Id id, String username, String firstName,
       String lastName, String fullName, String password, LocalDate birthday,
       Optional<Gender> gender, Nationality nationality, String contactMail,
       Optional<Long> cellphoneNumber, Long idNumber, Long taxId, Long socialSecurityId,
-      Map<String, Set<String>> observers) {
+      List<String> photoReferences, Map<String, Set<String>> observers) {
     this.operator = operator;
     this.user = user;
     this.id = id;
@@ -124,6 +126,7 @@ public final class UserProfile extends Template {
     this.idNumber = idNumber;
     this.taxId = taxId;
     this.socialSecurityId = socialSecurityId;
+    this.photoReferences = photoReferences;
     this.observers = observers;
   }
 
@@ -169,10 +172,10 @@ public final class UserProfile extends Template {
       String username, String firstName, String lastName, String fullName, String password,
       LocalDate birthday, Optional<Gender> gender, Nationality nationality, String contactMail,
       Optional<Long> cellphoneNumber, Long idNumber, Long taxId, Long socialSecurityId,
-      Map<String, Set<String>> observers) {
+      List<String> photoReferences, Map<String, Set<String>> observers) {
     return new UserProfile(operator, user, id, username, firstName, lastName, fullName, password,
         birthday, gender, nationality, contactMail, cellphoneNumber, idNumber, taxId,
-        socialSecurityId, observers).create();
+        socialSecurityId, photoReferences, observers).create();
   }
 
   @Override
@@ -199,7 +202,7 @@ public final class UserProfile extends Template {
   }
 
   public DamlRecord toValue() {
-    ArrayList<DamlRecord.Field> fields = new ArrayList<DamlRecord.Field>(17);
+    ArrayList<DamlRecord.Field> fields = new ArrayList<DamlRecord.Field>(18);
     fields.add(new DamlRecord.Field("operator", new Party(this.operator)));
     fields.add(new DamlRecord.Field("user", new Party(this.user)));
     fields.add(new DamlRecord.Field("id", this.id.toValue()));
@@ -216,6 +219,7 @@ public final class UserProfile extends Template {
     fields.add(new DamlRecord.Field("idNumber", new Int64(this.idNumber)));
     fields.add(new DamlRecord.Field("taxId", new Int64(this.taxId)));
     fields.add(new DamlRecord.Field("socialSecurityId", new Int64(this.socialSecurityId)));
+    fields.add(new DamlRecord.Field("photoReferences", this.photoReferences.stream().collect(DamlCollectors.toDamlList(v$0 -> new Text(v$0)))));
     fields.add(new DamlRecord.Field("observers", this.observers.entrySet().stream()
         .collect(DamlCollectors.toDamlGenMap(v$0 -> new Text(v$0.getKey()), v$0 -> v$0.getValue().toValue(v$1 -> new Party(v$1))))));
     return new DamlRecord(fields);
@@ -224,7 +228,7 @@ public final class UserProfile extends Template {
   private static ValueDecoder<UserProfile> templateValueDecoder() throws IllegalArgumentException {
     return value$ -> {
       Value recordValue$ = value$;
-      List<DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(17,0, recordValue$);
+      List<DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(18,0, recordValue$);
       String operator = PrimitiveValueDecoders.fromParty.decode(fields$.get(0).getValue());
       String user = PrimitiveValueDecoders.fromParty.decode(fields$.get(1).getValue());
       Id id = Id.valueDecoder().decode(fields$.get(2).getValue());
@@ -243,18 +247,20 @@ public final class UserProfile extends Template {
       Long idNumber = PrimitiveValueDecoders.fromInt64.decode(fields$.get(13).getValue());
       Long taxId = PrimitiveValueDecoders.fromInt64.decode(fields$.get(14).getValue());
       Long socialSecurityId = PrimitiveValueDecoders.fromInt64.decode(fields$.get(15).getValue());
+      List<String> photoReferences = PrimitiveValueDecoders.fromList(
+            PrimitiveValueDecoders.fromText).decode(fields$.get(16).getValue());
       Map<String, Set<String>> observers = PrimitiveValueDecoders.fromGenMap(
             PrimitiveValueDecoders.fromText,
             Set.<java.lang.String>valueDecoder(PrimitiveValueDecoders.fromParty))
-          .decode(fields$.get(16).getValue());
+          .decode(fields$.get(17).getValue());
       return new UserProfile(operator, user, id, username, firstName, lastName, fullName, password,
           birthday, gender, nationality, contactMail, cellphoneNumber, idNumber, taxId,
-          socialSecurityId, observers);
+          socialSecurityId, photoReferences, observers);
     } ;
   }
 
   public static JsonLfDecoder<UserProfile> jsonDecoder() {
-    return JsonLfDecoders.record(Arrays.asList("operator", "user", "id", "username", "firstName", "lastName", "fullName", "password", "birthday", "gender", "nationality", "contactMail", "cellphoneNumber", "idNumber", "taxId", "socialSecurityId", "observers"), name -> {
+    return JsonLfDecoders.record(Arrays.asList("operator", "user", "id", "username", "firstName", "lastName", "fullName", "password", "birthday", "gender", "nationality", "contactMail", "cellphoneNumber", "idNumber", "taxId", "socialSecurityId", "photoReferences", "observers"), name -> {
           switch (name) {
             case "operator": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(0, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party);
             case "user": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(1, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party);
@@ -272,11 +278,12 @@ public final class UserProfile extends Template {
             case "idNumber": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(13, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.int64);
             case "taxId": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(14, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.int64);
             case "socialSecurityId": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(15, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.int64);
-            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(16, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
+            case "photoReferences": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(16, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.list(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text));
+            case "observers": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(17, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.genMap(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text, daml.da.set.types.Set.jsonDecoder(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party)));
             default: return null;
           }
         }
-        , (Object[] args) -> new UserProfile(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15]), JsonLfDecoders.cast(args[16])));
+        , (Object[] args) -> new UserProfile(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15]), JsonLfDecoders.cast(args[16]), JsonLfDecoders.cast(args[17])));
   }
 
   public static UserProfile fromJson(String json) throws JsonLfDecoder.Error {
@@ -301,6 +308,7 @@ public final class UserProfile extends Template {
         JsonLfEncoders.Field.of("idNumber", apply(JsonLfEncoders::int64, idNumber)),
         JsonLfEncoders.Field.of("taxId", apply(JsonLfEncoders::int64, taxId)),
         JsonLfEncoders.Field.of("socialSecurityId", apply(JsonLfEncoders::int64, socialSecurityId)),
+        JsonLfEncoders.Field.of("photoReferences", apply(JsonLfEncoders.list(JsonLfEncoders::text), photoReferences)),
         JsonLfEncoders.Field.of("observers", apply(JsonLfEncoders.genMap(JsonLfEncoders::text, _x1 -> _x1.jsonEncoder(JsonLfEncoders::party)), observers)));
   }
 
@@ -333,6 +341,7 @@ public final class UserProfile extends Template {
         Objects.equals(this.cellphoneNumber, other.cellphoneNumber) &&
         Objects.equals(this.idNumber, other.idNumber) && Objects.equals(this.taxId, other.taxId) &&
         Objects.equals(this.socialSecurityId, other.socialSecurityId) &&
+        Objects.equals(this.photoReferences, other.photoReferences) &&
         Objects.equals(this.observers, other.observers);
   }
 
@@ -341,16 +350,16 @@ public final class UserProfile extends Template {
     return Objects.hash(this.operator, this.user, this.id, this.username, this.firstName,
         this.lastName, this.fullName, this.password, this.birthday, this.gender, this.nationality,
         this.contactMail, this.cellphoneNumber, this.idNumber, this.taxId, this.socialSecurityId,
-        this.observers);
+        this.photoReferences, this.observers);
   }
 
   @Override
   public String toString() {
-    return String.format("daml.app.profilemanager.userprofile.UserProfile(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    return String.format("daml.app.profilemanager.userprofile.UserProfile(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         this.operator, this.user, this.id, this.username, this.firstName, this.lastName,
         this.fullName, this.password, this.birthday, this.gender, this.nationality,
         this.contactMail, this.cellphoneNumber, this.idNumber, this.taxId, this.socialSecurityId,
-        this.observers);
+        this.photoReferences, this.observers);
   }
 
   /**

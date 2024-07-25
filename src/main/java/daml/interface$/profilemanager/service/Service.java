@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public final class Service {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.ProfileManager.Service", "Service");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.ProfileManager.Service", "Service");
 
   public static final Choice<Service, UpdateSocialSecurityId, Unit> CHOICE_UpdateSocialSecurityId = 
       Choice.create("UpdateSocialSecurityId", value$ -> value$.toValue(), value$ ->
@@ -41,6 +41,11 @@ public final class Service {
       Choice.create("UpdateNationality", value$ -> value$.toValue(), value$ ->
         UpdateNationality.valueDecoder().decode(value$), value$ -> PrimitiveValueDecoders.fromUnit
         .decode(value$));
+
+  public static final Choice<Service, UpdatePhotoReferences, Unit> CHOICE_UpdatePhotoReferences = 
+      Choice.create("UpdatePhotoReferences", value$ -> value$.toValue(), value$ ->
+        UpdatePhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromUnit.decode(value$));
 
   public static final Choice<Service, UpdateLastName, Unit> CHOICE_UpdateLastName = 
       Choice.create("UpdateLastName", value$ -> value$.toValue(), value$ ->
@@ -150,6 +155,16 @@ public final class Service {
     default Update<Exercised<Unit>> exerciseUpdateNationality(Nationality newNationality,
         UserProfileKey userProfileKey) {
       return exerciseUpdateNationality(new UpdateNationality(newNationality, userProfileKey));
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdatePhotoReferences(UpdatePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_UpdatePhotoReferences, arg);
+    }
+
+    default Update<Exercised<Unit>> exerciseUpdatePhotoReferences(List<String> newPhotoReferences,
+        UserProfileKey userProfileKey) {
+      return exerciseUpdatePhotoReferences(new UpdatePhotoReferences(newPhotoReferences,
+          userProfileKey));
     }
 
     default Update<Exercised<Unit>> exerciseUpdateLastName(UpdateLastName arg) {
@@ -269,10 +284,10 @@ public final class Service {
         Id id, String username, String firstName, String lastName, String fullName, String password,
         LocalDate birthday, Optional<Gender> gender, Nationality nationality, String contactMail,
         Optional<Long> cellphoneNumber, Long idNumber, Long taxId, Long socialSecurityId,
-        Map<String, Set<String>> observers) {
+        List<String> photoReferences, Map<String, Set<String>> observers) {
       return exerciseRequestCreateUserProfile(new RequestCreateUserProfile(id, username, firstName,
           lastName, fullName, password, birthday, gender, nationality, contactMail, cellphoneNumber,
-          idNumber, taxId, socialSecurityId, observers));
+          idNumber, taxId, socialSecurityId, photoReferences, observers));
     }
 
     default Update<Exercised<Unit>> exerciseUpdateContactMail(UpdateContactMail arg) {
@@ -316,9 +331,9 @@ public final class Service {
             View::fromJson,List.of(CHOICE_UpdateGender, CHOICE_UpdateContactMail,
             CHOICE_UpdateTaxId, CHOICE_CreateUserProfile, CHOICE_UpdateBirthday,
             CHOICE_UpdatePassword, CHOICE_UpdateFirstName, CHOICE_UpdateCellphoneNumber,
-            CHOICE_UpdateSocialSecurityId, CHOICE_UpdateIdNumber, CHOICE_UpdateNationality,
-            CHOICE_UpdateFullName, CHOICE_Archive, CHOICE_UpdateUsername, CHOICE_UpdateLastName,
-            CHOICE_RequestCreateUserProfile));
+            CHOICE_UpdateSocialSecurityId, CHOICE_UpdateNationality, CHOICE_UpdateFullName,
+            CHOICE_Archive, CHOICE_UpdateUsername, CHOICE_UpdatePhotoReferences,
+            CHOICE_UpdateIdNumber, CHOICE_UpdateLastName, CHOICE_RequestCreateUserProfile));
     }
   }
 }

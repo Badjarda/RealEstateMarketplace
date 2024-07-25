@@ -21,7 +21,7 @@ import java.lang.String;
 import java.util.List;
 
 public final class RequestCreateApartmentProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Choices.RequestCreateApartmentProperty", "RequestCreateApartmentProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Choices.RequestCreateApartmentProperty", "RequestCreateApartmentProperty");
 
   public static final Choice<RequestCreateApartmentProperty, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->

@@ -27,12 +27,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public final class LandProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Property.LandProperty.LandProperty", "LandProperty");
-
-  public static final Choice<LandProperty, SetLandType, ContractId> CHOICE_SetLandType = 
-      Choice.create("SetLandType", value$ -> value$.toValue(), value$ -> SetLandType.valueDecoder()
-        .decode(value$), value$ ->
-        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Property.LandProperty.LandProperty", "LandProperty");
 
   public static final Choice<LandProperty, GetLandViableConstructionTypes, List<ViableConstructionTypes>> CHOICE_GetLandViableConstructionTypes = 
       Choice.create("GetLandViableConstructionTypes", value$ -> value$.toValue(), value$ ->
@@ -76,6 +71,21 @@ public final class LandProperty {
       Choice.create("GetLandMinimumSurfaceForSale", value$ -> value$.toValue(), value$ ->
         GetLandMinimumSurfaceForSale.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromNumeric.decode(value$));
+
+  public static final Choice<LandProperty, GetLandPhotoReferences, List<String>> CHOICE_GetLandPhotoReferences = 
+      Choice.create("GetLandPhotoReferences", value$ -> value$.toValue(), value$ ->
+        GetLandPhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromList(PrimitiveValueDecoders.fromText).decode(value$));
+
+  public static final Choice<LandProperty, SetLandType, ContractId> CHOICE_SetLandType = 
+      Choice.create("SetLandType", value$ -> value$.toValue(), value$ -> SetLandType.valueDecoder()
+        .decode(value$), value$ ->
+        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
+
+  public static final Choice<LandProperty, SetLandPhotoReferences, ContractId> CHOICE_SetLandPhotoReferences = 
+      Choice.create("SetLandPhotoReferences", value$ -> value$.toValue(), value$ ->
+        SetLandPhotoReferences.valueDecoder().decode(value$), value$ ->
+        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
 
   public static final Choice<LandProperty, GetLandBuildableArea, BigDecimal> CHOICE_GetLandBuildableArea = 
       Choice.create("GetLandBuildableArea", value$ -> value$.toValue(), value$ ->
@@ -223,14 +233,6 @@ public final class LandProperty {
   }
 
   public interface Exercises<Cmd> extends com.daml.ledger.javaapi.data.codegen.Exercises.Archive<Cmd> {
-    default Update<Exercised<ContractId>> exerciseSetLandType(SetLandType arg) {
-      return makeExerciseCmd(CHOICE_SetLandType, arg);
-    }
-
-    default Update<Exercised<ContractId>> exerciseSetLandType(LandType newLandType) {
-      return exerciseSetLandType(new SetLandType(newLandType));
-    }
-
     default Update<Exercised<List<ViableConstructionTypes>>> exerciseGetLandViableConstructionTypes(
         GetLandViableConstructionTypes arg) {
       return makeExerciseCmd(CHOICE_GetLandViableConstructionTypes, arg);
@@ -307,6 +309,33 @@ public final class LandProperty {
 
     default Update<Exercised<BigDecimal>> exerciseGetLandMinimumSurfaceForSale() {
       return exerciseGetLandMinimumSurfaceForSale(new GetLandMinimumSurfaceForSale());
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetLandPhotoReferences(
+        GetLandPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_GetLandPhotoReferences, arg);
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetLandPhotoReferences() {
+      return exerciseGetLandPhotoReferences(new GetLandPhotoReferences());
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetLandType(SetLandType arg) {
+      return makeExerciseCmd(CHOICE_SetLandType, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetLandType(LandType newLandType) {
+      return exerciseSetLandType(new SetLandType(newLandType));
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetLandPhotoReferences(
+        SetLandPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_SetLandPhotoReferences, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetLandPhotoReferences(
+        List<String> newPhotoReferences) {
+      return exerciseSetLandPhotoReferences(new SetLandPhotoReferences(newPhotoReferences));
     }
 
     default Update<Exercised<BigDecimal>> exerciseGetLandBuildableArea(GetLandBuildableArea arg) {
@@ -565,7 +594,8 @@ public final class LandProperty {
             CHOICE_SetLandAdditionalInformation, CHOICE_SetLandDescription,
             CHOICE_GetLandDescription, CHOICE_GetLandType, CHOICE_SetLandInstalledEquipment,
             CHOICE_Remove, CHOICE_GetLandInstrumentKey, CHOICE_GetLandInstalledEquipment,
-            CHOICE_SetLandPropertyAddress, CHOICE_SetLandAccessByRoad, CHOICE_GetLandPropertyCounty,
+            CHOICE_SetLandPropertyAddress, CHOICE_SetLandPhotoReferences,
+            CHOICE_GetLandPhotoReferences, CHOICE_SetLandAccessByRoad, CHOICE_GetLandPropertyCounty,
             CHOICE_SetLandType, CHOICE_SetLandPropertyCounty, CHOICE_GetLandAdditionalInformation,
             CHOICE_SetLandViableConstructionTypes, CHOICE_GetLandPropertyAddress,
             CHOICE_GetLandViableConstructionTypes, CHOICE_SetLandMinimumSurfaceForSale,

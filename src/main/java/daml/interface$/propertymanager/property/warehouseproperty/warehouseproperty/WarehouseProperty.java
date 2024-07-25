@@ -26,17 +26,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 public final class WarehouseProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty", "WarehouseProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty", "WarehouseProperty");
 
   public static final Choice<WarehouseProperty, SetWarehousePropertyAddress, ContractId> CHOICE_SetWarehousePropertyAddress = 
       Choice.create("SetWarehousePropertyAddress", value$ -> value$.toValue(), value$ ->
         SetWarehousePropertyAddress.valueDecoder().decode(value$), value$ ->
         new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
 
-  public static final Choice<WarehouseProperty, GetWarehousePrice, BigDecimal> CHOICE_GetWarehousePrice = 
-      Choice.create("GetWarehousePrice", value$ -> value$.toValue(), value$ ->
-        GetWarehousePrice.valueDecoder().decode(value$), value$ ->
-        PrimitiveValueDecoders.fromNumeric.decode(value$));
+  public static final Choice<WarehouseProperty, SetWarehousePhotoReferences, ContractId> CHOICE_SetWarehousePhotoReferences = 
+      Choice.create("SetWarehousePhotoReferences", value$ -> value$.toValue(), value$ ->
+        SetWarehousePhotoReferences.valueDecoder().decode(value$), value$ ->
+        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
 
   public static final Choice<WarehouseProperty, GetView, View> CHOICE_GetView = 
       Choice.create("GetView", value$ -> value$.toValue(), value$ -> GetView.valueDecoder()
@@ -71,6 +71,16 @@ public final class WarehouseProperty {
       Choice.create("SetWarehouseGrossArea", value$ -> value$.toValue(), value$ ->
         SetWarehouseGrossArea.valueDecoder().decode(value$), value$ ->
         new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
+
+  public static final Choice<WarehouseProperty, GetWarehousePhotoReferences, List<String>> CHOICE_GetWarehousePhotoReferences = 
+      Choice.create("GetWarehousePhotoReferences", value$ -> value$.toValue(), value$ ->
+        GetWarehousePhotoReferences.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromList(PrimitiveValueDecoders.fromText).decode(value$));
+
+  public static final Choice<WarehouseProperty, GetWarehousePrice, BigDecimal> CHOICE_GetWarehousePrice = 
+      Choice.create("GetWarehousePrice", value$ -> value$.toValue(), value$ ->
+        GetWarehousePrice.valueDecoder().decode(value$), value$ ->
+        PrimitiveValueDecoders.fromNumeric.decode(value$));
 
   public static final Choice<WarehouseProperty, GetWarehouseFloors, Long> CHOICE_GetWarehouseFloors = 
       Choice.create("GetWarehouseFloors", value$ -> value$.toValue(), value$ ->
@@ -213,12 +223,14 @@ public final class WarehouseProperty {
       return exerciseSetWarehousePropertyAddress(new SetWarehousePropertyAddress(newWarehousePropertyAddress));
     }
 
-    default Update<Exercised<BigDecimal>> exerciseGetWarehousePrice(GetWarehousePrice arg) {
-      return makeExerciseCmd(CHOICE_GetWarehousePrice, arg);
+    default Update<Exercised<ContractId>> exerciseSetWarehousePhotoReferences(
+        SetWarehousePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_SetWarehousePhotoReferences, arg);
     }
 
-    default Update<Exercised<BigDecimal>> exerciseGetWarehousePrice() {
-      return exerciseGetWarehousePrice(new GetWarehousePrice());
+    default Update<Exercised<ContractId>> exerciseSetWarehousePhotoReferences(
+        List<String> newPhotoReferences) {
+      return exerciseSetWarehousePhotoReferences(new SetWarehousePhotoReferences(newPhotoReferences));
     }
 
     default Update<Exercised<View>> exerciseGetView(GetView arg) {
@@ -278,6 +290,23 @@ public final class WarehouseProperty {
     default Update<Exercised<ContractId>> exerciseSetWarehouseGrossArea(
         BigDecimal newWarehouseGrossArea) {
       return exerciseSetWarehouseGrossArea(new SetWarehouseGrossArea(newWarehouseGrossArea));
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetWarehousePhotoReferences(
+        GetWarehousePhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_GetWarehousePhotoReferences, arg);
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetWarehousePhotoReferences() {
+      return exerciseGetWarehousePhotoReferences(new GetWarehousePhotoReferences());
+    }
+
+    default Update<Exercised<BigDecimal>> exerciseGetWarehousePrice(GetWarehousePrice arg) {
+      return makeExerciseCmd(CHOICE_GetWarehousePrice, arg);
+    }
+
+    default Update<Exercised<BigDecimal>> exerciseGetWarehousePrice() {
+      return exerciseGetWarehousePrice(new GetWarehousePrice());
     }
 
     default Update<Exercised<Long>> exerciseGetWarehouseFloors(GetWarehouseFloors arg) {
@@ -514,14 +543,16 @@ public final class WarehouseProperty {
             CHOICE_SetWarehousePropertyDistrict, CHOICE_GetWarehouseDescription,
             CHOICE_SetWarehouseInstalledEquipment, CHOICE_SetWarehouseGrossArea, CHOICE_Archive,
             CHOICE_GetWarehouseInstalledEquipment, CHOICE_SetWarehouseDescription,
-            CHOICE_GetWarehouseType, CHOICE_GetWarehouseBuildDate,
-            CHOICE_GetWarehousePropertyPostalCode, CHOICE_Remove, CHOICE_GetWarehouseUsableArea,
-            CHOICE_GetWarehousePropertyCounty, CHOICE_SetWarehouseUsableArea,
-            CHOICE_GetWarehouseFloors, CHOICE_SetWarehousePropertyAddress, CHOICE_GetView,
+            CHOICE_SetWarehousePhotoReferences, CHOICE_GetWarehouseType,
+            CHOICE_GetWarehouseBuildDate, CHOICE_GetWarehousePropertyPostalCode, CHOICE_Remove,
+            CHOICE_GetWarehouseUsableArea, CHOICE_GetWarehousePropertyCounty,
+            CHOICE_SetWarehouseUsableArea, CHOICE_GetWarehouseFloors,
+            CHOICE_SetWarehousePropertyAddress, CHOICE_GetView,
             CHOICE_SetWarehousePropertyPostalCode, CHOICE_GetWarehousePrice,
             CHOICE_GetWarehouseInstrumentKey, CHOICE_SetWarehouseFloors,
             CHOICE_SetWarehouseInstrumentKey, CHOICE_GetWarehousePropertyDistrict,
-            CHOICE_GetWarehouseAdditionalInformation, CHOICE_SetWarehouseType));
+            CHOICE_GetWarehouseAdditionalInformation, CHOICE_GetWarehousePhotoReferences,
+            CHOICE_SetWarehouseType));
     }
   }
 }

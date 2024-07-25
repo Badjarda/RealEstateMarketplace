@@ -2,6 +2,7 @@ package daml.interface$.propertymanager.property.residenceproperty.residenceprop
 
 import static com.daml.ledger.javaapi.data.codegen.json.JsonLfEncoders.apply;
 
+import com.daml.ledger.javaapi.data.DamlCollectors;
 import com.daml.ledger.javaapi.data.Date;
 import com.daml.ledger.javaapi.data.Int64;
 import com.daml.ledger.javaapi.data.Numeric;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class View extends DamlRecord<View> {
-  public static final String _packageId = "f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d";
+  public static final String _packageId = "8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f";
 
   public final String operator;
 
@@ -81,12 +82,14 @@ public class View extends DamlRecord<View> {
 
   public final String description;
 
+  public final List<String> photoReferences;
+
   public View(String operator, String user, Id id, InstrumentKey instrument,
       BigDecimal residencePrice, String propertyAddress, String propertyPostalCode,
       String propertyDistrict, String propertyCounty, BigDecimal grossArea, BigDecimal usableArea,
       Long bedrooms, Long bathrooms, Long floors, ResidenceType residenceType, String backyard,
       Parking parking, LocalDate buildDate, Orientation orientation, String installedEquipment,
-      String additionalInformation, String description) {
+      String additionalInformation, String description, List<String> photoReferences) {
     this.operator = operator;
     this.user = user;
     this.id = id;
@@ -109,6 +112,7 @@ public class View extends DamlRecord<View> {
     this.installedEquipment = installedEquipment;
     this.additionalInformation = additionalInformation;
     this.description = description;
+    this.photoReferences = photoReferences;
   }
 
   /**
@@ -122,7 +126,7 @@ public class View extends DamlRecord<View> {
   public static ValueDecoder<View> valueDecoder() throws IllegalArgumentException {
     return value$ -> {
       Value recordValue$ = value$;
-      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(22,0,
+      List<com.daml.ledger.javaapi.data.DamlRecord.Field> fields$ = PrimitiveValueDecoders.recordCheck(23,0,
           recordValue$);
       String operator = PrimitiveValueDecoders.fromParty.decode(fields$.get(0).getValue());
       String user = PrimitiveValueDecoders.fromParty.decode(fields$.get(1).getValue());
@@ -149,15 +153,17 @@ public class View extends DamlRecord<View> {
       String additionalInformation = PrimitiveValueDecoders.fromText
           .decode(fields$.get(20).getValue());
       String description = PrimitiveValueDecoders.fromText.decode(fields$.get(21).getValue());
+      List<String> photoReferences = PrimitiveValueDecoders.fromList(
+            PrimitiveValueDecoders.fromText).decode(fields$.get(22).getValue());
       return new View(operator, user, id, instrument, residencePrice, propertyAddress,
           propertyPostalCode, propertyDistrict, propertyCounty, grossArea, usableArea, bedrooms,
           bathrooms, floors, residenceType, backyard, parking, buildDate, orientation,
-          installedEquipment, additionalInformation, description);
+          installedEquipment, additionalInformation, description, photoReferences);
     } ;
   }
 
   public com.daml.ledger.javaapi.data.DamlRecord toValue() {
-    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(22);
+    ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field> fields = new ArrayList<com.daml.ledger.javaapi.data.DamlRecord.Field>(23);
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("operator", new Party(this.operator)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("user", new Party(this.user)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("id", this.id.toValue()));
@@ -180,11 +186,12 @@ public class View extends DamlRecord<View> {
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("installedEquipment", new Text(this.installedEquipment)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("additionalInformation", new Text(this.additionalInformation)));
     fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("description", new Text(this.description)));
+    fields.add(new com.daml.ledger.javaapi.data.DamlRecord.Field("photoReferences", this.photoReferences.stream().collect(DamlCollectors.toDamlList(v$0 -> new Text(v$0)))));
     return new com.daml.ledger.javaapi.data.DamlRecord(fields);
   }
 
   public static JsonLfDecoder<View> jsonDecoder() {
-    return JsonLfDecoders.record(Arrays.asList("operator", "user", "id", "instrument", "residencePrice", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "grossArea", "usableArea", "bedrooms", "bathrooms", "floors", "residenceType", "backyard", "parking", "buildDate", "orientation", "installedEquipment", "additionalInformation", "description"), name -> {
+    return JsonLfDecoders.record(Arrays.asList("operator", "user", "id", "instrument", "residencePrice", "propertyAddress", "propertyPostalCode", "propertyDistrict", "propertyCounty", "grossArea", "usableArea", "bedrooms", "bathrooms", "floors", "residenceType", "backyard", "parking", "buildDate", "orientation", "installedEquipment", "additionalInformation", "description", "photoReferences"), name -> {
           switch (name) {
             case "operator": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(0, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party);
             case "user": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(1, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.party);
@@ -208,10 +215,11 @@ public class View extends DamlRecord<View> {
             case "installedEquipment": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(19, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "additionalInformation": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(20, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
             case "description": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(21, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text);
+            case "photoReferences": return com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.JavaArg.at(22, com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.list(com.daml.ledger.javaapi.data.codegen.json.JsonLfDecoders.text));
             default: return null;
           }
         }
-        , (Object[] args) -> new View(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15]), JsonLfDecoders.cast(args[16]), JsonLfDecoders.cast(args[17]), JsonLfDecoders.cast(args[18]), JsonLfDecoders.cast(args[19]), JsonLfDecoders.cast(args[20]), JsonLfDecoders.cast(args[21])));
+        , (Object[] args) -> new View(JsonLfDecoders.cast(args[0]), JsonLfDecoders.cast(args[1]), JsonLfDecoders.cast(args[2]), JsonLfDecoders.cast(args[3]), JsonLfDecoders.cast(args[4]), JsonLfDecoders.cast(args[5]), JsonLfDecoders.cast(args[6]), JsonLfDecoders.cast(args[7]), JsonLfDecoders.cast(args[8]), JsonLfDecoders.cast(args[9]), JsonLfDecoders.cast(args[10]), JsonLfDecoders.cast(args[11]), JsonLfDecoders.cast(args[12]), JsonLfDecoders.cast(args[13]), JsonLfDecoders.cast(args[14]), JsonLfDecoders.cast(args[15]), JsonLfDecoders.cast(args[16]), JsonLfDecoders.cast(args[17]), JsonLfDecoders.cast(args[18]), JsonLfDecoders.cast(args[19]), JsonLfDecoders.cast(args[20]), JsonLfDecoders.cast(args[21]), JsonLfDecoders.cast(args[22])));
   }
 
   public static View fromJson(String json) throws JsonLfDecoder.Error {
@@ -241,7 +249,8 @@ public class View extends DamlRecord<View> {
         JsonLfEncoders.Field.of("orientation", apply(Orientation::jsonEncoder, orientation)),
         JsonLfEncoders.Field.of("installedEquipment", apply(JsonLfEncoders::text, installedEquipment)),
         JsonLfEncoders.Field.of("additionalInformation", apply(JsonLfEncoders::text, additionalInformation)),
-        JsonLfEncoders.Field.of("description", apply(JsonLfEncoders::text, description)));
+        JsonLfEncoders.Field.of("description", apply(JsonLfEncoders::text, description)),
+        JsonLfEncoders.Field.of("photoReferences", apply(JsonLfEncoders.list(JsonLfEncoders::text), photoReferences)));
   }
 
   @Override
@@ -275,7 +284,8 @@ public class View extends DamlRecord<View> {
         Objects.equals(this.orientation, other.orientation) &&
         Objects.equals(this.installedEquipment, other.installedEquipment) &&
         Objects.equals(this.additionalInformation, other.additionalInformation) &&
-        Objects.equals(this.description, other.description);
+        Objects.equals(this.description, other.description) &&
+        Objects.equals(this.photoReferences, other.photoReferences);
   }
 
   @Override
@@ -284,16 +294,18 @@ public class View extends DamlRecord<View> {
         this.propertyAddress, this.propertyPostalCode, this.propertyDistrict, this.propertyCounty,
         this.grossArea, this.usableArea, this.bedrooms, this.bathrooms, this.floors,
         this.residenceType, this.backyard, this.parking, this.buildDate, this.orientation,
-        this.installedEquipment, this.additionalInformation, this.description);
+        this.installedEquipment, this.additionalInformation, this.description,
+        this.photoReferences);
   }
 
   @Override
   public String toString() {
-    return String.format("daml.interface$.propertymanager.property.residenceproperty.residenceproperty.View(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    return String.format("daml.interface$.propertymanager.property.residenceproperty.residenceproperty.View(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         this.operator, this.user, this.id, this.instrument, this.residencePrice,
         this.propertyAddress, this.propertyPostalCode, this.propertyDistrict, this.propertyCounty,
         this.grossArea, this.usableArea, this.bedrooms, this.bathrooms, this.floors,
         this.residenceType, this.backyard, this.parking, this.buildDate, this.orientation,
-        this.installedEquipment, this.additionalInformation, this.description);
+        this.installedEquipment, this.additionalInformation, this.description,
+        this.photoReferences);
   }
 }

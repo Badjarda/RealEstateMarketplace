@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 public final class UserProfile {
-  public static final Identifier TEMPLATE_ID = new Identifier("f0dcbf884b6b6c6225689dfc29d021f7054d825e7f59acb15e7d4ca03ecb808d", "Interface.ProfileManager.UserProfile.UserProfile", "UserProfile");
+  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.ProfileManager.UserProfile.UserProfile", "UserProfile");
 
   public static final Choice<UserProfile, SetLastName, ContractId> CHOICE_SetLastName = 
       Choice.create("SetLastName", value$ -> value$.toValue(), value$ -> SetLastName.valueDecoder()
@@ -69,6 +69,11 @@ public final class UserProfile {
       Choice.create("SetTaxId", value$ -> value$.toValue(), value$ -> SetTaxId.valueDecoder()
         .decode(value$), value$ ->
         new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
+
+  public static final Choice<UserProfile, GetPhotoReferences, List<String>> CHOICE_GetPhotoReferences = 
+      Choice.create("GetPhotoReferences", value$ -> value$.toValue(), value$ ->
+        GetPhotoReferences.valueDecoder().decode(value$), value$ -> PrimitiveValueDecoders.fromList(
+          PrimitiveValueDecoders.fromText).decode(value$));
 
   public static final Choice<UserProfile, SetUsername, ContractId> CHOICE_SetUsername = 
       Choice.create("SetUsername", value$ -> value$.toValue(), value$ -> SetUsername.valueDecoder()
@@ -157,6 +162,11 @@ public final class UserProfile {
   public static final Choice<UserProfile, SetNationality, ContractId> CHOICE_SetNationality = 
       Choice.create("SetNationality", value$ -> value$.toValue(), value$ ->
         SetNationality.valueDecoder().decode(value$), value$ ->
+        new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
+
+  public static final Choice<UserProfile, SetPhotoReferences, ContractId> CHOICE_SetPhotoReferences = 
+      Choice.create("SetPhotoReferences", value$ -> value$.toValue(), value$ ->
+        SetPhotoReferences.valueDecoder().decode(value$), value$ ->
         new ContractId(value$.asContractId().orElseThrow(() -> new IllegalArgumentException("Expected value$ to be of type com.daml.ledger.javaapi.data.ContractId")).getValue()));
 
   public static final Choice<UserProfile, SetContactMail, ContractId> CHOICE_SetContactMail = 
@@ -256,6 +266,14 @@ public final class UserProfile {
 
     default Update<Exercised<ContractId>> exerciseSetTaxId(Long newTaxId) {
       return exerciseSetTaxId(new SetTaxId(newTaxId));
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetPhotoReferences(GetPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_GetPhotoReferences, arg);
+    }
+
+    default Update<Exercised<List<String>>> exerciseGetPhotoReferences() {
+      return exerciseGetPhotoReferences(new GetPhotoReferences());
     }
 
     default Update<Exercised<ContractId>> exerciseSetUsername(SetUsername arg) {
@@ -411,6 +429,15 @@ public final class UserProfile {
       return exerciseSetNationality(new SetNationality(newNationality));
     }
 
+    default Update<Exercised<ContractId>> exerciseSetPhotoReferences(SetPhotoReferences arg) {
+      return makeExerciseCmd(CHOICE_SetPhotoReferences, arg);
+    }
+
+    default Update<Exercised<ContractId>> exerciseSetPhotoReferences(
+        List<String> newPhotoReferences) {
+      return exerciseSetPhotoReferences(new SetPhotoReferences(newPhotoReferences));
+    }
+
     default Update<Exercised<ContractId>> exerciseSetContactMail(SetContactMail arg) {
       return makeExerciseCmd(CHOICE_SetContactMail, arg);
     }
@@ -449,13 +476,13 @@ public final class UserProfile {
       super(
             "daml.interface$.profilemanager.userprofile.userprofile.UserProfile", UserProfile.TEMPLATE_ID, ContractId::new, View.valueDecoder(),
             View::fromJson,List.of(CHOICE_SetUsername, CHOICE_SetPassword, CHOICE_Remove,
-            CHOICE_GetTaxId, CHOICE_SetContactMail, CHOICE_SetLastName, CHOICE_Archive,
-            CHOICE_GetBirthday, CHOICE_GetView, CHOICE_SetTaxId, CHOICE_GetSocialSecurityId,
+            CHOICE_GetPhotoReferences, CHOICE_GetTaxId, CHOICE_SetContactMail, CHOICE_SetLastName,
+            CHOICE_Archive, CHOICE_GetBirthday, CHOICE_SetTaxId, CHOICE_GetSocialSecurityId,
             CHOICE_SetCellphoneNumber, CHOICE_GetFullName, CHOICE_SetBirthday, CHOICE_GetUsername,
             CHOICE_SetFirstName, CHOICE_GetIdNumber, CHOICE_GetLastName, CHOICE_GetCellphoneNumber,
             CHOICE_GetNationality, CHOICE_GetGender, CHOICE_GetPassword, CHOICE_GetFirstName,
-            CHOICE_GetContactMail, CHOICE_SetNationality, CHOICE_SetSocialSecurityId,
-            CHOICE_SetGender, CHOICE_SetIdNumber, CHOICE_SetFullName));
+            CHOICE_GetContactMail, CHOICE_GetView, CHOICE_SetPhotoReferences, CHOICE_SetNationality,
+            CHOICE_SetSocialSecurityId, CHOICE_SetGender, CHOICE_SetIdNumber, CHOICE_SetFullName));
     }
   }
 }
