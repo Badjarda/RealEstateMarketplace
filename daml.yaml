@@ -46,11 +46,11 @@ script-options:
   - --output-file=ui/src/parties.json
 #json-api-options:
   #- --config=json-api.conf
-codegen:
-  java:
-    output-directory: src/main/java
-    package-prefix: daml
-    java-options: "-Xmx8g -Xms8g -XX:ParallelGCThreads=32 -XX:ConcGCThreads=32 -XX:CICompilerCount=32"
+#codegen:
+  #java:
+   # output-directory: src/main/java
+   # package-prefix: daml
+   # java-options: "-Xmx8g -Xms8g -XX:ParallelGCThreads=32 -XX:ConcGCThreads=32 -XX:CICompilerCount=32"
 
 build-options:
   - --target=1.15
