@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public final class GarageProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("e09e7a18c217e8002e4a374c04915d394e5120e173ac8f1ee6decbc2d8c3c8b4", "Interface.PropertyManager.Property.GarageProperty.GarageProperty", "GarageProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("f8883c36e16696951f0e9312ee45dacca92b05226daf215a5159b95d1b1c4079", "Interface.PropertyManager.Property.GarageProperty.GarageProperty", "GarageProperty");
 
   public static final Choice<GarageProperty, GetGaragePropertyAddress, String> CHOICE_GetGaragePropertyAddress = 
       Choice.create("GetGaragePropertyAddress", value$ -> value$.toValue(), value$ ->

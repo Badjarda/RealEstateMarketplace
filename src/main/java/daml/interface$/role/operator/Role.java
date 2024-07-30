@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class Role {
-  public static final Identifier TEMPLATE_ID = new Identifier("e09e7a18c217e8002e4a374c04915d394e5120e173ac8f1ee6decbc2d8c3c8b4", "Interface.Role.Operator", "Role");
+  public static final Identifier TEMPLATE_ID = new Identifier("f8883c36e16696951f0e9312ee45dacca92b05226daf215a5159b95d1b1c4079", "Interface.Role.Operator", "Role");
 
   public static final Choice<Role, TerminateCustodianService, Unit> CHOICE_TerminateCustodianService = 
       Choice.create("TerminateCustodianService", value$ -> value$.toValue(), value$ ->
