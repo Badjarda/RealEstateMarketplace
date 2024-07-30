@@ -43,7 +43,7 @@ template RequestCreateApartmentProperty
     signatory operator, user
 
     key (operator, user, id) : (Party, Party, Id)
-    maintainer key._1
+    maintainer key._2
 
     interface instance Removable.I for RequestCreateApartmentProperty where
       view = Removable.View with removers = fromList [operator, user]
@@ -81,7 +81,7 @@ template RequestCreateLandProperty
     signatory operator, user
 
     key (operator, user, id) : (Party, Party, Id)
-    maintainer key._1
+    maintainer key._2
 
     interface instance Removable.I for RequestCreateLandProperty where
       view = Removable.View with removers = fromList [operator, user]
@@ -122,7 +122,7 @@ template RequestCreateResidenceProperty
     signatory operator, user
 
     key (operator, user, id) : (Party, Party, Id)
-    maintainer key._1
+    maintainer key._2
 
     interface instance Removable.I for RequestCreateResidenceProperty where
       view = Removable.View with removers = fromList [operator, user]
@@ -156,7 +156,7 @@ template RequestCreateGarageProperty
     signatory operator, user
 
     key (operator, user, id) : (Party, Party, Id)
-    maintainer key._1
+    maintainer key._2
 
     interface instance Removable.I for RequestCreateGarageProperty where
       view = Removable.View with removers = fromList [operator, user]
@@ -192,7 +192,7 @@ template RequestCreateWarehouseProperty
     signatory operator, user
 
     key (operator, user, id) : (Party, Party, Id)
-    maintainer key._1
+    maintainer key._2
 
     interface instance Removable.I for RequestCreateWarehouseProperty where
       view = Removable.View with removers = fromList [operator, user]

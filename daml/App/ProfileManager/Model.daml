@@ -36,7 +36,7 @@ template RequestCreateUserProfile
     signatory operator, user
 
     key (operator, user, id) : (Party, Party, Id)
-    maintainer key._1
+    maintainer key._2
 
     interface instance Removable.I for RequestCreateUserProfile where
       view = Removable.View with removers = fromList [operator, user]
