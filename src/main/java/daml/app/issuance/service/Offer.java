@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class Offer extends Template {
-  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "App.Issuance.Service", "Offer");
+  public static final Identifier TEMPLATE_ID = new Identifier("e09e7a18c217e8002e4a374c04915d394e5120e173ac8f1ee6decbc2d8c3c8b4", "App.Issuance.Service", "Offer");
 
   public static final Choice<Offer, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->

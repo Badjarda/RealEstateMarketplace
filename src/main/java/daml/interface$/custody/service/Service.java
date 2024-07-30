@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class Service {
-  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.Custody.Service", "Service");
+  public static final Identifier TEMPLATE_ID = new Identifier("e09e7a18c217e8002e4a374c04915d394e5120e173ac8f1ee6decbc2d8c3c8b4", "Interface.Custody.Service", "Service");
 
   public static final Choice<Service, AtomicSwapLand, Tuple2<Transferable.ContractId, Transferable.ContractId>> CHOICE_AtomicSwapLand = 
       Choice.create("AtomicSwapLand", value$ -> value$.toValue(), value$ ->

@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public final class Service {
-  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.ProfileManager.Service", "Service");
+  public static final Identifier TEMPLATE_ID = new Identifier("e09e7a18c217e8002e4a374c04915d394e5120e173ac8f1ee6decbc2d8c3c8b4", "Interface.ProfileManager.Service", "Service");
 
   public static final Choice<Service, UpdateSocialSecurityId, Unit> CHOICE_UpdateSocialSecurityId = 
       Choice.create("UpdateSocialSecurityId", value$ -> value$.toValue(), value$ ->

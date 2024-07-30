@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public final class ApartmentProperty {
-  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty", "ApartmentProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("e09e7a18c217e8002e4a374c04915d394e5120e173ac8f1ee6decbc2d8c3c8b4", "Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty", "ApartmentProperty");
 
   public static final Choice<ApartmentProperty, GetApartmentBathrooms, Long> CHOICE_GetApartmentBathrooms = 
       Choice.create("GetApartmentBathrooms", value$ -> value$.toValue(), value$ ->

@@ -35,7 +35,7 @@ import com.daml.ledger.javaapi.data.codegen.json.JsonLfEncoder;
 import com.daml.ledger.javaapi.data.codegen.json.JsonLfEncoders;
 import com.daml.ledger.javaapi.data.codegen.json.JsonLfReader;
 import daml.da.set.types.Set;
-import daml.da.types.Tuple2;
+import daml.da.types.Tuple3;
 import daml.daml.finance.interface$.types.common.types.Id;
 import daml.daml.finance.interface$.types.common.types.InstrumentKey;
 import daml.daml.finance.interface$.util.disclosure.Disclosure;
@@ -56,21 +56,21 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ApartmentProperty extends Template {
-  public static final Identifier TEMPLATE_ID = new Identifier("8c6e592f5a33911df4c5cbfd683c840613ba80718b2d85f183257ac23495fc1f", "App.PropertyManager.Property.ApartmentProperty", "ApartmentProperty");
+  public static final Identifier TEMPLATE_ID = new Identifier("e09e7a18c217e8002e4a374c04915d394e5120e173ac8f1ee6decbc2d8c3c8b4", "App.PropertyManager.Property.ApartmentProperty", "ApartmentProperty");
 
   public static final Choice<ApartmentProperty, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->
         daml.da.internal.template.Archive.valueDecoder().decode(value$), value$ ->
         PrimitiveValueDecoders.fromUnit.decode(value$));
 
-  public static final ContractCompanion.WithKey<Contract, ContractId, ApartmentProperty, Tuple2<String, String>> COMPANION = 
+  public static final ContractCompanion.WithKey<Contract, ContractId, ApartmentProperty, Tuple3<String, String, Id>> COMPANION = 
       new ContractCompanion.WithKey<>(
         "daml.app.propertymanager.property.apartmentproperty.ApartmentProperty", TEMPLATE_ID,
         ContractId::new, v -> ApartmentProperty.templateValueDecoder().decode(v),
         ApartmentProperty::fromJson, Contract::new, List.of(CHOICE_Archive),
-        e -> Tuple2.<java.lang.String,
-        java.lang.String>valueDecoder(PrimitiveValueDecoders.fromParty,
-        PrimitiveValueDecoders.fromParty).decode(e));
+        e -> Tuple3.<java.lang.String, java.lang.String,
+        daml.daml.finance.interface$.types.common.types.Id>valueDecoder(PrimitiveValueDecoders.fromParty,
+        PrimitiveValueDecoders.fromParty, Id.valueDecoder()).decode(e));
 
   public final String operator;
 
@@ -155,7 +155,7 @@ public final class ApartmentProperty extends Template {
    * @deprecated since Daml 2.3.0; use {@code byKey(key).exerciseArchive} instead
    */
   @Deprecated
-  public static Update<Exercised<Unit>> exerciseByKeyArchive(Tuple2<String, String> key,
+  public static Update<Exercised<Unit>> exerciseByKeyArchive(Tuple3<String, String, Id> key,
       daml.da.internal.template.Archive arg) {
     return byKey(key).exerciseArchive(arg);
   }
@@ -164,7 +164,7 @@ public final class ApartmentProperty extends Template {
    * @deprecated since Daml 2.3.0; use {@code byKey(key).exerciseArchive()} instead
    */
   @Deprecated
-  public static Update<Exercised<Unit>> exerciseByKeyArchive(Tuple2<String, String> key) {
+  public static Update<Exercised<Unit>> exerciseByKeyArchive(Tuple3<String, String, Id> key) {
     return byKey(key).exerciseArchive();
   }
 
@@ -203,7 +203,7 @@ public final class ApartmentProperty extends Template {
   }
 
   @Override
-  protected ContractCompanion.WithKey<Contract, ContractId, ApartmentProperty, Tuple2<String, String>> getCompanion(
+  protected ContractCompanion.WithKey<Contract, ContractId, ApartmentProperty, Tuple3<String, String, Id>> getCompanion(
       ) {
     return COMPANION;
   }
@@ -412,8 +412,9 @@ public final class ApartmentProperty extends Template {
       this to finish creating the command, or convert to an interface first with {@code toInterface}
       to invoke an interface {@code exercise} method.
    */
-  public static ByKey byKey(Tuple2<String, String> key) {
-    return new ByKey(key.toValue(v$0 -> new Party(v$0), v$1 -> new Party(v$1)));
+  public static ByKey byKey(Tuple3<String, String, Id> key) {
+    return new ByKey(key.toValue(v$0 -> new Party(v$0), v$1 -> new Party(v$1),
+        v$2 -> v$2.toValue()));
   }
 
   public static final class ContractId extends com.daml.ledger.javaapi.data.codegen.ContractId<ApartmentProperty> implements Exercises<ExerciseCommand> {
@@ -451,9 +452,9 @@ public final class ApartmentProperty extends Template {
     }
   }
 
-  public static class Contract extends ContractWithKey<ContractId, ApartmentProperty, Tuple2<String, String>> {
+  public static class Contract extends ContractWithKey<ContractId, ApartmentProperty, Tuple3<String, String, Id>> {
     public Contract(ContractId id, ApartmentProperty data, Optional<String> agreementText,
-        Optional<Tuple2<String, String>> key, java.util.Set<String> signatories,
+        Optional<Tuple3<String, String, Id>> key, java.util.Set<String> signatories,
         java.util.Set<String> observers) {
       super(id, data, agreementText, key, signatories, observers);
     }
@@ -464,7 +465,7 @@ public final class ApartmentProperty extends Template {
     }
 
     public static Contract fromIdAndRecord(String contractId, DamlRecord record$,
-        Optional<String> agreementText, Optional<Tuple2<String, String>> key,
+        Optional<String> agreementText, Optional<Tuple3<String, String, Id>> key,
         java.util.Set<String> signatories, java.util.Set<String> observers) {
       return COMPANION.fromIdAndRecord(contractId, record$, agreementText, key, signatories,
           observers);
