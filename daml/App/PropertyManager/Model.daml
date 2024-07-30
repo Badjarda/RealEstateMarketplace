@@ -42,7 +42,7 @@ template RequestCreateApartmentProperty
   where
     signatory operator, user
 
-    key (operator, id) : (Party, Id)
+    key (operator, user, id) : (Party, Party, Id)
     maintainer key._1
 
     interface instance Removable.I for RequestCreateApartmentProperty where
@@ -80,7 +80,7 @@ template RequestCreateLandProperty
   where
     signatory operator, user
 
-    key (operator, id) : (Party, Id)
+    key (operator, user, id) : (Party, Party, Id)
     maintainer key._1
 
     interface instance Removable.I for RequestCreateLandProperty where
@@ -121,7 +121,7 @@ template RequestCreateResidenceProperty
   where
     signatory operator, user
 
-    key (operator, id) : (Party, Id)
+    key (operator, user, id) : (Party, Party, Id)
     maintainer key._1
 
     interface instance Removable.I for RequestCreateResidenceProperty where
@@ -155,7 +155,7 @@ template RequestCreateGarageProperty
   where
     signatory operator, user
 
-    key (operator, id) : (Party, Id)
+    key (operator, user, id) : (Party, Party, Id)
     maintainer key._1
 
     interface instance Removable.I for RequestCreateGarageProperty where
@@ -191,7 +191,7 @@ template RequestCreateWarehouseProperty
   where
     signatory operator, user
 
-    key (operator, id) : (Party, Id)
+    key (operator, user, id) : (Party, Party, Id)
     maintainer key._1
 
     interface instance Removable.I for RequestCreateWarehouseProperty where

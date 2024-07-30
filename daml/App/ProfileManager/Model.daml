@@ -35,7 +35,7 @@ template RequestCreateUserProfile
   where
     signatory operator, user
 
-    key (operator, id) : (Party, Id)
+    key (operator, user, id) : (Party, Party, Id)
     maintainer key._1
 
     interface instance Removable.I for RequestCreateUserProfile where

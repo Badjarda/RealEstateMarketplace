@@ -39,7 +39,7 @@ template ResidenceProperty
   where
     signatory operator, user
 
-    key (operator, user) : (Party, Party)
+    key (operator, user, id) : (Party, Party, Id)
   
     maintainer key._2
 
