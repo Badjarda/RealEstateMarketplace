@@ -2,7 +2,7 @@ module App.ProfileManager.UserProfile where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(I, View(..), GetUsername(..), SetUsername(..), GetFirstName(..), SetFirstName(..), GetLastName(..), SetLastName(..), GetFullName(..), SetFullName(..), GetPassword(..), SetPassword(..), GetContactMail(..), SetContactMail(..), GetBirthday(..), SetBirthday(..), GetGender(..), SetGender(..), GetNationality(..), SetNationality(..), GetCellphoneNumber(..), SetCellphoneNumber(..), GetTaxId(..), SetTaxId(..), GetIdNumber(..), SetIdNumber(..), GetSocialSecurityId(..), SetSocialSecurityId(..), GetPhotoReferences(..), SetPhotoReferences(..), userProfileKey, disclosureUpdateReference, createReference)
+import Interface.ProfileManager.UserProfile.UserProfile qualified as UserProfile(I, View(..), GetUsername(..), GetFirstName(..), GetLastName(..), GetFullName(..), GetPassword(..),GetContactMail(..), GetBirthday(..), GetGender(..), GetNationality(..), GetCellphoneNumber(..), GetTaxId(..), GetIdNumber(..), GetSocialSecurityId(..), GetPhotoReferences(..), UpdateProfile(..), userProfileKey, disclosureUpdateReference, createReference)
 import Interface.ProfileManager.UserProfile.Factory qualified as UserProfileFactory(I, View(..), Create(..))
 import Interface.ProfileManager.UserProfile.Common (Nationality(..), Gender(..))
 
@@ -47,86 +47,47 @@ template UserProfile
       getUsername UserProfile.GetUsername{} = do 
         pure username
 
-      setUsername UserProfile.SetUsername{newUsername} = do 
-        toInterfaceContractId <$> create this with username = newUsername
-
       getFirstName UserProfile.GetFirstName{} = do 
         pure firstName
-
-      setFirstName UserProfile.SetFirstName{newFirstName} = do 
-        toInterfaceContractId <$> create this with firstName = newFirstName
 
       getLastName UserProfile.GetLastName{} = do 
         pure lastName
 
-      setLastName UserProfile.SetLastName{newLastName} = do 
-        toInterfaceContractId <$> create this with lastName = newLastName
-
       getFullName UserProfile.GetFullName{} = do 
         pure fullName
-
-      setFullName UserProfile.SetFullName{newFullName} = do 
-        toInterfaceContractId <$> create this with fullName = newFullName
 
       getPassword UserProfile.GetPassword{} = do 
         pure password
 
-      setPassword UserProfile.SetPassword{newPassword} = do 
-        toInterfaceContractId <$> create this with password = newPassword
-
       getBirthday UserProfile.GetBirthday{} = do 
         pure birthday
-
-      setBirthday UserProfile.SetBirthday{newBirthday} = do 
-        toInterfaceContractId <$> create this with birthday = newBirthday
 
       getGender UserProfile.GetGender{} = do 
         pure gender
 
-      setGender UserProfile.SetGender{newGender} = do 
-        toInterfaceContractId <$> create this with gender = newGender
-
       getNationality UserProfile.GetNationality{} = do 
         pure nationality
 
-      setNationality UserProfile.SetNationality{newNationality} = do 
-        toInterfaceContractId <$> create this with nationality = newNationality
-
       getContactMail UserProfile.GetContactMail{} = do 
         pure contactMail
-
-      setContactMail UserProfile.SetContactMail{newContactMail} = do 
-        toInterfaceContractId <$> create this with contactMail = newContactMail
       
       getCellphoneNumber UserProfile.GetCellphoneNumber{} = do 
         pure cellphoneNumber
-
-      setCellphoneNumber UserProfile.SetCellphoneNumber{newCellphoneNumber} = do 
-        toInterfaceContractId <$> create this with cellphoneNumber = newCellphoneNumber
       
       getIdNumber UserProfile.GetIdNumber{} = do 
         pure idNumber
 
-      setIdNumber UserProfile.SetIdNumber{newIdNumber} = do 
-        toInterfaceContractId <$> create this with idNumber = newIdNumber
-
       getTaxId UserProfile.GetTaxId{} = do 
         pure taxId
-
-      setTaxId UserProfile.SetTaxId{newTaxId} = do 
-        toInterfaceContractId <$> create this with taxId = newTaxId
       
       getSocialSecurityId UserProfile.GetSocialSecurityId{} = do 
         pure socialSecurityId
-
-      setSocialSecurityId UserProfile.SetSocialSecurityId{newSocialSecurityId} = do 
-        toInterfaceContractId <$> create this with socialSecurityId = newSocialSecurityId
       
       getPhotoReferences UserProfile.GetPhotoReferences{} = do 
         pure photoReferences
 
-      setPhotoReferences UserProfile.SetPhotoReferences{newPhotoReferences} = do 
-        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
+      updateProfile UserProfile.UpdateProfile{newUsername,newFirstName,newLastName,newFullName,newPassword,newBirthday,newGender,newNationality,newContactMail,newCellphoneNumber,newIdNumber,newTaxId,newSocialSecurityId,newPhotoReferences} = do 
+        toInterfaceContractId <$> create this with username=newUsername,firstName=newFirstName,lastName=newLastName,fullName=newFullName,password=newPassword,birthday=newBirthday,gender=newGender,nationality=newNationality,contactMail=newContactMail,cellphoneNumber=newCellphoneNumber,idNumber=newIdNumber,taxId=newTaxId,socialSecurityId=newSocialSecurityId,photoReferences=newPhotoReferences
 
     interface instance Disclosure.I for UserProfile where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers

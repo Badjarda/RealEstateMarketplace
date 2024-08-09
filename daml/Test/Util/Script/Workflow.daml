@@ -4,7 +4,7 @@ import DA.Set (fromList, singleton)
 import DA.Optional (fromSome)
 
 import Interface.RoleManager.Service qualified as RoleManagerService (I, CreateUserRole(..), DeleteUserRole(..), AddPermissionToUserRole(..), RemovePermissionInUserRole(..), UpdateUserRole(..))
-import Interface.ProfileManager.Service qualified as ProfileManagerService(I, RequestCreateUserProfile(..), CreateUserProfile(..), UpdateUsername(..), UpdateFirstName(..), UpdateLastName(..), UpdateFullName(..), UpdatePassword(..), UpdateBirthday(..), UpdateGender(..), UpdateNationality(..), UpdateContactMail(..), UpdateCellphoneNumber(..), UpdateIdNumber(..), UpdateTaxId(..), UpdateSocialSecurityId(..), UpdatePhotoReferences(..))
+import Interface.ProfileManager.Service qualified as ProfileManagerService(I, RequestCreateUserProfile(..), CreateUserProfile(..), UpdateProfile(..))
 import Interface.PropertyManager.Service qualified as PropertyManagerService (I, RequestCreateApartmentProperty(..), RequestCreateLandProperty(..), RequestCreateResidenceProperty(..), RequestCreateGarageProperty(..), CreateApartmentProperty(..), UpdateApartment(..), CreateLandProperty(..), UpdateLand(..), CreateResidenceProperty(..), UpdateResidence(..), CreateGarageProperty(..), UpdateGarage(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehouse(..))
 import Interface.Custody.Service qualified as CustodyService (I, OpenAccount(..), RequestOpenAccount(..), RequestDeposit(..), Deposit(..), CloseAccount(..), RequestCloseAccount(..), Withdrawal(..), RequestWithdraw(..), RequestSwap(..), AtomicSwapApartment(..), AtomicSwapLand(..), AtomicSwapGarage(..), AtomicSwapResidence(..), AtomicSwapWarehouse(..))
 import Interface.Issuance.Service qualified as IssuanceService (I, RequestIssue(..), Issue(..), RequestDeIssue(..), DeIssue(..))
@@ -177,75 +177,10 @@ createUserProfile operator user public observers id username firstName lastName 
   createUserProfileRequestCid <- submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.RequestCreateUserProfile with ..
   submitMulti [operator] [public] do exerciseCmd serviceCid ProfileManagerService.CreateUserProfile with createUserProfileRequest = createUserProfileRequestCid
 
-updateUserProfileUsername : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
-updateUserProfileUsername operator user public userProfileKey newUsername = do
+updateUserProfile : Party -> Party -> Party -> UserProfileKey -> Text -> Text -> Text -> Text -> Text -> Date -> Optional Gender -> Nationality -> Text -> Optional Int -> Int -> Int -> Int -> [Text] -> Script()
+updateUserProfile operator user public userProfileKey newUsername newFirstName newLastName newFullName newPassword newBirthday newGender newNationality newContactMail newCellphoneNumber newIdNumber newTaxId newSocialSecurityId newPhotoReferences = do
   serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateUsername with ..
-
-updateUserProfileFirstName : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
-updateUserProfileFirstName operator user public userProfileKey newFirstName = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateFirstName with ..
-
-updateUserProfileLastName : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
-updateUserProfileLastName operator user public userProfileKey newLastName = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateLastName with ..
-
-updateUserProfileFullName : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
-updateUserProfileFullName operator user public userProfileKey newFullName = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateFullName with ..
-
-updateUserProfilePassword : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
-updateUserProfilePassword operator user public userProfileKey newPassword = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdatePassword with ..
-
-updateUserProfileContactMail : Party -> Party -> Party -> UserProfileKey -> Text -> Script()
-updateUserProfileContactMail operator user public userProfileKey newContactMail = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateContactMail with ..
-
-updateUserProfileBirthday : Party -> Party -> Party -> UserProfileKey -> Date -> Script()
-updateUserProfileBirthday operator user public userProfileKey newBirthday = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateBirthday with ..
-
-updateUserProfileGender : Party -> Party -> Party -> UserProfileKey -> Optional Gender -> Script()
-updateUserProfileGender operator user public userProfileKey newGender = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateGender with ..
-
-updateUserProfileNationality : Party -> Party -> Party -> UserProfileKey -> Nationality -> Script()
-updateUserProfileNationality operator user public userProfileKey newNationality = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateNationality with ..
-
-updateUserProfileCellphoneNumber : Party -> Party -> Party -> UserProfileKey -> Optional Int -> Script()
-updateUserProfileCellphoneNumber operator user public userProfileKey newCellphoneNumber = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateCellphoneNumber with ..
-
-updateUserProfileIdNumber : Party -> Party -> Party -> UserProfileKey -> Int -> Script()
-updateUserProfileIdNumber operator user public userProfileKey newIdNumber = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateIdNumber with ..
-
-updateUserProfileTaxId : Party -> Party -> Party -> UserProfileKey -> Int -> Script()
-updateUserProfileTaxId operator user public userProfileKey newTaxId = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateTaxId with ..
-
-updateUserProfileSocialSecurityId : Party -> Party -> Party -> UserProfileKey -> Int -> Script()
-updateUserProfileSocialSecurityId operator user public userProfileKey newSocialSecurityId = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateSocialSecurityId with ..
-
-updateUserProfilePhotoReferences : Party -> Party -> Party -> UserProfileKey -> [Text] -> Script()
-updateUserProfilePhotoReferences operator user public userProfileKey newPhotoReferences = do
-  serviceCid <- toInterfaceContractId @ProfileManagerService.I . fst . fromSome <$> queryContractKey @ProfileManagerService.T user (operator, user)
-  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdatePhotoReferences with ..
+  submitMulti [user] [public] do exerciseCmd serviceCid ProfileManagerService.UpdateProfile with ..
 
 ------ Apartment Property Manager
 

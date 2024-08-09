@@ -41,33 +41,7 @@ interface Service where
     requestCreateUserProfile : RequestCreateUserProfile -> Update (ContractId RequestCreateUserProfile.I)
     createUserProfile: CreateUserProfile -> Update (UserProfileKey) 
 
-    updateUsername : UpdateUsername -> Update ()
-
-    updateFirstName : UpdateFirstName -> Update ()
-
-    updateLastName : UpdateLastName -> Update ()
-
-    updateFullName : UpdateFullName -> Update ()
-
-    updatePassword : UpdatePassword -> Update ()
-
-    updateBirthday: UpdateBirthday -> Update()
-
-    updateGender: UpdateGender -> Update()
-
-    updateNationality: UpdateNationality -> Update()
-
-    updateContactMail : UpdateContactMail -> Update ()
-
-    updateCellphoneNumber : UpdateCellphoneNumber -> Update ()
-
-    updateIdNumber : UpdateIdNumber -> Update ()
-
-    updateTaxId : UpdateTaxId -> Update ()
-
-    updateSocialSecurityId : UpdateSocialSecurityId -> Update ()
-
-    updatePhotoReferences : UpdatePhotoReferences -> Update ()
+    updateProfile : UpdateProfile -> Update ()
 
 
     nonconsuming choice RequestCreateUserProfile : ContractId RequestCreateUserProfile.I
@@ -99,117 +73,26 @@ interface Service where
       do
         createUserProfile this arg
 
-    nonconsuming choice UpdateUsername : ()
+    nonconsuming choice UpdateProfile : ()
       with
         newUsername : Text
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateUsername this arg
-  
-    nonconsuming choice UpdateFirstName : ()
-      with
         newFirstName : Text
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateFirstName this arg
-
-    nonconsuming choice UpdateLastName : ()
-      with
-          newLastName : Text
-          userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateLastName this arg
-
-    nonconsuming choice UpdateFullName : ()
-      with
+        newLastName : Text
         newFullName : Text
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateFullName this arg
-
-    nonconsuming choice UpdatePassword : ()
-      with
         newPassword : Text
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updatePassword this arg
-
-    nonconsuming choice UpdateBirthday : ()
-      with
         newBirthday : Date
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateBirthday this arg
-
-    nonconsuming choice UpdateGender : ()
-      with
         newGender : Optional Gender
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateGender this arg
-
-    nonconsuming choice UpdateNationality : ()
-      with
         newNationality : Nationality
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateNationality this arg
-
-    nonconsuming choice UpdateContactMail : ()
-      with
         newContactMail : Text
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateContactMail this arg
-    
-    nonconsuming choice UpdateCellphoneNumber : ()
-      with
         newCellphoneNumber : Optional Int
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateCellphoneNumber this arg
-
-    nonconsuming choice UpdateIdNumber : ()
-      with
         newIdNumber : Int
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateIdNumber this arg
-
-    nonconsuming choice UpdateTaxId : ()
-      with
         newTaxId : Int
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateTaxId this arg
-
-    nonconsuming choice UpdateSocialSecurityId : ()
-      with
         newSocialSecurityId : Int
-        userProfileKey : UserProfileKey
-      controller (view $ asBase this).user
-      do
-        updateSocialSecurityId this arg
-    
-    nonconsuming choice UpdatePhotoReferences : ()
-      with
         newPhotoReferences : [Text]
         userProfileKey : UserProfileKey
       controller (view $ asBase this).user
       do
-        updatePhotoReferences this arg
+        updateProfile this arg
 
 
 interface Offer where

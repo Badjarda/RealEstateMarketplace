@@ -49,47 +49,35 @@ interface UserProfile requires Disclosure.I where
 
   getKey : UserProfileKey
 
+  updateProfile : UpdateProfile -> Update(ContractId UserProfile)
+
   getUsername : GetUsername -> Update (Text)
-  setUsername : SetUsername -> Update (ContractId UserProfile)
 
   getFirstName : GetFirstName -> Update (Text)
-  setFirstName : SetFirstName -> Update (ContractId UserProfile)
 
   getLastName : GetLastName -> Update (Text)
-  setLastName : SetLastName -> Update (ContractId UserProfile)
 
   getFullName : GetFullName -> Update (Text)
-  setFullName : SetFullName -> Update (ContractId UserProfile)
 
   getPassword : GetPassword -> Update (Text)
-  setPassword : SetPassword -> Update (ContractId UserProfile)
 
   getBirthday : GetBirthday -> Update (Date)
-  setBirthday : SetBirthday -> Update (ContractId UserProfile)
 
   getGender : GetGender -> Update (Optional Gender)
-  setGender : SetGender -> Update (ContractId UserProfile)
 
   getNationality : GetNationality -> Update (Nationality)
-  setNationality : SetNationality -> Update (ContractId UserProfile)
 
   getContactMail : GetContactMail -> Update (Text)
-  setContactMail : SetContactMail -> Update (ContractId UserProfile)
 
   getCellphoneNumber : GetCellphoneNumber -> Update (Optional Int)
-  setCellphoneNumber : SetCellphoneNumber -> Update (ContractId UserProfile)
 
   getIdNumber : GetIdNumber -> Update (Int)
-  setIdNumber : SetIdNumber -> Update (ContractId UserProfile)
 
   getTaxId : GetTaxId -> Update (Int)
-  setTaxId : SetTaxId -> Update (ContractId UserProfile)
 
   getSocialSecurityId : GetSocialSecurityId -> Update (Int)
-  setSocialSecurityId : SetSocialSecurityId -> Update (ContractId UserProfile)
 
   getPhotoReferences : GetPhotoReferences -> Update ([Text])
-  setPhotoReferences : SetPhotoReferences -> Update (ContractId UserProfile)
 
   nonconsuming choice GetView : View
     with
@@ -104,12 +92,25 @@ interface UserProfile requires Disclosure.I where
     do
       getUsername this arg
 
-  choice SetUsername : ContractId UserProfile
+  choice UpdateProfile : ContractId UserProfile
     with
       newUsername : Text
+      newFirstName : Text
+      newLastName : Text
+      newFullName : Text
+      newPassword : Text
+      newBirthday : Date
+      newGender : Optional Gender
+      newNationality : Nationality
+      newContactMail : Text
+      newCellphoneNumber : Optional Int
+      newIdNumber : Int
+      newTaxId : Int
+      newSocialSecurityId : Int
+      newPhotoReferences : [Text]
     controller signatory this
     do
-      setUsername this arg
+      updateProfile this arg
 
   -- First Name
   nonconsuming choice GetFirstName : Text
@@ -117,25 +118,11 @@ interface UserProfile requires Disclosure.I where
     do
       getFirstName this arg
 
-  choice SetFirstName : ContractId UserProfile
-    with
-      newFirstName : Text
-    controller signatory this
-    do
-      setFirstName this arg
-
   -- Last Name
   nonconsuming choice GetLastName : Text
     controller signatory this
     do
       getLastName this arg
-
-  choice SetLastName : ContractId UserProfile
-    with
-      newLastName : Text
-    controller signatory this
-    do
-      setLastName this arg
 
   -- Full Name
   nonconsuming choice GetFullName : Text
@@ -143,25 +130,11 @@ interface UserProfile requires Disclosure.I where
     do
       getFullName this arg
   
-  choice SetFullName : ContractId UserProfile
-    with
-      newFullName : Text
-    controller signatory this
-    do
-      setFullName this arg
-
   -- Password
   nonconsuming choice GetPassword : Text
     controller signatory this
     do
       getPassword this arg
-  
-  choice SetPassword : ContractId UserProfile
-    with
-      newPassword : Text
-    controller signatory this
-    do
-      setPassword this arg
 
   -- Birthday
   nonconsuming choice GetBirthday : Date
@@ -169,25 +142,11 @@ interface UserProfile requires Disclosure.I where
     do
       getBirthday this arg
 
-  choice SetBirthday : ContractId UserProfile
-    with
-      newBirthday : Date
-    controller signatory this
-    do
-      setBirthday this arg
-
   -- Gender
   nonconsuming choice GetGender : Optional Gender
     controller signatory this
     do
       getGender this arg
-
-  choice SetGender : ContractId UserProfile
-    with
-      newGender : Optional Gender
-    controller signatory this
-    do
-      setGender this arg
 
   -- Nationality
   nonconsuming choice GetNationality : Nationality
@@ -195,25 +154,11 @@ interface UserProfile requires Disclosure.I where
     do
       getNationality this arg
 
-  choice SetNationality : ContractId UserProfile
-    with
-      newNationality : Nationality
-    controller signatory this
-    do
-      setNationality this arg
-
   -- Contact Mail
   nonconsuming choice GetContactMail : Text
     controller signatory this
     do
       getContactMail this arg
-
-  choice SetContactMail : ContractId UserProfile
-    with
-      newContactMail : Text
-    controller signatory this
-    do
-      setContactMail this arg
 
   -- Cellphone Number
   nonconsuming choice GetCellphoneNumber : Optional Int
@@ -221,25 +166,11 @@ interface UserProfile requires Disclosure.I where
     do
       getCellphoneNumber this arg
 
-  choice SetCellphoneNumber : ContractId UserProfile
-    with
-      newCellphoneNumber : Optional Int
-    controller signatory this
-    do
-      setCellphoneNumber this arg
-
   -- Id Number
   nonconsuming choice GetIdNumber : Int
     controller signatory this
     do
       getIdNumber this arg
-
-  choice SetIdNumber : ContractId UserProfile
-    with
-      newIdNumber : Int
-    controller signatory this
-    do
-      setIdNumber this arg
 
   -- Tax ID
   nonconsuming choice GetTaxId : Int
@@ -247,38 +178,17 @@ interface UserProfile requires Disclosure.I where
     do
       getTaxId this arg
 
-  choice SetTaxId : ContractId UserProfile
-    with
-      newTaxId : Int
-    controller signatory this
-    do
-      setTaxId this arg
-
   -- Social Security ID
   nonconsuming choice GetSocialSecurityId : Int
     controller signatory this
     do
       getSocialSecurityId this arg
-
-  choice SetSocialSecurityId : ContractId UserProfile
-    with
-      newSocialSecurityId : Int
-    controller signatory this
-    do
-      setSocialSecurityId this arg
   
   -- Photo References
   nonconsuming choice GetPhotoReferences : [Text]
     controller signatory this
     do
       getPhotoReferences this arg
-
-  choice SetPhotoReferences : ContractId UserProfile
-    with
-      newPhotoReferences : [Text]
-    controller signatory this
-    do
-      setPhotoReferences this arg
       
   choice Remove : ()
     controller signatory this
