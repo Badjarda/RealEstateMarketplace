@@ -2,7 +2,7 @@ module App.PropertyManager.Property.ApartmentProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty(I, View(..), GetApartmentInstrumentKey(..), GetApartmentPrice(..), GetApartmentPropertyAddress(..), GetApartmentPropertyPostalCode(..), GetApartmentPropertyDistrict(..), GetApartmentPropertyCounty(..), GetApartmentGrossArea(..), GetApartmentUsableArea(..), GetApartmentBedrooms(..), GetApartmentBathrooms(..), GetApartmentBedrooms(..), GetApartmentFloor(..), GetApartmentParkingSpaces(..), GetApartmentElevator(..), GetApartmentBuildDate(..), GetApartmentInstalledEquipment(..), GetApartmentAdditionalInformation(..), GetApartmentBuildDate(..), GetApartmentDescription(..), GetApartmentPhotoReferences(..), SetApartmentInstrumentKey(..), SetApartmentPrice(..), SetApartmentPropertyAddress(..), SetApartmentPropertyPostalCode(..), SetApartmentPropertyDistrict(..), SetApartmentPropertyCounty(..), SetApartmentGrossArea(..), SetApartmentUsableArea(..), SetApartmentBedrooms(..), SetApartmentBathrooms(..), SetApartmentBedrooms(..), SetApartmentFloor(..), SetApartmentParkingSpaces(..), SetApartmentElevator(..), SetApartmentBuildDate(..), SetApartmentInstalledEquipment(..), SetApartmentAdditionalInformation(..), SetApartmentBuildDate(..), SetApartmentDescription(..), SetApartmentPhotoReferences(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty(I, View(..), GetApartmentInstrumentKey(..), GetApartmentPrice(..), GetApartmentPropertyAddress(..), GetApartmentPropertyPostalCode(..), GetApartmentPropertyDistrict(..), GetApartmentPropertyCounty(..), GetApartmentGrossArea(..), GetApartmentUsableArea(..), GetApartmentBedrooms(..), GetApartmentBathrooms(..), GetApartmentBedrooms(..), GetApartmentFloor(..), GetApartmentParkingSpaces(..), GetApartmentElevator(..), GetApartmentBuildDate(..), GetApartmentInstalledEquipment(..), GetApartmentAdditionalInformation(..), GetApartmentBuildDate(..), GetApartmentDescription(..), GetApartmentPhotoReferences(..), UpdateApartment(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.ApartmentProperty.Factory qualified as ApartmentPropertyFactory(I, View(..), Create(..))
 
 import Daml.Finance.Interface.Types.Common.Types (Id, PartiesMap, InstrumentKey)
@@ -98,60 +98,9 @@ template ApartmentProperty
       
       getApartmentPhotoReferences ApartmentProperty.GetApartmentPhotoReferences{} = do 
         pure photoReferences 
-
-      setApartmentInstrumentKey ApartmentProperty.SetApartmentInstrumentKey{newApartmentInstrumentKey} = do 
-        toInterfaceContractId <$> create this with instrument = newApartmentInstrumentKey
       
-      setApartmentPrice ApartmentProperty.SetApartmentPrice{newApartmentPrice} = do 
-        toInterfaceContractId <$> create this with apartmentPrice = newApartmentPrice
-
-      setApartmentPropertyAddress ApartmentProperty.SetApartmentPropertyAddress{newApartmentPropertyAddress} = do 
-        toInterfaceContractId <$> create this with propertyAddress = newApartmentPropertyAddress
-      
-      setApartmentPropertyPostalCode ApartmentProperty.SetApartmentPropertyPostalCode{newApartmentPropertyPostalCode} = do 
-        toInterfaceContractId <$> create this with propertyPostalCode = newApartmentPropertyPostalCode
-      
-      setApartmentPropertyDistrict ApartmentProperty.SetApartmentPropertyDistrict{newApartmentPropertyDistrict} = do 
-        toInterfaceContractId <$> create this with propertyDistrict = newApartmentPropertyDistrict
-
-      setApartmentPropertyCounty ApartmentProperty.SetApartmentPropertyCounty{newApartmentPropertyCounty} = do 
-        toInterfaceContractId <$> create this with propertyCounty = newApartmentPropertyCounty
-      
-      setApartmentGrossArea ApartmentProperty.SetApartmentGrossArea{newApartmentGrossArea} = do 
-        toInterfaceContractId <$> create this with grossArea = newApartmentGrossArea
-      
-      setApartmentUsableArea ApartmentProperty.SetApartmentUsableArea{newApartmentUsableArea} = do 
-        toInterfaceContractId <$> create this with usableArea = newApartmentUsableArea
-
-      setApartmentBedrooms ApartmentProperty.SetApartmentBedrooms{newApartmentBedrooms} = do 
-        toInterfaceContractId <$> create this with bedrooms = newApartmentBedrooms
-      
-      setApartmentBathrooms ApartmentProperty.SetApartmentBathrooms{newApartmentBathrooms} = do 
-        toInterfaceContractId <$> create this with bathrooms = newApartmentBathrooms
-      
-      setApartmentFloor ApartmentProperty.SetApartmentFloor{newApartmentFloor} = do 
-        toInterfaceContractId <$> create this with floor = newApartmentFloor
-
-      setApartmentParkingSpaces ApartmentProperty.SetApartmentParkingSpaces{newApartmentParkingSpaces} = do 
-        toInterfaceContractId <$> create this with parkingSpaces = newApartmentParkingSpaces
-      
-      setApartmentElevator ApartmentProperty.SetApartmentElevator{newApartmentElevator} = do 
-        toInterfaceContractId <$> create this with elevator = newApartmentElevator
-      
-      setApartmentBuildDate ApartmentProperty.SetApartmentBuildDate{newApartmentBuildDate} = do 
-        toInterfaceContractId <$> create this with buildDate = newApartmentBuildDate
-
-      setApartmentInstalledEquipment ApartmentProperty.SetApartmentInstalledEquipment{newApartmentInstalledEquipment} = do 
-        toInterfaceContractId <$> create this with installedEquipment = newApartmentInstalledEquipment
-      
-      setApartmentAdditionalInformation ApartmentProperty.SetApartmentAdditionalInformation{newApartmentAdditionalInformation} = do 
-        toInterfaceContractId <$> create this with additionalInformation = newApartmentAdditionalInformation
-      
-      setApartmentDescription ApartmentProperty.SetApartmentDescription{newApartmentDescription} = do 
-        toInterfaceContractId <$> create this with description = newApartmentDescription
-      
-      setApartmentPhotoReferences ApartmentProperty.SetApartmentPhotoReferences{newPhotoReferences} = do 
-        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
+      updateApartment ApartmentProperty.UpdateApartment{newApartmentPrice,newApartmentPropertyAddress,newApartmentPropertyPostalCode,newApartmentPropertyDistrict,newApartmentPropertyCounty,newApartmentGrossArea,newApartmentUsableArea,newApartmentBedrooms,newApartmentBathrooms,newApartmentFloor,newApartmentParkingSpaces,newApartmentElevator,newApartmentBuildDate,newApartmentInstalledEquipment,newApartmentAdditionalInformation,newApartmentDescription,newApartmentPhotoReferences} = do 
+        toInterfaceContractId <$> create this with apartmentPrice = newApartmentPrice, propertyAddress = newApartmentPropertyAddress, propertyPostalCode = newApartmentPropertyPostalCode, propertyDistrict = newApartmentPropertyDistrict, propertyCounty = newApartmentPropertyCounty, grossArea=newApartmentGrossArea, usableArea=newApartmentUsableArea, bedrooms=newApartmentBedrooms, bathrooms=newApartmentBathrooms, floor=newApartmentFloor, parkingSpaces=newApartmentParkingSpaces, elevator=newApartmentElevator, buildDate=newApartmentBuildDate, installedEquipment=newApartmentInstalledEquipment, additionalInformation=newApartmentAdditionalInformation, description=newApartmentDescription, photoReferences=newApartmentPhotoReferences
 
     interface instance Disclosure.I for ApartmentProperty where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers

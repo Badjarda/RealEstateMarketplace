@@ -2,7 +2,7 @@ module App.PropertyManager.Property.GarageProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty(I, View(..), GetGarageInstrumentKey(..), GetGaragePrice(..), GetGaragePropertyAddress(..), GetGaragePropertyPostalCode(..), GetGaragePropertyDistrict(..), GetGaragePropertyCounty(..), GetGarageType(..), GetGarageArea(..), GetVehicleCapacity(..), GetGarageInstalledEquipment(..), GetGarageAdditionalInformation(..), GetGarageDescription(..), GetGaragePhotoReferences(..), SetGaragePhotoReferences(..), SetGarageDescription(..), SetGarageAdditionalInformation(..), SetGarageInstalledEquipment(..), SetGarageType(..), SetGarageArea(..), SetVehicleCapacity(..), SetGaragePropertyCounty(..), SetGaragePropertyDistrict(..), SetGaragePropertyPostalCode(..), SetGaragePropertyAddress(..), SetGaragePrice(..), SetGarageInstrumentKey(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty(I, View(..), GetGarageInstrumentKey(..), GetGaragePrice(..), GetGaragePropertyAddress(..), GetGaragePropertyPostalCode(..), GetGaragePropertyDistrict(..), GetGaragePropertyCounty(..), GetGarageType(..), GetGarageArea(..), GetVehicleCapacity(..), GetGarageInstalledEquipment(..), GetGarageAdditionalInformation(..), GetGarageDescription(..), GetGaragePhotoReferences(..), UpdateGarage(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.GarageProperty.Factory qualified as GaragePropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (GarageType)
 
@@ -80,44 +80,8 @@ template GarageProperty
       getGaragePhotoReferences GarageProperty.GetGaragePhotoReferences{} = do 
         pure photoReferences 
 
-      setGarageInstrumentKey GarageProperty.SetGarageInstrumentKey{newGarageInstrumentKey} = do 
-        toInterfaceContractId <$> create this with instrument = newGarageInstrumentKey
-      
-      setGaragePrice GarageProperty.SetGaragePrice{newGaragePrice} = do 
-        toInterfaceContractId <$> create this with garagePrice = newGaragePrice
-
-      setGaragePropertyAddress GarageProperty.SetGaragePropertyAddress{newGaragePropertyAddress} = do 
-        toInterfaceContractId <$> create this with propertyAddress = newGaragePropertyAddress
-      
-      setGaragePropertyPostalCode GarageProperty.SetGaragePropertyPostalCode{newGaragePropertyPostalCode} = do 
-        toInterfaceContractId <$> create this with propertyPostalCode = newGaragePropertyPostalCode
-      
-      setGaragePropertyDistrict GarageProperty.SetGaragePropertyDistrict{newGaragePropertyDistrict} = do 
-        toInterfaceContractId <$> create this with propertyDistrict = newGaragePropertyDistrict
-
-      setGaragePropertyCounty GarageProperty.SetGaragePropertyCounty{newGaragePropertyCounty} = do 
-        toInterfaceContractId <$> create this with propertyCounty = newGaragePropertyCounty
-      
-      setGarageType GarageProperty.SetGarageType{newGarageType} = do 
-        toInterfaceContractId <$> create this with garageType = newGarageType
-      
-      setGarageArea GarageProperty.SetGarageArea{newGarageArea} = do 
-        toInterfaceContractId <$> create this with garageArea = newGarageArea
-
-      setVehicleCapacity GarageProperty.SetVehicleCapacity{newVehicleCapacity} = do 
-        toInterfaceContractId <$> create this with vehicleCapacity = newVehicleCapacity
-
-      setGarageInstalledEquipment GarageProperty.SetGarageInstalledEquipment{newGarageInstalledEquipment} = do 
-        toInterfaceContractId <$> create this with installedEquipment = newGarageInstalledEquipment
-      
-      setGarageAdditionalInformation GarageProperty.SetGarageAdditionalInformation{newGarageAdditionalInformation} = do 
-        toInterfaceContractId <$> create this with additionalInformation = newGarageAdditionalInformation
-      
-      setGarageDescription GarageProperty.SetGarageDescription{newGarageDescription} = do 
-        toInterfaceContractId <$> create this with description = newGarageDescription
-      
-      setGaragePhotoReferences GarageProperty.SetGaragePhotoReferences{newPhotoReferences} = do 
-        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
+      updateGarage GarageProperty.UpdateGarage{newGaragePrice,newGaragePropertyAddress,newGaragePropertyPostalCode,newGaragePropertyDistrict,newGaragePropertyCounty,newGarageArea,newGarageType,newGarageVehicleCapacity,newGarageInstalledEquipment,newGarageAdditionalInformation, newGarageDescription,newGaragePhotoReferences} = do 
+        toInterfaceContractId <$> create this with garagePrice = newGaragePrice, propertyAddress=newGaragePropertyAddress,propertyPostalCode=newGaragePropertyPostalCode,propertyDistrict=newGaragePropertyDistrict, propertyCounty=newGaragePropertyCounty,garageArea=newGarageArea,garageType=newGarageType,vehicleCapacity=newGarageVehicleCapacity,installedEquipment=newGarageInstalledEquipment,additionalInformation=newGarageAdditionalInformation, description=newGarageDescription, photoReferences=newGaragePhotoReferences
 
     interface instance Disclosure.I for GarageProperty where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers

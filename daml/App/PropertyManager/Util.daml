@@ -5,11 +5,11 @@ import Interface.Common.Types (PropertyKey(..))
 import Interface.Common.Util (fetchAndRemove)
 import Interface.PropertyManager.Property.Common (GarageType, LandType, ViableConstructionTypes, ResidenceType, Parking, Orientation, WarehouseType)
 
-import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (R(..), SetApartmentInstrumentKey(..), GetApartmentPrice(..), SetApartmentPrice(..), SetApartmentPhotoReferences(..), SetApartmentPropertyAddress(..), SetApartmentPropertyPostalCode(..), SetApartmentPropertyDistrict(..), SetApartmentPropertyCounty(..), SetApartmentGrossArea(..), SetApartmentUsableArea(..), SetApartmentBedrooms(..), SetApartmentBathrooms(..), SetApartmentFloor(..), SetApartmentParkingSpaces(..), SetApartmentElevator(..), SetApartmentBuildDate(..), SetApartmentInstalledEquipment(..), SetApartmentAdditionalInformation(..), SetApartmentDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(R(..), SetLandInstrumentKey(..), SetLandPrice(..), SetLandPhotoReferences(..), SetLandPropertyAddress(..), SetLandPropertyPostalCode(..), SetLandPropertyDistrict(..), SetLandPropertyCounty(..), SetLandType(..), SetTotalLandArea(..), SetLandMinimumSurfaceForSale(..), SetLandBuildableArea(..), SetLandBuildableFloors(..), SetLandAccessByRoad(..), SetLandViableConstructionTypes(..), SetLandInstalledEquipment(..), SetLandAdditionalInformation(..), SetLandDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty (R(..), SetResidenceInstrumentKey(..), SetResidencePhotoReferences(..), SetResidencePrice(..), SetResidencePropertyAddress(..), SetResidencePropertyPostalCode(..), SetResidencePropertyDistrict(..), SetResidencePropertyCounty(..), SetResidenceGrossArea(..), SetResidenceUsableArea(..), SetResidenceBedrooms(..), SetResidenceBathrooms(..), SetResidenceFloors(..), SetResidenceType(..), SetResidenceBackyard(..), SetResidenceParking(..), SetResidenceBuildDate(..), SetResidenceOrientation(..), SetResidenceInstalledEquipment(..), SetResidenceAdditionalInformation(..), SetResidenceDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty (R(..), SetGarageInstrumentKey(..), SetGaragePhotoReferences(..), SetGaragePrice(..), SetGaragePropertyAddress(..), SetGaragePropertyPostalCode(..), SetGaragePropertyDistrict(..), SetGaragePropertyCounty(..), SetGarageArea(..), SetGarageType(..), SetVehicleCapacity(..), SetGarageInstalledEquipment(..), SetGarageAdditionalInformation(..), SetGarageDescription(..), SetCid(..))
-import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty (R(..), SetWarehouseInstrumentKey(..), SetWarehousePhotoReferences(..), SetWarehousePrice(..), SetWarehousePropertyAddress(..), SetWarehousePropertyPostalCode(..), SetWarehousePropertyDistrict(..), SetWarehousePropertyCounty(..), SetWarehouseType(..), SetWarehouseGrossArea(..), SetWarehouseUsableArea(..), SetWarehouseFloors(..), SetWarehouseBuildDate(..), SetWarehouseInstalledEquipment(..), SetWarehouseAdditionalInformation(..), SetWarehouseDescription(..),SetCid(..))
+import Interface.PropertyManager.Property.ApartmentProperty.ApartmentProperty qualified as ApartmentProperty (R(..), UpdateApartment(..) ,SetCid(..))
+import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(R(..), UpdateLand(..), SetCid(..))
+import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty (R(..), UpdateResidence(..), SetCid(..))
+import Interface.PropertyManager.Property.GarageProperty.GarageProperty qualified as GarageProperty (R(..), UpdateGarage(..), SetCid(..))
+import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty (R(..), UpdateWarehouse(..), SetCid(..))
 
 import Interface.PropertyManager.Choices.RequestCreateApartmentProperty qualified as RequestCreateApartmentProperty (I, View(..))
 import Interface.PropertyManager.Choices.RequestCreateLandProperty qualified as RequestCreateLandProperty (I, View(..))
@@ -99,257 +99,50 @@ createApartmentPropertyAux request = do
   exercise request.apartmentPropertyFactoryCid ApartmentProperty.Create with instrument = apartmentInstrument, propertyKey = apartmentProperty, ..
   pure (apartmentInstrument,apartmentProperty)
 
-data UpdateApartmentInstrumentKey = UpdateApartmentInstrumentKey
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newApartmentInstrumentKey: InstrumentKey
-
-updateApartmentInstrumentKeyAux: UpdateApartmentInstrumentKey -> Update ()
-updateApartmentInstrumentKeyAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentInstrumentKey with newApartmentInstrumentKey = request.newApartmentInstrumentKey
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentPrice = UpdateApartmentPrice
+data UpdateApartment = UpdateApartment
   with
     operator: Party
     user: Party
     propertyKey: PropertyKey
     newApartmentPrice: Decimal
-
-updateApartmentPriceAux: UpdateApartmentPrice -> Update ()
-updateApartmentPriceAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentPrice with newApartmentPrice = request.newApartmentPrice
-  price <- exercise ref.cid ApartmentProperty.GetApartmentPrice
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentPropertyAddress = UpdateApartmentPropertyAddress
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentPropertyAddress: Text
-
-updateApartmentPropertyAdressAux: UpdateApartmentPropertyAddress -> Update ()
-updateApartmentPropertyAdressAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentPropertyAddress with newApartmentPropertyAddress = request.newApartmentPropertyAddress
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentPropertyPostalCode = UpdateApartmentPropertyPostalCode
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newApartmentPropertyPostalCode: Text
-
-updateApartmentPropertyPostalCodeAux: UpdateApartmentPropertyPostalCode -> Update ()
-updateApartmentPropertyPostalCodeAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentPropertyPostalCode with newApartmentPropertyPostalCode = request.newApartmentPropertyPostalCode
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentPropertyDistrict = UpdateApartmentPropertyDistrict
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newApartmentPropertyDistrict: Text
-
-updateApartmentPropertyDistrictAux: UpdateApartmentPropertyDistrict -> Update ()
-updateApartmentPropertyDistrictAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentPropertyDistrict with newApartmentPropertyDistrict = request.newApartmentPropertyDistrict
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentPropertyCounty = UpdateApartmentPropertyCounty
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newApartmentPropertyCounty: Text
-
-updateApartmentPropertyCountyAux: UpdateApartmentPropertyCounty -> Update ()
-updateApartmentPropertyCountyAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentPropertyCounty with newApartmentPropertyCounty = request.newApartmentPropertyCounty
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-
-data UpdateApartmentGrossArea = UpdateApartmentGrossArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newApartmentPropertyPostalCode : Text
+    newApartmentPropertyDistrict : Text
+    newApartmentPropertyCounty : Text
     newApartmentGrossArea: Decimal
-
-updateApartmentGrossAreaAux: UpdateApartmentGrossArea -> Update ()
-updateApartmentGrossAreaAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentGrossArea with newApartmentGrossArea = request.newApartmentGrossArea
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentUsableArea = UpdateApartmentUsableArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentUsableArea: Decimal
-
-updateApartmentUsableAreaAux: UpdateApartmentUsableArea -> Update ()
-updateApartmentUsableAreaAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentUsableArea with newApartmentUsableArea = request.newApartmentUsableArea
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentBedrooms = UpdateApartmentBedrooms
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentBedrooms: Int
-
-updateApartmentBedroomsAux: UpdateApartmentBedrooms -> Update ()
-updateApartmentBedroomsAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentBedrooms with newApartmentBedrooms = request.newApartmentBedrooms
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentBathrooms = UpdateApartmentBathrooms
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentBathrooms: Int
-
-updateApartmentBathroomsAux: UpdateApartmentBathrooms -> Update ()
-updateApartmentBathroomsAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentBathrooms with newApartmentBathrooms = request.newApartmentBathrooms
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentFloor = UpdateApartmentFloor
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentFloor: Int
-
-updateApartmentFloorAux: UpdateApartmentFloor -> Update ()
-updateApartmentFloorAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentFloor with newApartmentFloor = request.newApartmentFloor
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentParkingSpaces = UpdateApartmentParkingSpaces
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentParkingSpaces: Int
-
-updateApartmentParkingSpacesAux: UpdateApartmentParkingSpaces -> Update ()
-updateApartmentParkingSpacesAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentParkingSpaces with newApartmentParkingSpaces = request.newApartmentParkingSpaces
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentElevator = UpdateApartmentElevator
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentElevator: Bool
-
-updateApartmentElevatorAux: UpdateApartmentElevator -> Update ()
-updateApartmentElevatorAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentElevator with newApartmentElevator = request.newApartmentElevator
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentBuildDate = UpdateApartmentBuildDate
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentBuildDate: Date
-
-updateApartmentBuildDateAux: UpdateApartmentBuildDate -> Update ()
-updateApartmentBuildDateAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentBuildDate with newApartmentBuildDate = request.newApartmentBuildDate
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentInstalledEquipment = UpdateApartmentInstalledEquipment
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentInstalledEquipment: Text
-
-updateApartmentInstalledEquipmentAux: UpdateApartmentInstalledEquipment -> Update ()
-updateApartmentInstalledEquipmentAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentInstalledEquipment with newApartmentInstalledEquipment = request.newApartmentInstalledEquipment
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentAdditionalInformation = UpdateApartmentAdditionalInformation
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newApartmentAdditionalInformation: Text
-
-updateApartmentAdditionalInformationAux: UpdateApartmentAdditionalInformation -> Update ()
-updateApartmentAdditionalInformationAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentAdditionalInformation with newApartmentAdditionalInformation = request.newApartmentAdditionalInformation
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentDescription = UpdateApartmentDescription
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newApartmentAdditionalInformation: Text 
     newApartmentDescription: Text
-
-updateApartmentDescriptionAux: UpdateApartmentDescription -> Update ()
-updateApartmentDescriptionAux request = do
-  (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentDescription with newApartmentDescription = request.newApartmentDescription
-  exercise refCid ApartmentProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateApartmentPhotoReferences = UpdateApartmentPhotoReferences
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newApartmentPhotoReferences: [Text]
 
-updateApartmentPhotoReferencesAux: UpdateApartmentPhotoReferences -> Update ()
-updateApartmentPhotoReferencesAux request = do
+updateApartmentAux: UpdateApartment -> Update ()
+updateApartmentAux request = do
   (refCid, ref) <- fetchByKey @ApartmentProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ApartmentProperty.SetApartmentPhotoReferences with newPhotoReferences = request.newApartmentPhotoReferences
+  cid <- exercise ref.cid ApartmentProperty.UpdateApartment with 
+    newApartmentPrice = request.newApartmentPrice,
+      newApartmentPropertyAddress = request.newApartmentPropertyAddress,
+      newApartmentPropertyPostalCode= request.newApartmentPropertyPostalCode,
+      newApartmentPropertyDistrict= request.newApartmentPropertyDistrict,
+      newApartmentPropertyCounty= request.newApartmentPropertyCounty,
+      newApartmentGrossArea= request.newApartmentGrossArea,
+      newApartmentUsableArea= request.newApartmentUsableArea,
+      newApartmentBedrooms= request.newApartmentBedrooms,
+      newApartmentBathrooms= request.newApartmentBathrooms,
+      newApartmentFloor= request.newApartmentFloor,
+      newApartmentParkingSpaces= request.newApartmentParkingSpaces,
+      newApartmentElevator= request.newApartmentElevator,
+      newApartmentBuildDate= request.newApartmentBuildDate,
+      newApartmentInstalledEquipment= request.newApartmentInstalledEquipment,
+      newApartmentAdditionalInformation= request.newApartmentAdditionalInformation,
+      newApartmentDescription= request.newApartmentDescription,
+      newApartmentPhotoReferences= request.newApartmentPhotoReferences
   exercise refCid ApartmentProperty.SetCid with newCid = cid
   pure()
 
@@ -422,244 +215,51 @@ createLandPropertyAux request = do
   exercise request.landPropertyFactoryCid LandProperty.Create with instrument = landInstrument, propertyKey = landProperty, ..
   pure (landInstrument,landProperty)
 
-data UpdateLandInstrumentKey = UpdateLandInstrumentKey
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newLandInstrumentKey: InstrumentKey
-
-updateLandInstrumentKeyAux: UpdateLandInstrumentKey -> Update ()
-updateLandInstrumentKeyAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandInstrumentKey with newLandInstrumentKey = request.newLandInstrumentKey
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandPrice = UpdateLandPrice
+data UpdateLand = UpdateLand
   with
     operator: Party
     user: Party
     propertyKey: PropertyKey
     newLandPrice: Decimal
-
-updateLandPriceAux: UpdateLandPrice -> Update ()
-updateLandPriceAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandPrice with newLandPrice = request.newLandPrice
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandPropertyAddress = UpdateLandPropertyAddress
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newLandPropertyAddress: Text
-
-updateLandPropertyAdressAux: UpdateLandPropertyAddress -> Update ()
-updateLandPropertyAdressAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandPropertyAddress with newLandPropertyAddress = request.newLandPropertyAddress
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandPropertyPostalCode = UpdateLandPropertyPostalCode
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newLandPropertyPostalCode: Text
-
-updateLandPropertyPostalCodeAux: UpdateLandPropertyPostalCode -> Update ()
-updateLandPropertyPostalCodeAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandPropertyPostalCode with newLandPropertyPostalCode = request.newLandPropertyPostalCode
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandPropertyDistrict = UpdateLandPropertyDistrict
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newLandPropertyDistrict: Text
-
-updateLandPropertyDistrictAux: UpdateLandPropertyDistrict -> Update ()
-updateLandPropertyDistrictAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandPropertyDistrict with newLandPropertyDistrict = request.newLandPropertyDistrict
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandPropertyCounty = UpdateLandPropertyCounty
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newLandPropertyCounty: Text
-
-updateLandPropertyCountyAux: UpdateLandPropertyCounty -> Update ()
-updateLandPropertyCountyAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandPropertyCounty with newLandPropertyCounty = request.newLandPropertyCounty
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandType = UpdateLandType
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newLandPropertyPostalCode : Text
+    newLandPropertyDistrict : Text
+    newLandPropertyCounty : Text
     newLandType: LandType
-
-updateLandTypeAux: UpdateLandType -> Update ()
-updateLandTypeAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandType with newLandType = request.newLandType
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateTotalLandArea = UpdateTotalLandArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newTotalLandArea: Decimal
-
-updateTotalLandAreaAux: UpdateTotalLandArea -> Update ()
-updateTotalLandAreaAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetTotalLandArea with newTotalLandArea = request.newTotalLandArea
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandMinimumSurfaceForSale = UpdateLandMinimumSurfaceForSale
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newLandTotalArea: Decimal
     newLandMinimumSurfaceForSale: Decimal
-
-updateLandMinimumSurfaceForSaleAux: UpdateLandMinimumSurfaceForSale -> Update ()
-updateLandMinimumSurfaceForSaleAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandMinimumSurfaceForSale with newMinimumSurfaceForSale = request.newLandMinimumSurfaceForSale
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandBuildableArea = UpdateLandBuildableArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newLandBuildableArea: Decimal
-
-updateLandBuildableAreaAux: UpdateLandBuildableArea -> Update ()
-updateLandBuildableAreaAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandBuildableArea with newBuildableArea = request.newLandBuildableArea
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandBuildableFloors = UpdateLandBuildableFloors
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newLandBuildableFloors: Int
-
-updateLandBuildableFloorsAux: UpdateLandBuildableFloors -> Update ()
-updateLandBuildableFloorsAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandBuildableFloors with newBuildableFloors = request.newLandBuildableFloors
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandAccessByRoad = UpdateLandAccessByRoad
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newLandAccessByRoad: Bool
-
-updateLandAccessByRoadAux: UpdateLandAccessByRoad -> Update ()
-updateLandAccessByRoadAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandAccessByRoad with newLandAccessByRoad = request.newLandAccessByRoad
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandViableConstructionTypes = UpdateLandViableConstructionTypes
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newLandViableConstructionTypes: [ViableConstructionTypes]
-
-updateLandViableConstructionTypesAux: UpdateLandViableConstructionTypes -> Update ()
-updateLandViableConstructionTypesAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandViableConstructionTypes with newLandViableConstructionTypes = request.newLandViableConstructionTypes
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandInstalledEquipment = UpdateLandInstalledEquipment
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newLandInstalledEquipment: Text
-
-updateLandInstalledEquipmentAux: UpdateLandInstalledEquipment -> Update ()
-updateLandInstalledEquipmentAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandInstalledEquipment with newLandInstalledEquipment = request.newLandInstalledEquipment
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandAdditionalInformation = UpdateLandAdditionalInformation
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newLandAdditionalInformation: Text
-
-updateLandAdditionalInformationAux: UpdateLandAdditionalInformation -> Update ()
-updateLandAdditionalInformationAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandAdditionalInformation with newLandAdditionalInformation = request.newLandAdditionalInformation
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandDescription = UpdateLandDescription
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newLandViableConstructionTypes: [ViableConstructionTypes]
+    newLandAdditionalInformation: Text 
     newLandDescription: Text
-
-updateLandDescriptionAux: UpdateLandDescription -> Update ()
-updateLandDescriptionAux request = do
-  (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandDescription with newLandDescription = request.newLandDescription
-  exercise refCid LandProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateLandPhotoReferences = UpdateLandPhotoReferences
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newLandPhotoReferences: [Text]
 
-updateLandPhotoReferencesAux: UpdateLandPhotoReferences -> Update ()
-updateLandPhotoReferencesAux request = do
+updateLandAux: UpdateLand -> Update ()
+updateLandAux request = do
   (refCid, ref) <- fetchByKey @LandProperty.R (request.propertyKey)
-  cid <- exercise ref.cid LandProperty.SetLandPhotoReferences with newPhotoReferences = request.newLandPhotoReferences
+  cid <- exercise ref.cid LandProperty.UpdateLand with 
+      newLandPrice = request.newLandPrice,
+        newLandPropertyAddress = request.newLandPropertyAddress,
+        newLandPropertyPostalCode = request.newLandPropertyPostalCode,
+        newLandPropertyDistrict = request.newLandPropertyDistrict,
+        newLandPropertyCounty = request.newLandPropertyCounty,
+        newLandType = request.newLandType,
+        newLandTotalArea = request.newLandTotalArea,
+        newLandMinimumSurfaceForSale = request.newLandMinimumSurfaceForSale,
+        newLandBuildableArea = request.newLandBuildableArea,
+        newLandBuildableFloors = request.newLandBuildableFloors,
+        newLandAccessByRoad = request.newLandAccessByRoad,
+        newLandInstalledEquipment = request.newLandInstalledEquipment,
+        newLandViableConstructionTypes = request.newLandViableConstructionTypes,
+        newLandAdditionalInformation = request.newLandAdditionalInformation,
+        newLandDescription = request.newLandDescription,
+        newLandPhotoReferences = request.newLandPhotoReferences
+
   exercise refCid LandProperty.SetCid with newCid = cid
   pure()
-
 
 ----------------------------------------------------------
 
@@ -736,283 +336,54 @@ createResidencePropertyAux request = do
   exercise request.residencePropertyFactoryCid ResidenceProperty.Create with instrument = residenceInstrument, propertyKey = residenceProperty, ..
   pure (residenceInstrument, residenceProperty)
 
-data UpdateResidenceInstrumentKey = UpdateResidenceInstrumentKey
+data UpdateResidence = UpdateResidence
   with
     operator: Party
     user: Party
     propertyKey: PropertyKey
-    newResidenceInstrumentKey: InstrumentKey
+    newResidencePrice : Decimal
+    newResidencePropertyAddress : Text
+    newResidencePropertyPostalCode : Text
+    newResidencePropertyDistrict : Text
+    newResidencePropertyCounty : Text
+    newResidenceGrossArea : Decimal
+    newResidenceUsableArea : Decimal
+    newResidenceBedrooms : Int
+    newResidenceBathrooms : Int
+    newResidenceFloors : Int
+    newResidenceType : ResidenceType
+    newResidenceBackyard : Text
+    newResidenceParking : Parking
+    newResidenceBuildDate : Date
+    newResidenceOrientation : Orientation
+    newResidenceInstalledEquipment : Text
+    newResidenceAdditionalInformation : Text
+    newResidenceDescription : Text
+    newResidencePhotoReferences : [Text]
 
-updateResidenceInstrumentKeyAux: UpdateResidenceInstrumentKey -> Update ()
-updateResidenceInstrumentKeyAux request = do
+updateResidenceAux: UpdateResidence -> Update ()
+updateResidenceAux request = do
   (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceInstrumentKey with newResidenceInstrumentKey = request.newResidenceInstrumentKey
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateResidencePrice = UpdateResidencePrice
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidencePrice: Decimal
-
-updateResidencePriceAux: UpdateResidencePrice -> Update ()
-updateResidencePriceAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidencePrice with newResidencePrice = request.newResidencePrice
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateResidencePropertyAddress = UpdateResidencePropertyAddress
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidencePropertyAddress: Text
-
-data UpdateResidencePropertyPostalCode = UpdateResidencePropertyPostalCode
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidencePropertyPostalCode: Text
-
-data UpdateResidencePropertyDistrict = UpdateResidencePropertyDistrict
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidencePropertyDistrict: Text
-
-data UpdateResidencePropertyCounty = UpdateResidencePropertyCounty
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidencePropertyCounty: Text
-
-data UpdateResidenceGrossArea = UpdateResidenceGrossArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceGrossArea: Decimal
-
-data UpdateResidenceUsableArea = UpdateResidenceUsableArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceUsableArea: Decimal
-
-data UpdateResidenceBedrooms = UpdateResidenceBedrooms
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceBedrooms: Int
-
-data UpdateResidenceBathrooms = UpdateResidenceBathrooms
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceBathrooms: Int
-
-data UpdateResidenceFloors = UpdateResidenceFloors
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceFloors: Int
-
-data UpdateResidenceType = UpdateResidenceType
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceType: ResidenceType
-
-data UpdateResidenceBackyard = UpdateResidenceBackyard
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceBackyardDescription: Text
-
-data UpdateResidenceParking = UpdateResidenceParking
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceParking: Parking
-
-data UpdateResidenceBuildDate = UpdateResidenceBuildDate
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceBuildDate: Date
-
-data UpdateResidenceOrientation = UpdateResidenceOrientation
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceOrientation: Orientation
-
-data UpdateResidenceInstalledEquipment = UpdateResidenceInstalledEquipment
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceInstalledEquipment: Text
-
-data UpdateResidenceAdditionalInformation = UpdateResidenceAdditionalInformation
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceAdditionalInformation: Text
-
-data UpdateResidenceDescription = UpdateResidenceDescription
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidenceDescription: Text
-
-updateResidencePropertyAddressAux: UpdateResidencePropertyAddress -> Update ()
-updateResidencePropertyAddressAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidencePropertyAddress with newResidencePropertyAddress = request.newResidencePropertyAddress
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidencePropertyPostalCodeAux: UpdateResidencePropertyPostalCode -> Update ()
-updateResidencePropertyPostalCodeAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidencePropertyPostalCode with newResidencePropertyPostalCode = request.newResidencePropertyPostalCode
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidencePropertyDistrictAux: UpdateResidencePropertyDistrict -> Update ()
-updateResidencePropertyDistrictAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidencePropertyDistrict with newResidencePropertyDistrict = request.newResidencePropertyDistrict
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidencePropertyCountyAux: UpdateResidencePropertyCounty -> Update ()
-updateResidencePropertyCountyAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidencePropertyCounty with newResidencePropertyCounty = request.newResidencePropertyCounty
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceGrossAreaAux: UpdateResidenceGrossArea -> Update ()
-updateResidenceGrossAreaAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceGrossArea with newResidenceGrossArea = request.newResidenceGrossArea
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceUsableAreaAux: UpdateResidenceUsableArea -> Update ()
-updateResidenceUsableAreaAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceUsableArea with newResidenceUsableArea = request.newResidenceUsableArea
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceBedroomsAux: UpdateResidenceBedrooms -> Update ()
-updateResidenceBedroomsAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceBedrooms with newResidenceBedrooms = request.newResidenceBedrooms
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceBathroomsAux: UpdateResidenceBathrooms -> Update ()
-updateResidenceBathroomsAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceBathrooms with newResidenceBathrooms = request.newResidenceBathrooms
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceFloorsAux: UpdateResidenceFloors -> Update ()
-updateResidenceFloorsAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceFloors with newResidenceFloors = request.newResidenceFloors
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceTypeAux: UpdateResidenceType -> Update ()
-updateResidenceTypeAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceType with newResidenceType = request.newResidenceType
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceBackyardAux: UpdateResidenceBackyard -> Update ()
-updateResidenceBackyardAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceBackyard with newResidenceBackyard = request.newResidenceBackyardDescription
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceParkingAux: UpdateResidenceParking -> Update ()
-updateResidenceParkingAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceParking with newResidenceParking = request.newResidenceParking
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceBuildDateAux: UpdateResidenceBuildDate -> Update ()
-updateResidenceBuildDateAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceBuildDate with newResidenceBuildDate = request.newResidenceBuildDate
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceOrientationAux: UpdateResidenceOrientation -> Update ()
-updateResidenceOrientationAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceOrientation with newOrientation = request.newResidenceOrientation
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceInstalledEquipmentAux: UpdateResidenceInstalledEquipment -> Update ()
-updateResidenceInstalledEquipmentAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceInstalledEquipment with newResidenceInstalledEquipment = request.newResidenceInstalledEquipment
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceAdditionalInformationAux: UpdateResidenceAdditionalInformation -> Update ()
-updateResidenceAdditionalInformationAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceAdditionalInformation with newResidenceAdditionalInformation = request.newResidenceAdditionalInformation
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-updateResidenceDescriptionAux: UpdateResidenceDescription -> Update ()
-updateResidenceDescriptionAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidenceDescription with newResidenceDescription = request.newResidenceDescription
-  exercise refCid ResidenceProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateResidencePhotoReferences = UpdateResidencePhotoReferences
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newResidencePhotoReferences: [Text]
-
-updateResidencePhotoReferencesAux: UpdateResidencePhotoReferences -> Update ()
-updateResidencePhotoReferencesAux request = do
-  (refCid, ref) <- fetchByKey @ResidenceProperty.R (request.propertyKey)
-  cid <- exercise ref.cid ResidenceProperty.SetResidencePhotoReferences with newPhotoReferences = request.newResidencePhotoReferences
+  cid <- exercise ref.cid ResidenceProperty.UpdateResidence with 
+    newResidencePrice = request.newResidencePrice,
+      newResidencePropertyAddress= request.newResidencePropertyAddress,
+      newResidencePropertyPostalCode= request.newResidencePropertyPostalCode,
+      newResidencePropertyDistrict= request.newResidencePropertyDistrict,
+      newResidencePropertyCounty= request.newResidencePropertyCounty,
+      newResidenceGrossArea= request.newResidenceGrossArea,
+      newResidenceUsableArea= request.newResidenceUsableArea,
+      newResidenceBedrooms= request.newResidenceBedrooms,
+      newResidenceBathrooms= request.newResidenceBathrooms,
+      newResidenceFloors = request.newResidenceFloors,
+      newResidenceType = request.newResidenceType,
+      newResidenceBackyard = request.newResidenceBackyard,
+      newResidenceParking = request.newResidenceParking,
+      newResidenceBuildDate = request.newResidenceBuildDate,
+      newResidenceOrientation = request.newResidenceOrientation,
+      newResidenceInstalledEquipment = request.newResidenceInstalledEquipment,
+      newResidenceAdditionalInformation = request.newResidenceAdditionalInformation,
+      newResidenceDescription = request.newResidenceDescription,
+      newResidencePhotoReferences  = request.newResidencePhotoReferences
   exercise refCid ResidenceProperty.SetCid with newCid = cid
   pure()
 
@@ -1077,185 +448,40 @@ createGaragePropertyAux request = do
   exercise request.garagePropertyFactoryCid GarageProperty.Create with instrument = garageInstrument, propertyKey = garageProperty, ..
   pure (garageInstrument, garageProperty)
 
-data UpdateGarageInstrumentKey = UpdateGarageInstrumentKey
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newGarageInstrumentKey: InstrumentKey
-
-updateGarageInstrumentKeyAux: UpdateGarageInstrumentKey -> Update ()
-updateGarageInstrumentKeyAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGarageInstrumentKey with newGarageInstrumentKey = request.newGarageInstrumentKey
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateGaragePrice = UpdateGaragePrice
+data UpdateGarage = UpdateGarage
   with
     operator: Party
     user: Party
     propertyKey: PropertyKey
     newGaragePrice: Decimal
-
-updateGaragePriceAux: UpdateGaragePrice -> Update ()
-updateGaragePriceAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGaragePrice with newGaragePrice = request.newGaragePrice
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateGaragePropertyAddress = UpdateGaragePropertyAddress
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newGaragePropertyAddress: Text
-
-data UpdateGaragePropertyPostalCode = UpdateGaragePropertyPostalCode
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newGaragePropertyPostalCode: Text
-
-data UpdateGaragePropertyDistrict = UpdateGaragePropertyDistrict
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newGaragePropertyDistrict: Text
-
-data UpdateGaragePropertyCounty = UpdateGaragePropertyCounty
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newGaragePropertyCounty: Text
-
-data UpdateGarageArea = UpdateGarageArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newGaragePropertyPostalCode : Text
+    newGaragePropertyDistrict : Text
+    newGaragePropertyCounty : Text
     newGarageArea: Decimal
-
-data UpdateGarageType = UpdateGarageType
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newGarageType: GarageType
-
-data UpdateVehicleCapacity = UpdateVehicleCapacity
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newVehicleCapacity: Int
-
-data UpdateGarageInstalledEquipment = UpdateGarageInstalledEquipment
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newGarageVehicleCapacity: Int
     newGarageInstalledEquipment: Text
-
-data UpdateGarageAdditionalInformation = UpdateGarageAdditionalInformation
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newGarageAdditionalInformation: Text
-
-data UpdateGarageDescription = UpdateGarageDescription
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
+    newGarageAdditionalInformation: Text 
     newGarageDescription: Text
-
-updateGaragePropertyAddressAux: UpdateGaragePropertyAddress -> Update ()
-updateGaragePropertyAddressAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGaragePropertyAddress with newGaragePropertyAddress = request.newGaragePropertyAddress
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGaragePropertyPostalCodeAux: UpdateGaragePropertyPostalCode -> Update ()
-updateGaragePropertyPostalCodeAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGaragePropertyPostalCode with newGaragePropertyPostalCode = request.newGaragePropertyPostalCode
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGaragePropertyDistrictAux: UpdateGaragePropertyDistrict -> Update ()
-updateGaragePropertyDistrictAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGaragePropertyDistrict with newGaragePropertyDistrict = request.newGaragePropertyDistrict
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGaragePropertyCountyAux: UpdateGaragePropertyCounty -> Update ()
-updateGaragePropertyCountyAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGaragePropertyCounty with newGaragePropertyCounty = request.newGaragePropertyCounty
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGarageAreaAux: UpdateGarageArea -> Update ()
-updateGarageAreaAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGarageArea with newGarageArea = request.newGarageArea
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGarageTypeAux: UpdateGarageType -> Update ()
-updateGarageTypeAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGarageType with newGarageType = request.newGarageType
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateVehicleCapacityAux: UpdateVehicleCapacity -> Update ()
-updateVehicleCapacityAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetVehicleCapacity with newVehicleCapacity = request.newVehicleCapacity
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGarageInstalledEquipmentAux: UpdateGarageInstalledEquipment -> Update ()
-updateGarageInstalledEquipmentAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGarageInstalledEquipment with newGarageInstalledEquipment = request.newGarageInstalledEquipment
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGarageAdditionalInformationAux: UpdateGarageAdditionalInformation -> Update ()
-updateGarageAdditionalInformationAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGarageAdditionalInformation with newGarageAdditionalInformation = request.newGarageAdditionalInformation
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-updateGarageDescriptionAux: UpdateGarageDescription -> Update ()
-updateGarageDescriptionAux request = do
-  (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGarageDescription with newGarageDescription = request.newGarageDescription
-  exercise refCid GarageProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateGaragePhotoReferences = UpdateGaragePhotoReferences
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
     newGaragePhotoReferences: [Text]
 
-updateGaragePhotoReferencesAux: UpdateGaragePhotoReferences -> Update ()
-updateGaragePhotoReferencesAux request = do
+updateGarageAux: UpdateGarage -> Update ()
+updateGarageAux request = do
   (refCid, ref) <- fetchByKey @GarageProperty.R (request.propertyKey)
-  cid <- exercise ref.cid GarageProperty.SetGaragePhotoReferences with newPhotoReferences = request.newGaragePhotoReferences
+  cid <- exercise ref.cid GarageProperty.UpdateGarage with 
+    newGaragePrice = request.newGaragePrice,
+      newGaragePropertyAddress = request.newGaragePropertyAddress,
+      newGaragePropertyPostalCode = request.newGaragePropertyPostalCode,
+      newGaragePropertyDistrict = request.newGaragePropertyDistrict,
+      newGaragePropertyCounty = request.newGaragePropertyCounty,
+      newGarageArea = request.newGarageArea,
+      newGarageType = request.newGarageType,
+      newGarageVehicleCapacity = request.newGarageVehicleCapacity,
+      newGarageInstalledEquipment = request.newGarageInstalledEquipment,
+      newGarageAdditionalInformation = request.newGarageAdditionalInformation,
+      newGarageDescription = request.newGarageDescription,
+      newGaragePhotoReferences = request.newGaragePhotoReferences
   exercise refCid GarageProperty.SetCid with newCid = cid
   pure()
 
@@ -1324,212 +550,43 @@ createWarehousePropertyAux request = do
   exercise request.warehousePropertyFactoryCid WarehouseProperty.Create with instrument = warehouseInstrument, propertyKey = warehouseProperty, ..
   pure (warehouseInstrument, warehouseProperty)
 
-data UpdateWarehouseInstrumentKey = UpdateWarehouseInstrumentKey
+data UpdateWarehouse = UpdateWarehouse
   with
     operator: Party
     user: Party
     propertyKey: PropertyKey
-    newWarehouseInstrumentKey: InstrumentKey
+    newWarehousePrice : Decimal
+    newWarehousePropertyAddress : Text
+    newWarehousePropertyPostalCode : Text
+    newWarehousePropertyDistrict : Text
+    newWarehousePropertyCounty : Text
+    newWarehouseType : WarehouseType
+    newWarehouseGrossArea : Decimal
+    newWarehouseUsableArea : Decimal
+    newWarehouseFloors : Int
+    newWarehouseBuildDate : Date
+    newWarehouseInstalledEquipment : Text
+    newWarehouseAdditionalInformation : Text
+    newWarehouseDescription : Text
+    newWarehousePhotoReferences : [Text]
 
-updateWarehouseInstrumentKeyAux: UpdateWarehouseInstrumentKey -> Update ()
-updateWarehouseInstrumentKeyAux request = do
+updateWarehouseAux: UpdateWarehouse -> Update ()
+updateWarehouseAux request = do
   (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseInstrumentKey with newWarehouseInstrumentKey = request.newWarehouseInstrumentKey
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateWarehousePrice = UpdateWarehousePrice
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehousePrice: Decimal
-
-updateWarehousePriceAux: UpdateWarehousePrice -> Update ()
-updateWarehousePriceAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehousePrice with newWarehousePrice = request.newWarehousePrice
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateWarehousePropertyAddress = UpdateWarehousePropertyAddress
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehousePropertyAddress: Text
-
-data UpdateWarehousePropertyPostalCode = UpdateWarehousePropertyPostalCode
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehousePropertyPostalCode: Text
-
-data UpdateWarehousePropertyDistrict = UpdateWarehousePropertyDistrict
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehousePropertyDistrict: Text
-
-data UpdateWarehousePropertyCounty = UpdateWarehousePropertyCounty
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehousePropertyCounty: Text
-
-data UpdateWarehouseType = UpdateWarehouseType
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseType: WarehouseType
-
-data UpdateWarehouseGrossArea = UpdateWarehouseGrossArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseGrossArea: Decimal
-
-data UpdateWarehouseUsableArea = UpdateWarehouseUsableArea
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseUsableArea: Decimal
-
-data UpdateWarehouseFloors = UpdateWarehouseFloors
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseFloors: Int
-
-data UpdateWarehouseBuildDate = UpdateWarehouseBuildDate
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseBuildDate: Date
-
-data UpdateWarehouseInstalledEquipment = UpdateWarehouseInstalledEquipment
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseInstalledEquipment: Text
-
-data UpdateWarehouseAdditionalInformation = UpdateWarehouseAdditionalInformation
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseAdditionalInformation: Text
-
-data UpdateWarehouseDescription = UpdateWarehouseDescription
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehouseDescription: Text
-
-updateWarehousePropertyAddressAux: UpdateWarehousePropertyAddress -> Update ()
-updateWarehousePropertyAddressAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehousePropertyAddress with newWarehousePropertyAddress = request.newWarehousePropertyAddress
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehousePropertyPostalCodeAux: UpdateWarehousePropertyPostalCode -> Update ()
-updateWarehousePropertyPostalCodeAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehousePropertyPostalCode with newWarehousePropertyPostalCode = request.newWarehousePropertyPostalCode
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehousePropertyDistrictAux: UpdateWarehousePropertyDistrict -> Update ()
-updateWarehousePropertyDistrictAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehousePropertyDistrict with newWarehousePropertyDistrict = request.newWarehousePropertyDistrict
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehousePropertyCountyAux: UpdateWarehousePropertyCounty -> Update ()
-updateWarehousePropertyCountyAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehousePropertyCounty with newWarehousePropertyCounty = request.newWarehousePropertyCounty
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseTypeAux: UpdateWarehouseType -> Update ()
-updateWarehouseTypeAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseType with newWarehouseType = request.newWarehouseType
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseGrossAreaAux: UpdateWarehouseGrossArea -> Update ()
-updateWarehouseGrossAreaAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseGrossArea with newWarehouseGrossArea = request.newWarehouseGrossArea
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseUsableAreaAux: UpdateWarehouseUsableArea -> Update ()
-updateWarehouseUsableAreaAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseUsableArea with newWarehouseUsableArea = request.newWarehouseUsableArea
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseFloorsAux: UpdateWarehouseFloors -> Update ()
-updateWarehouseFloorsAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseFloors with newWarehouseFloors = request.newWarehouseFloors
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseBuildDateAux: UpdateWarehouseBuildDate -> Update ()
-updateWarehouseBuildDateAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseBuildDate with newWarehouseBuildDate = request.newWarehouseBuildDate
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseInstalledEquipmentAux: UpdateWarehouseInstalledEquipment -> Update ()
-updateWarehouseInstalledEquipmentAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseInstalledEquipment with newWarehouseInstalledEquipment = request.newWarehouseInstalledEquipment
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseAdditionalInformationAux: UpdateWarehouseAdditionalInformation -> Update ()
-updateWarehouseAdditionalInformationAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseAdditionalInformation with newWarehouseAdditionalInformation = request.newWarehouseAdditionalInformation
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-updateWarehouseDescriptionAux: UpdateWarehouseDescription -> Update ()
-updateWarehouseDescriptionAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehouseDescription with newWarehouseDescription = request.newWarehouseDescription
-  exercise refCid WarehouseProperty.SetCid with newCid = cid
-  pure()
-
-data UpdateWarehousePhotoReferences = UpdateWarehousePhotoReferences
-  with
-    operator: Party
-    user: Party
-    propertyKey: PropertyKey
-    newWarehousePhotoReferences: [Text]
-
-updateWarehousePhotoReferencesAux: UpdateWarehousePhotoReferences -> Update ()
-updateWarehousePhotoReferencesAux request = do
-  (refCid, ref) <- fetchByKey @WarehouseProperty.R (request.propertyKey)
-  cid <- exercise ref.cid WarehouseProperty.SetWarehousePhotoReferences with newPhotoReferences = request.newWarehousePhotoReferences
+  cid <- exercise ref.cid WarehouseProperty.UpdateWarehouse with 
+    newWarehousePrice = request.newWarehousePrice,
+      newWarehousePropertyAddress = request.newWarehousePropertyAddress,
+      newWarehousePropertyPostalCode = request.newWarehousePropertyPostalCode,
+      newWarehousePropertyDistrict = request.newWarehousePropertyDistrict,
+      newWarehousePropertyCounty = request.newWarehousePropertyCounty,
+      newWarehouseType = request.newWarehouseType,
+      newWarehouseGrossArea = request.newWarehouseGrossArea,
+      newWarehouseUsableArea = request.newWarehouseUsableArea,
+      newWarehouseFloors = request.newWarehouseFloors,
+      newWarehouseBuildDate = request.newWarehouseBuildDate,
+      newWarehouseInstalledEquipment = request.newWarehouseInstalledEquipment,
+      newWarehouseAdditionalInformation = request.newWarehouseAdditionalInformation,
+      newWarehouseDescription = request.newWarehouseDescription,
+      newWarehousePhotoReferences = request.newWarehousePhotoReferences
   exercise refCid WarehouseProperty.SetCid with newCid = cid
   pure()

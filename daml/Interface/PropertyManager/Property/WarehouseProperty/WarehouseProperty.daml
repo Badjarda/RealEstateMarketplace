@@ -50,50 +50,37 @@ interface WarehouseProperty requires Disclosure.I where
 
   getKey : PropertyKey
 
+  updateWarehouse : UpdateWarehouse -> Update(ContractId WarehouseProperty)
+
   getWarehouseInstrumentKey : GetWarehouseInstrumentKey -> Update(InstrumentKey)
-  setWarehouseInstrumentKey : SetWarehouseInstrumentKey -> Update(ContractId WarehouseProperty)
 
   getWarehousePrice : GetWarehousePrice -> Update(Decimal)
-  setWarehousePrice : SetWarehousePrice -> Update(ContractId WarehouseProperty)
 
   getWarehousePropertyAddress : GetWarehousePropertyAddress -> Update(Text)
-  setWarehousePropertyAddress : SetWarehousePropertyAddress -> Update(ContractId WarehouseProperty)
 
   getWarehousePropertyPostalCode : GetWarehousePropertyPostalCode -> Update(Text)
-  setWarehousePropertyPostalCode : SetWarehousePropertyPostalCode -> Update(ContractId WarehouseProperty)
 
   getWarehousePropertyDistrict : GetWarehousePropertyDistrict -> Update(Text)
-  setWarehousePropertyDistrict : SetWarehousePropertyDistrict -> Update(ContractId WarehouseProperty)
 
   getWarehousePropertyCounty : GetWarehousePropertyCounty -> Update(Text)
-  setWarehousePropertyCounty : SetWarehousePropertyCounty -> Update(ContractId WarehouseProperty)
 
   getWarehouseType : GetWarehouseType -> Update(WarehouseType)
-  setWarehouseType : SetWarehouseType -> Update(ContractId WarehouseProperty)
 
   getWarehouseGrossArea : GetWarehouseGrossArea -> Update(Decimal)
-  setWarehouseGrossArea : SetWarehouseGrossArea -> Update(ContractId WarehouseProperty)
 
   getWarehouseUsableArea : GetWarehouseUsableArea -> Update(Decimal)
-  setWarehouseUsableArea : SetWarehouseUsableArea -> Update(ContractId WarehouseProperty)
 
   getWarehouseFloors : GetWarehouseFloors -> Update(Int)
-  setWarehouseFloors : SetWarehouseFloors -> Update(ContractId WarehouseProperty)
 
   getWarehouseBuildDate : GetWarehouseBuildDate -> Update(Date)
-  setWarehouseBuildDate : SetWarehouseBuildDate -> Update(ContractId WarehouseProperty)
 
   getWarehouseInstalledEquipment : GetWarehouseInstalledEquipment -> Update(Text)
-  setWarehouseInstalledEquipment : SetWarehouseInstalledEquipment -> Update(ContractId WarehouseProperty)
 
   getWarehouseAdditionalInformation : GetWarehouseAdditionalInformation -> Update(Text)
-  setWarehouseAdditionalInformation : SetWarehouseAdditionalInformation -> Update(ContractId WarehouseProperty)
 
   getWarehouseDescription : GetWarehouseDescription -> Update(Text)
-  setWarehouseDescription : SetWarehouseDescription -> Update(ContractId WarehouseProperty)
 
   getWarehousePhotoReferences : GetWarehousePhotoReferences -> Update([Text])
-  setWarehousePhotoReferences : SetWarehousePhotoReferences -> Update(ContractId WarehouseProperty)
 
   nonconsuming choice GetView : View
     with
@@ -107,180 +94,95 @@ interface WarehouseProperty requires Disclosure.I where
     do
       getWarehouseInstrumentKey this arg
 
-  choice SetWarehouseInstrumentKey: ContractId WarehouseProperty
+  choice UpdateWarehouse: ContractId WarehouseProperty
     with
-      newWarehouseInstrumentKey : InstrumentKey
+      newWarehousePrice : Decimal
+      newWarehousePropertyAddress : Text
+      newWarehousePropertyPostalCode : Text
+      newWarehousePropertyDistrict : Text
+      newWarehousePropertyCounty : Text
+      newWarehouseType : WarehouseType
+      newWarehouseGrossArea : Decimal
+      newWarehouseUsableArea : Decimal
+      newWarehouseFloors : Int
+      newWarehouseBuildDate : Date
+      newWarehouseInstalledEquipment : Text
+      newWarehouseAdditionalInformation : Text
+      newWarehouseDescription : Text
+      newWarehousePhotoReferences : [Text]
     controller signatory this
     do
-      setWarehouseInstrumentKey this arg
+      updateWarehouse this arg
 
   nonconsuming choice GetWarehousePrice : Decimal
     controller signatory this
     do
       getWarehousePrice this arg
 
-  choice SetWarehousePrice: ContractId WarehouseProperty
-    with
-      newWarehousePrice : Decimal
-    controller signatory this
-    do
-      setWarehousePrice this arg
-  
   nonconsuming choice GetWarehousePropertyAddress : Text
     controller signatory this
     do
       getWarehousePropertyAddress this arg
 
-  choice SetWarehousePropertyAddress : ContractId WarehouseProperty
-    with
-      newWarehousePropertyAddress : Text
-    controller signatory this
-    do
-      setWarehousePropertyAddress this arg
-
   nonconsuming choice GetWarehousePropertyPostalCode : Text
     controller signatory this
     do
       getWarehousePropertyPostalCode this arg
-
-  choice SetWarehousePropertyPostalCode : ContractId WarehouseProperty
-    with
-      newWarehousePropertyPostalCode : Text
-    controller signatory this
-    do
-      setWarehousePropertyPostalCode this arg
-  
+ 
   nonconsuming choice GetWarehousePropertyDistrict : Text
     controller signatory this
     do
       getWarehousePropertyDistrict this arg
-
-  choice SetWarehousePropertyDistrict : ContractId WarehouseProperty
-    with
-      newWarehousePropertyDistrict : Text
-    controller signatory this
-    do
-      setWarehousePropertyDistrict this arg
 
   nonconsuming choice GetWarehousePropertyCounty : Text
     controller signatory this
     do
       getWarehousePropertyCounty this arg
 
-  choice SetWarehousePropertyCounty : ContractId WarehouseProperty
-    with
-      newWarehousePropertyCounty : Text
-    controller signatory this
-    do
-      setWarehousePropertyCounty this arg
-
   nonconsuming choice GetWarehouseType : WarehouseType
     controller signatory this
     do
       getWarehouseType this arg
-
-  choice SetWarehouseType : ContractId WarehouseProperty
-    with
-      newWarehouseType : WarehouseType
-    controller signatory this
-    do
-      setWarehouseType this arg
 
   nonconsuming choice GetWarehouseGrossArea : Decimal
     controller signatory this
     do
       getWarehouseGrossArea this arg
 
-  choice SetWarehouseGrossArea : ContractId WarehouseProperty
-    with
-      newWarehouseGrossArea : Decimal
-    controller signatory this
-    do
-      setWarehouseGrossArea this arg
-
   nonconsuming choice GetWarehouseUsableArea : Decimal
     controller signatory this
     do
       getWarehouseUsableArea this arg
-
-  choice SetWarehouseUsableArea : ContractId WarehouseProperty
-    with
-      newWarehouseUsableArea : Decimal
-    controller signatory this
-    do
-      setWarehouseUsableArea this arg
 
   nonconsuming choice GetWarehouseFloors : Int
     controller signatory this
     do
       getWarehouseFloors this arg
 
-  choice SetWarehouseFloors : ContractId WarehouseProperty
-    with
-      newWarehouseFloors : Int
-    controller signatory this
-    do
-      setWarehouseFloors this arg
-
   nonconsuming choice GetWarehouseBuildDate : Date
     controller signatory this
     do
       getWarehouseBuildDate this arg
 
-  choice SetWarehouseBuildDate : ContractId WarehouseProperty
-    with
-      newWarehouseBuildDate : Date
-    controller signatory this
-    do
-      setWarehouseBuildDate this arg
-  
   nonconsuming choice GetWarehouseInstalledEquipment : Text
     controller signatory this
     do
       getWarehouseInstalledEquipment this arg
-
-  choice SetWarehouseInstalledEquipment : ContractId WarehouseProperty
-    with
-      newWarehouseInstalledEquipment : Text
-    controller signatory this
-    do
-      setWarehouseInstalledEquipment this arg
   
   nonconsuming choice GetWarehouseAdditionalInformation : Text
     controller signatory this
     do
       getWarehouseAdditionalInformation this arg
 
-  choice SetWarehouseAdditionalInformation : ContractId WarehouseProperty
-    with
-      newWarehouseAdditionalInformation : Text
-    controller signatory this
-    do
-      setWarehouseAdditionalInformation this arg
-
   nonconsuming choice GetWarehouseDescription : Text
     controller signatory this
     do
       getWarehouseDescription this arg
-
-  choice SetWarehouseDescription : ContractId WarehouseProperty
-    with
-      newWarehouseDescription : Text
-    controller signatory this
-    do
-      setWarehouseDescription this arg
   
   nonconsuming choice GetWarehousePhotoReferences : [Text]
     controller signatory this
     do
       getWarehousePhotoReferences this arg
-
-  choice SetWarehousePhotoReferences : ContractId WarehouseProperty
-    with
-      newPhotoReferences : [Text]
-    controller signatory this
-    do
-      setWarehousePhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

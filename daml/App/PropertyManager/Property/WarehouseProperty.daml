@@ -2,7 +2,7 @@ module App.PropertyManager.Property.WarehouseProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty(I, View(..), GetWarehouseInstrumentKey(..), GetWarehousePrice(..), GetWarehousePropertyAddress(..), GetWarehousePropertyPostalCode(..), GetWarehousePropertyDistrict(..), GetWarehousePropertyCounty(..), GetWarehouseType(..), GetWarehouseGrossArea(..), GetWarehouseUsableArea(..), GetWarehouseFloors(..), GetWarehouseBuildDate(..), GetWarehouseInstalledEquipment(..), GetWarehouseAdditionalInformation(..), GetWarehouseDescription(..), GetWarehousePhotoReferences(..), SetWarehousePhotoReferences(..), SetWarehouseInstrumentKey(..), SetWarehousePrice(..), SetWarehousePropertyAddress(..), SetWarehousePropertyPostalCode(..), SetWarehousePropertyDistrict(..), SetWarehousePropertyCounty(..), SetWarehouseGrossArea(..), SetWarehouseUsableArea(..), SetWarehouseFloors(..), SetWarehouseType(..), SetWarehouseBuildDate(..), SetWarehouseInstalledEquipment(..), SetWarehouseAdditionalInformation(..), SetWarehouseDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.WarehouseProperty.WarehouseProperty qualified as WarehouseProperty(I, View(..), GetWarehouseInstrumentKey(..), GetWarehousePrice(..), GetWarehousePropertyAddress(..), GetWarehousePropertyPostalCode(..), GetWarehousePropertyDistrict(..), GetWarehousePropertyCounty(..), GetWarehouseType(..), GetWarehouseGrossArea(..), GetWarehouseUsableArea(..), GetWarehouseFloors(..), GetWarehouseBuildDate(..), GetWarehouseInstalledEquipment(..), GetWarehouseAdditionalInformation(..), GetWarehouseDescription(..), GetWarehousePhotoReferences(..), UpdateWarehouse(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.WarehouseProperty.Factory qualified as WarehousePropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (WarehouseType)
 
@@ -88,50 +88,8 @@ template WarehouseProperty
       getWarehousePhotoReferences WarehouseProperty.GetWarehousePhotoReferences{} = do 
         pure photoReferences
 
-      setWarehouseInstrumentKey WarehouseProperty.SetWarehouseInstrumentKey{newWarehouseInstrumentKey} = do 
-        toInterfaceContractId <$> create this with instrument = newWarehouseInstrumentKey
-      
-      setWarehousePrice WarehouseProperty.SetWarehousePrice{newWarehousePrice} = do 
-        toInterfaceContractId <$> create this with warehousePrice = newWarehousePrice
-
-      setWarehousePropertyAddress WarehouseProperty.SetWarehousePropertyAddress{newWarehousePropertyAddress} = do 
-        toInterfaceContractId <$> create this with propertyAddress = newWarehousePropertyAddress
-      
-      setWarehousePropertyPostalCode WarehouseProperty.SetWarehousePropertyPostalCode{newWarehousePropertyPostalCode} = do 
-        toInterfaceContractId <$> create this with propertyPostalCode = newWarehousePropertyPostalCode
-      
-      setWarehousePropertyDistrict WarehouseProperty.SetWarehousePropertyDistrict{newWarehousePropertyDistrict} = do 
-        toInterfaceContractId <$> create this with propertyDistrict = newWarehousePropertyDistrict
-
-      setWarehousePropertyCounty WarehouseProperty.SetWarehousePropertyCounty{newWarehousePropertyCounty} = do 
-        toInterfaceContractId <$> create this with propertyCounty = newWarehousePropertyCounty
-      
-      setWarehouseType WarehouseProperty.SetWarehouseType{newWarehouseType} = do 
-        toInterfaceContractId <$> create this with warehouseType = newWarehouseType
-      
-      setWarehouseGrossArea WarehouseProperty.SetWarehouseGrossArea{newWarehouseGrossArea} = do 
-        toInterfaceContractId <$> create this with grossArea = newWarehouseGrossArea
-      
-      setWarehouseUsableArea WarehouseProperty.SetWarehouseUsableArea{newWarehouseUsableArea} = do 
-        toInterfaceContractId <$> create this with usableArea = newWarehouseUsableArea
-      
-      setWarehouseFloors WarehouseProperty.SetWarehouseFloors{newWarehouseFloors} = do 
-        toInterfaceContractId <$> create this with floors = newWarehouseFloors
-
-      setWarehouseBuildDate WarehouseProperty.SetWarehouseBuildDate{newWarehouseBuildDate} = do 
-        toInterfaceContractId <$> create this with buildDate = newWarehouseBuildDate
-
-      setWarehouseInstalledEquipment WarehouseProperty.SetWarehouseInstalledEquipment{newWarehouseInstalledEquipment} = do 
-        toInterfaceContractId <$> create this with installedEquipment = newWarehouseInstalledEquipment
-      
-      setWarehouseAdditionalInformation WarehouseProperty.SetWarehouseAdditionalInformation{newWarehouseAdditionalInformation} = do 
-        toInterfaceContractId <$> create this with additionalInformation = newWarehouseAdditionalInformation
-      
-      setWarehouseDescription WarehouseProperty.SetWarehouseDescription{newWarehouseDescription} = do 
-        toInterfaceContractId <$> create this with description = newWarehouseDescription
-      
-      setWarehousePhotoReferences WarehouseProperty.SetWarehousePhotoReferences{newPhotoReferences} = do 
-        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
+      updateWarehouse WarehouseProperty.UpdateWarehouse{newWarehousePrice,newWarehousePropertyAddress,newWarehousePropertyPostalCode,newWarehousePropertyDistrict,newWarehousePropertyCounty,newWarehouseType,newWarehouseGrossArea,newWarehouseUsableArea,newWarehouseFloors,newWarehouseBuildDate,newWarehouseInstalledEquipment,newWarehouseAdditionalInformation,newWarehouseDescription,newWarehousePhotoReferences} = do 
+        toInterfaceContractId <$> create this with warehousePrice=newWarehousePrice,propertyAddress=newWarehousePropertyAddress,propertyPostalCode=newWarehousePropertyPostalCode,propertyDistrict=newWarehousePropertyDistrict,propertyCounty=newWarehousePropertyCounty,warehouseType=newWarehouseType,grossArea=newWarehouseGrossArea,usableArea=newWarehouseUsableArea,floors=newWarehouseFloors,buildDate=newWarehouseBuildDate,installedEquipment=newWarehouseInstalledEquipment,additionalInformation=newWarehouseAdditionalInformation,description=newWarehouseDescription,photoReferences=newWarehousePhotoReferences
 
     interface instance Disclosure.I for WarehouseProperty where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers

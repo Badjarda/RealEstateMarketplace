@@ -2,7 +2,7 @@ module App.PropertyManager.Property.LandProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(I, View(..), GetLandInstrumentKey(..), GetLandPrice(..), GetLandPropertyAddress(..), GetLandPropertyPostalCode(..), GetLandPropertyDistrict(..), GetLandPropertyCounty(..), GetLandType(..), GetTotalLandArea(..), GetLandMinimumSurfaceForSale(..), GetLandBuildableArea(..), GetLandBuildableFloors(..), GetLandAccessByRoad(..), GetLandInstalledEquipment(..), GetLandAdditionalInformation(..), GetLandViableConstructionTypes(..), GetLandDescription(..), GetLandPhotoReferences(..), SetLandPhotoReferences(..), SetLandInstrumentKey(..), SetLandPrice(..), SetLandPropertyAddress(..), SetLandPropertyPostalCode(..), SetLandPropertyDistrict(..), SetLandPropertyCounty(..), SetLandType(..), SetTotalLandArea(..), SetLandMinimumSurfaceForSale(..), SetLandBuildableArea(..), SetLandBuildableFloors(..), SetLandAccessByRoad(..), SetLandInstalledEquipment(..), SetLandAdditionalInformation(..), SetLandViableConstructionTypes(..), SetLandDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.LandProperty.LandProperty qualified as LandProperty(I, View(..), GetLandInstrumentKey(..), GetLandPrice(..), GetLandPropertyAddress(..), GetLandPropertyPostalCode(..), GetLandPropertyDistrict(..), GetLandPropertyCounty(..), GetLandType(..), GetTotalLandArea(..), GetLandMinimumSurfaceForSale(..), GetLandBuildableArea(..), GetLandBuildableFloors(..), GetLandAccessByRoad(..), GetLandInstalledEquipment(..), GetLandAdditionalInformation(..), GetLandViableConstructionTypes(..), GetLandDescription(..), GetLandPhotoReferences(..), UpdateLand(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.LandProperty.Factory qualified as LandPropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (LandType, ViableConstructionTypes)
 
@@ -96,56 +96,8 @@ template LandProperty
       getLandPhotoReferences LandProperty.GetLandPhotoReferences{} = do 
         pure photoReferences 
 
-      setLandInstrumentKey LandProperty.SetLandInstrumentKey{newLandInstrumentKey} = do 
-        toInterfaceContractId <$> create this with instrument = newLandInstrumentKey
-      
-      setLandPrice LandProperty.SetLandPrice{newLandPrice} = do 
-        toInterfaceContractId <$> create this with landPrice = newLandPrice
-
-      setLandPropertyAddress LandProperty.SetLandPropertyAddress{newLandPropertyAddress} = do 
-        toInterfaceContractId <$> create this with propertyAddress = newLandPropertyAddress
-      
-      setLandPropertyPostalCode LandProperty.SetLandPropertyPostalCode{newLandPropertyPostalCode} = do 
-        toInterfaceContractId <$> create this with propertyPostalCode = newLandPropertyPostalCode
-      
-      setLandPropertyDistrict LandProperty.SetLandPropertyDistrict{newLandPropertyDistrict} = do 
-        toInterfaceContractId <$> create this with propertyDistrict = newLandPropertyDistrict
-
-      setLandPropertyCounty LandProperty.SetLandPropertyCounty{newLandPropertyCounty} = do 
-        toInterfaceContractId <$> create this with propertyCounty = newLandPropertyCounty
-      
-      setLandType LandProperty.SetLandType{newLandType} = do 
-        toInterfaceContractId <$> create this with landType = newLandType
-      
-      setTotalLandArea LandProperty.SetTotalLandArea{newTotalLandArea} = do 
-        toInterfaceContractId <$> create this with totalLandArea = newTotalLandArea
-
-      setLandMinimumSurfaceForSale LandProperty.SetLandMinimumSurfaceForSale{newMinimumSurfaceForSale} = do 
-        toInterfaceContractId <$> create this with minimumSurfaceForSale = newMinimumSurfaceForSale
-
-      setLandBuildableArea LandProperty.SetLandBuildableArea{newBuildableArea} = do 
-        toInterfaceContractId <$> create this with buildableArea = newBuildableArea
-      
-      setLandBuildableFloors LandProperty.SetLandBuildableFloors{newBuildableFloors} = do 
-        toInterfaceContractId <$> create this with buildableFloors = newBuildableFloors
-      
-      setLandAccessByRoad LandProperty.SetLandAccessByRoad{newLandAccessByRoad} = do 
-        toInterfaceContractId <$> create this with accessByRoad = newLandAccessByRoad
-
-      setLandInstalledEquipment LandProperty.SetLandInstalledEquipment{newLandInstalledEquipment} = do 
-        toInterfaceContractId <$> create this with installedEquipment = newLandInstalledEquipment
-      
-      setLandAdditionalInformation LandProperty.SetLandAdditionalInformation{newLandAdditionalInformation} = do 
-        toInterfaceContractId <$> create this with additionalInformation = newLandAdditionalInformation
-      
-      setLandViableConstructionTypes LandProperty.SetLandViableConstructionTypes{newLandViableConstructionTypes} = do 
-        toInterfaceContractId <$> create this with viableConstructionTypes = newLandViableConstructionTypes
-      
-      setLandDescription LandProperty.SetLandDescription{newLandDescription} = do 
-        toInterfaceContractId <$> create this with description = newLandDescription
-
-      setLandPhotoReferences LandProperty.SetLandPhotoReferences{newPhotoReferences} = do 
-        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
+      updateLand LandProperty.UpdateLand{newLandPrice,newLandPropertyAddress,newLandPropertyPostalCode,newLandPropertyDistrict,newLandPropertyCounty,newLandType,newLandTotalArea,newLandMinimumSurfaceForSale,newLandBuildableArea,newLandBuildableFloors,newLandAccessByRoad,newLandInstalledEquipment,newLandViableConstructionTypes,newLandAdditionalInformation,newLandDescription,newLandPhotoReferences} = do 
+        toInterfaceContractId <$> create this with landPrice=newLandPrice,propertyAddress=newLandPropertyAddress,propertyPostalCode=newLandPropertyPostalCode,propertyDistrict=newLandPropertyDistrict,propertyCounty=newLandPropertyCounty,landType=newLandType,totalLandArea=newLandTotalArea, minimumSurfaceForSale=newLandMinimumSurfaceForSale, accessByRoad=newLandAccessByRoad, installedEquipment=newLandInstalledEquipment, viableConstructionTypes=newLandViableConstructionTypes, additionalInformation=newLandAdditionalInformation,description=newLandDescription, photoReferences=newLandPhotoReferences 
 
     interface instance Disclosure.I for LandProperty where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers

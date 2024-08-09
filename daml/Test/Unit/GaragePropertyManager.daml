@@ -10,7 +10,7 @@ import Interface.PropertyManager.Property.Common (GarageType(..))
 import Test.Util.Update.Service (createPropertyManagerService)
 import Test.Util.Update.Role (createOperatorRole, createRoleUser)
 import Test.Util.Update.Workflow (createInitialUserRole)
-import Test.Util.Script.Workflow (createGarageProperty, updateGaragePrice, updateGaragePropertyAddress, updateGaragePropertyPostalCode, updateGaragePropertyDistrict, updateGaragePropertyCounty, updateGarageArea, updateGarageType, updateVehicleCapacity, updateGarageInstalledEquipment, updateGarageAdditionalInformation, updateGarageDescription, updateGaragePhotoReferences)
+import Test.Util.Script.Workflow (createGarageProperty, updateGarage)
 import Test.Types (Fixture(..))
 
 import Daml.Finance.Interface.Types.Common.Types (Id(..), InstrumentKey(..), HoldingStandard(..))
@@ -56,8 +56,8 @@ testCreateGarageProperty = do
   
   pure()
 
-testCreateAndModifyGaragePrice : Script ()
-testCreateAndModifyGaragePrice = do
+testCreateAndModifyGarage : Script ()
+testCreateAndModifyGarage = do
   parties@[marketplace, user, public] <-
     mapA allocateParty ["Marketplace", "User", "Public"]
   Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
@@ -69,193 +69,6 @@ testCreateAndModifyGaragePrice = do
       instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
 
   (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGaragePrice marketplace user public propertyKey 1000000.0
-
-  pure()
-
-testCreateAndModifyGaragePropertyAddress : Script ()
-testCreateAndModifyGaragePropertyAddress = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGaragePropertyAddress marketplace user public propertyKey "Updated Property Address"
-
-  pure()
-
-testCreateAndModifyGaragePropertyPostalCode : Script ()
-testCreateAndModifyGaragePropertyPostalCode = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGaragePropertyPostalCode marketplace user public propertyKey "Updated Property Postal Code"
-
-  pure()
-
-testCreateAndModifyGaragePropertyDistrict : Script ()
-testCreateAndModifyGaragePropertyDistrict = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGaragePropertyDistrict marketplace user public propertyKey "Updated Property District"
-
-  pure()
-
-testCreateAndModifyGaragePropertyCounty : Script ()
-testCreateAndModifyGaragePropertyCounty = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGaragePropertyCounty marketplace user public propertyKey "Updated Property County"
-
-  pure()
-
-testCreateAndModifyGaragePropertyArea : Script ()
-testCreateAndModifyGaragePropertyArea = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGarageArea marketplace user public propertyKey 200.0
-
-  pure()
-
-testCreateAndModifyGaragePropertyType : Script ()
-testCreateAndModifyGaragePropertyType = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGarageType marketplace user public propertyKey ParkingSpace
-
-  pure()
-
-testCreateAndModifyGaragePropertyVehicleCapacity : Script ()
-testCreateAndModifyGaragePropertyVehicleCapacity = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateVehicleCapacity marketplace user public propertyKey 2
-
-  pure()
-
-testCreateAndModifyGaragePropertyInstalledEquipment : Script ()
-testCreateAndModifyGaragePropertyInstalledEquipment = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGarageInstalledEquipment marketplace user public propertyKey "Updated Equipment"
-
-  pure()
-
-testCreateAndModifyGaragePropertyAdditionalInformation : Script ()
-testCreateAndModifyGaragePropertyAdditionalInformation = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGarageAdditionalInformation marketplace user public propertyKey "Updated Information"
-
-  pure()
-
-testCreateAndModifyGaragePropertyDescription : Script ()
-testCreateAndModifyGaragePropertyDescription = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGarageDescription marketplace user public propertyKey "Updated Description"
-
-  pure()
-
-testCreateAndModifyGaragePropertyPhotoReferences : Script ()
-testCreateAndModifyGaragePropertyPhotoReferences = do
-  parties@[marketplace, user, public] <-
-    mapA allocateParty ["Marketplace", "User", "Public"]
-  Fixture{instruments; accounts; holdings; roles} <- submitMulti parties [] do createAndExerciseCmd (Scenario with parties) Setup
-
-  let 
-      single_observers = singleton marketplace
-      observers = fromList [("Default", single_observers)]
-      id = Id "Custom Garage Property"
-      instrument = InstrumentKey with issuer=marketplace; depository=user; id = Id "GaragePropertyInstrumentKey"; version = "0"; holdingStandard = Transferable
-
-  (_,propertyKey) <- createGarageProperty marketplace user public observers id instrument 200000.0 "RandomPropertyAddress" "RandomPropertyPostalCode" "RandomPropertyDistrict" "RandomPropertyCounty" IsolatedPrivate 120.0 1 "Installed Equipment" "Additional Information" "Description" [""]
-  updateGaragePhotoReferences marketplace user public propertyKey ["",""]
+  updateGarage marketplace user public propertyKey 1111111.11 "EditPropertyAddress" "EditPropertyPostalCode" "EditropertyDistrict" "EditPropertyCounty" CondominiumPrivate 111.11 11 "Edit Equipment" "Edit Information" "Edit Description" ["1", "2", "3"]
 
   pure()

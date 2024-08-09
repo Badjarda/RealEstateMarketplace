@@ -2,7 +2,7 @@ module App.PropertyManager.Property.ResidenceProperty where
 
 import DA.Set qualified as Set (fromList, singleton)
 
-import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty(I, View(..), GetResidenceInstrumentKey(..), GetResidencePrice(..), GetResidencePropertyAddress(..), GetResidencePropertyPostalCode(..), GetResidencePropertyDistrict(..), GetResidencePropertyCounty(..), GetResidenceGrossArea(..), GetResidenceUsableArea(..), GetResidenceBedrooms(..), GetResidenceBathrooms(..), GetResidenceFloors(..), GetResidenceType(..), GetResidenceBackyard(..), GetResidenceParking(..), GetResidenceBuildDate(..), GetResidenceOrientation(..), GetResidenceInstalledEquipment(..), GetResidenceAdditionalInformation(..), GetResidenceDescription(..), GetResidencePhotoReferences(..), SetResidencePhotoReferences(..), SetResidenceInstrumentKey(..), SetResidencePrice(..), SetResidencePropertyAddress(..), SetResidencePropertyPostalCode(..), SetResidencePropertyDistrict(..), SetResidencePropertyCounty(..), SetResidenceGrossArea(..), SetResidenceUsableArea(..), SetResidenceBedrooms(..), SetResidenceBathrooms(..), SetResidenceFloors(..), SetResidenceType(..), SetResidenceBackyard(..), SetResidenceParking(..), SetResidenceBuildDate(..), SetResidenceOrientation(..), SetResidenceInstalledEquipment(..), SetResidenceAdditionalInformation(..), SetResidenceDescription(..), propertyKey, disclosureUpdateReference, createReference)
+import Interface.PropertyManager.Property.ResidenceProperty.ResidenceProperty qualified as ResidenceProperty(I, View(..), GetResidenceInstrumentKey(..), GetResidencePrice(..), GetResidencePropertyAddress(..), GetResidencePropertyPostalCode(..), GetResidencePropertyDistrict(..), GetResidencePropertyCounty(..), GetResidenceGrossArea(..), GetResidenceUsableArea(..), GetResidenceBedrooms(..), GetResidenceBathrooms(..), GetResidenceFloors(..), GetResidenceType(..), GetResidenceBackyard(..), GetResidenceParking(..), GetResidenceBuildDate(..), GetResidenceOrientation(..), GetResidenceInstalledEquipment(..), GetResidenceAdditionalInformation(..), GetResidenceDescription(..), GetResidencePhotoReferences(..), UpdateResidence(..), propertyKey, disclosureUpdateReference, createReference)
 import Interface.PropertyManager.Property.ResidenceProperty.Factory qualified as ResidencePropertyFactory(I, View(..), Create(..))
 import Interface.PropertyManager.Property.Common (ResidenceType, Parking, Orientation)
 
@@ -108,65 +108,8 @@ template ResidenceProperty
       getResidencePhotoReferences ResidenceProperty.GetResidencePhotoReferences{} = do 
         pure photoReferences 
 
-      setResidenceInstrumentKey ResidenceProperty.SetResidenceInstrumentKey{newResidenceInstrumentKey} = do 
-        toInterfaceContractId <$> create this with instrument = newResidenceInstrumentKey
-      
-      setResidencePrice ResidenceProperty.SetResidencePrice{newResidencePrice} = do 
-        toInterfaceContractId <$> create this with residencePrice = newResidencePrice
-
-      setResidencePropertyAddress ResidenceProperty.SetResidencePropertyAddress{newResidencePropertyAddress} = do 
-        toInterfaceContractId <$> create this with propertyAddress = newResidencePropertyAddress
-      
-      setResidencePropertyPostalCode ResidenceProperty.SetResidencePropertyPostalCode{newResidencePropertyPostalCode} = do 
-        toInterfaceContractId <$> create this with propertyPostalCode = newResidencePropertyPostalCode
-      
-      setResidencePropertyDistrict ResidenceProperty.SetResidencePropertyDistrict{newResidencePropertyDistrict} = do 
-        toInterfaceContractId <$> create this with propertyDistrict = newResidencePropertyDistrict
-
-      setResidencePropertyCounty ResidenceProperty.SetResidencePropertyCounty{newResidencePropertyCounty} = do 
-        toInterfaceContractId <$> create this with propertyCounty = newResidencePropertyCounty
-      
-      setResidenceGrossArea ResidenceProperty.SetResidenceGrossArea{newResidenceGrossArea} = do 
-        toInterfaceContractId <$> create this with grossArea = newResidenceGrossArea
-      
-      setResidenceUsableArea ResidenceProperty.SetResidenceUsableArea{newResidenceUsableArea} = do 
-        toInterfaceContractId <$> create this with usableArea = newResidenceUsableArea
-
-      setResidenceBedrooms ResidenceProperty.SetResidenceBedrooms{newResidenceBedrooms} = do 
-        toInterfaceContractId <$> create this with bedrooms = newResidenceBedrooms
-      
-      setResidenceBathrooms ResidenceProperty.SetResidenceBathrooms{newResidenceBathrooms} = do 
-        toInterfaceContractId <$> create this with bathrooms = newResidenceBathrooms
-      
-      setResidenceFloors ResidenceProperty.SetResidenceFloors{newResidenceFloors} = do 
-        toInterfaceContractId <$> create this with floors = newResidenceFloors
-
-      setResidenceType ResidenceProperty.SetResidenceType{newResidenceType} = do 
-        toInterfaceContractId <$> create this with residenceType = newResidenceType
-
-      setResidenceBackyard ResidenceProperty.SetResidenceBackyard{newResidenceBackyard} = do 
-        toInterfaceContractId <$> create this with backyard = newResidenceBackyard
-
-      setResidenceParking ResidenceProperty.SetResidenceParking{newResidenceParking} = do 
-        toInterfaceContractId <$> create this with parking = newResidenceParking
-
-      setResidenceBuildDate ResidenceProperty.SetResidenceBuildDate{newResidenceBuildDate} = do 
-        toInterfaceContractId <$> create this with buildDate = newResidenceBuildDate
-
-      setResidenceOrientation ResidenceProperty.SetResidenceOrientation{newOrientation} = do 
-        toInterfaceContractId <$> create this with orientation = newOrientation
-
-      setResidenceInstalledEquipment ResidenceProperty.SetResidenceInstalledEquipment{newResidenceInstalledEquipment} = do 
-        toInterfaceContractId <$> create this with installedEquipment = newResidenceInstalledEquipment
-      
-      setResidenceAdditionalInformation ResidenceProperty.SetResidenceAdditionalInformation{newResidenceAdditionalInformation} = do 
-        toInterfaceContractId <$> create this with additionalInformation = newResidenceAdditionalInformation
-      
-      setResidenceDescription ResidenceProperty.SetResidenceDescription{newResidenceDescription} = do 
-        toInterfaceContractId <$> create this with description = newResidenceDescription
-      
-      setResidencePhotoReferences ResidenceProperty.SetResidencePhotoReferences{newPhotoReferences} = do 
-        toInterfaceContractId <$> create this with photoReferences = newPhotoReferences
+      updateResidence ResidenceProperty.UpdateResidence{newResidencePrice,newResidencePropertyAddress,newResidencePropertyPostalCode,newResidencePropertyDistrict,newResidencePropertyCounty,newResidenceGrossArea,newResidenceUsableArea,newResidenceBedrooms,newResidenceBathrooms,newResidenceFloors,newResidenceType,newResidenceBackyard,newResidenceParking,newResidenceBuildDate,newResidenceOrientation,newResidenceInstalledEquipment,newResidenceAdditionalInformation,newResidenceDescription,newResidencePhotoReferences} = do 
+        toInterfaceContractId <$> create this with residencePrice=newResidencePrice,propertyAddress=newResidencePropertyAddress,propertyPostalCode=newResidencePropertyPostalCode,propertyDistrict=newResidencePropertyDistrict,propertyCounty=newResidencePropertyCounty,grossArea=newResidenceGrossArea,usableArea=newResidenceUsableArea,bedrooms=newResidenceBedrooms,bathrooms=newResidenceBathrooms,floors=newResidenceFloors,residenceType=newResidenceType,backyard=newResidenceBackyard,parking=newResidenceParking,buildDate=newResidenceBuildDate,orientation=newResidenceOrientation,installedEquipment=newResidenceInstalledEquipment,additionalInformation=newResidenceAdditionalInformation,description=newResidenceDescription,photoReferences=newResidencePhotoReferences
 
     interface instance Disclosure.I for ResidenceProperty where
       view = Disclosure.View with disclosureControllers = Set.fromList [operator, operator]; observers

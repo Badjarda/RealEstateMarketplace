@@ -54,65 +54,47 @@ interface ResidenceProperty requires Disclosure.I where
 
   getKey : PropertyKey
 
+  updateResidence : UpdateResidence -> Update(ContractId ResidenceProperty)
+
   getResidenceInstrumentKey : GetResidenceInstrumentKey -> Update(InstrumentKey)
-  setResidenceInstrumentKey : SetResidenceInstrumentKey -> Update(ContractId ResidenceProperty)
 
   getResidencePrice : GetResidencePrice -> Update(Decimal)
-  setResidencePrice : SetResidencePrice -> Update(ContractId ResidenceProperty)
 
   getResidencePropertyAddress : GetResidencePropertyAddress -> Update(Text)
-  setResidencePropertyAddress : SetResidencePropertyAddress -> Update(ContractId ResidenceProperty)
 
   getResidencePropertyPostalCode : GetResidencePropertyPostalCode -> Update(Text)
-  setResidencePropertyPostalCode : SetResidencePropertyPostalCode -> Update(ContractId ResidenceProperty)
 
   getResidencePropertyDistrict : GetResidencePropertyDistrict -> Update(Text)
-  setResidencePropertyDistrict : SetResidencePropertyDistrict -> Update(ContractId ResidenceProperty)
 
   getResidencePropertyCounty : GetResidencePropertyCounty -> Update(Text)
-  setResidencePropertyCounty : SetResidencePropertyCounty -> Update(ContractId ResidenceProperty)
 
   getResidenceGrossArea : GetResidenceGrossArea -> Update(Decimal)
-  setResidenceGrossArea : SetResidenceGrossArea -> Update(ContractId ResidenceProperty)
 
   getResidenceUsableArea : GetResidenceUsableArea -> Update(Decimal)
-  setResidenceUsableArea : SetResidenceUsableArea -> Update(ContractId ResidenceProperty)
 
   getResidenceBedrooms : GetResidenceBedrooms -> Update(Int)
-  setResidenceBedrooms : SetResidenceBedrooms -> Update(ContractId ResidenceProperty)
 
   getResidenceBathrooms : GetResidenceBathrooms -> Update(Int)
-  setResidenceBathrooms : SetResidenceBathrooms -> Update(ContractId ResidenceProperty)
 
   getResidenceFloors : GetResidenceFloors -> Update(Int)
-  setResidenceFloors : SetResidenceFloors -> Update(ContractId ResidenceProperty)
 
   getResidenceType : GetResidenceType -> Update(ResidenceType)
-  setResidenceType : SetResidenceType -> Update(ContractId ResidenceProperty)
 
   getResidenceBackyard : GetResidenceBackyard -> Update(Text)
-  setResidenceBackyard : SetResidenceBackyard -> Update(ContractId ResidenceProperty)
 
   getResidenceParking : GetResidenceParking-> Update(Parking)
-  setResidenceParking : SetResidenceParking -> Update(ContractId ResidenceProperty)
 
   getResidenceBuildDate : GetResidenceBuildDate -> Update(Date)
-  setResidenceBuildDate : SetResidenceBuildDate -> Update(ContractId ResidenceProperty)
 
   getResidenceOrientation : GetResidenceOrientation -> Update(Orientation)
-  setResidenceOrientation : SetResidenceOrientation -> Update(ContractId ResidenceProperty)
 
   getResidenceInstalledEquipment : GetResidenceInstalledEquipment -> Update(Text)
-  setResidenceInstalledEquipment : SetResidenceInstalledEquipment -> Update(ContractId ResidenceProperty)
 
   getResidenceAdditionalInformation : GetResidenceAdditionalInformation -> Update(Text)
-  setResidenceAdditionalInformation : SetResidenceAdditionalInformation -> Update(ContractId ResidenceProperty)
 
   getResidenceDescription : GetResidenceDescription -> Update(Text)
-  setResidenceDescription : SetResidenceDescription -> Update(ContractId ResidenceProperty)
 
   getResidencePhotoReferences : GetResidencePhotoReferences -> Update([Text])
-  setResidencePhotoReferences : SetResidencePhotoReferences -> Update(ContractId ResidenceProperty)
 
   nonconsuming choice GetView : View
     with
@@ -126,241 +108,125 @@ interface ResidenceProperty requires Disclosure.I where
     do
       getResidenceInstrumentKey this arg
 
-  choice SetResidenceInstrumentKey: ContractId ResidenceProperty
+  choice UpdateResidence: ContractId ResidenceProperty
     with
-      newResidenceInstrumentKey : InstrumentKey
+      newResidencePrice : Decimal
+      newResidencePropertyAddress : Text
+      newResidencePropertyPostalCode : Text
+      newResidencePropertyDistrict : Text
+      newResidencePropertyCounty : Text
+      newResidenceGrossArea : Decimal
+      newResidenceUsableArea : Decimal
+      newResidenceBedrooms : Int
+      newResidenceBathrooms : Int
+      newResidenceFloors : Int
+      newResidenceType : ResidenceType
+      newResidenceBackyard : Text
+      newResidenceParking : Parking
+      newResidenceBuildDate : Date
+      newResidenceOrientation : Orientation
+      newResidenceInstalledEquipment : Text
+      newResidenceAdditionalInformation : Text
+      newResidenceDescription : Text
+      newResidencePhotoReferences : [Text]
     controller signatory this
     do
-      setResidenceInstrumentKey this arg
+      updateResidence this arg
   
   nonconsuming choice GetResidencePrice : Decimal
     controller signatory this
     do
       getResidencePrice this arg
 
-  choice SetResidencePrice: ContractId ResidenceProperty
-    with
-      newResidencePrice : Decimal
-    controller signatory this
-    do
-      setResidencePrice this arg
-
   nonconsuming choice GetResidencePropertyAddress : Text
     controller signatory this
     do
       getResidencePropertyAddress this arg
 
-  choice SetResidencePropertyAddress : ContractId ResidenceProperty
-    with
-      newResidencePropertyAddress : Text
-    controller signatory this
-    do
-      setResidencePropertyAddress this arg
-
   nonconsuming choice GetResidencePropertyPostalCode : Text
     controller signatory this
     do
       getResidencePropertyPostalCode this arg
-
-  choice SetResidencePropertyPostalCode : ContractId ResidenceProperty
-    with
-      newResidencePropertyPostalCode : Text
-    controller signatory this
-    do
-      setResidencePropertyPostalCode this arg
   
   nonconsuming choice GetResidencePropertyDistrict : Text
     controller signatory this
     do
       getResidencePropertyDistrict this arg
 
-  choice SetResidencePropertyDistrict : ContractId ResidenceProperty
-    with
-      newResidencePropertyDistrict : Text
-    controller signatory this
-    do
-      setResidencePropertyDistrict this arg
-
   nonconsuming choice GetResidencePropertyCounty : Text
     controller signatory this
     do
       getResidencePropertyCounty this arg
-
-  choice SetResidencePropertyCounty : ContractId ResidenceProperty
-    with
-      newResidencePropertyCounty : Text
-    controller signatory this
-    do
-      setResidencePropertyCounty this arg
-
 
   nonconsuming choice GetResidenceGrossArea : Decimal
     controller signatory this
     do
       getResidenceGrossArea this arg
 
-  choice SetResidenceGrossArea : ContractId ResidenceProperty
-    with
-      newResidenceGrossArea : Decimal
-    controller signatory this
-    do
-      setResidenceGrossArea this arg
-
   nonconsuming choice GetResidenceUsableArea : Decimal
     controller signatory this
     do
       getResidenceUsableArea this arg
-
-  choice SetResidenceUsableArea : ContractId ResidenceProperty
-    with
-      newResidenceUsableArea : Decimal
-    controller signatory this
-    do
-      setResidenceUsableArea this arg
 
   nonconsuming choice GetResidenceBedrooms : Int
     controller signatory this
     do
       getResidenceBedrooms this arg
 
-  choice SetResidenceBedrooms : ContractId ResidenceProperty
-    with
-      newResidenceBedrooms : Int
-    controller signatory this
-    do
-      setResidenceBedrooms this arg
-
   nonconsuming choice GetResidenceBathrooms : Int
     controller signatory this
     do
       getResidenceBathrooms this arg
-
-  choice SetResidenceBathrooms : ContractId ResidenceProperty
-    with
-      newResidenceBathrooms : Int
-    controller signatory this
-    do
-      setResidenceBathrooms this arg
 
   nonconsuming choice GetResidenceFloors : Int
     controller signatory this
     do
       getResidenceFloors this arg
 
-  choice SetResidenceFloors : ContractId ResidenceProperty
-    with
-      newResidenceFloors : Int
-    controller signatory this
-    do
-      setResidenceFloors this arg
-
   nonconsuming choice GetResidenceType : ResidenceType
     controller signatory this
     do
       getResidenceType this arg
-
-  choice SetResidenceType : ContractId ResidenceProperty
-    with
-      newResidenceType : ResidenceType
-    controller signatory this
-    do
-      setResidenceType this arg
 
   nonconsuming choice GetResidenceBackyard : Text
     controller signatory this
     do
       getResidenceBackyard this arg
 
-  choice SetResidenceBackyard : ContractId ResidenceProperty
-    with
-      newResidenceBackyard : Text
-    controller signatory this
-    do
-      setResidenceBackyard this arg
-
   nonconsuming choice GetResidenceParking : Parking
     controller signatory this
     do
       getResidenceParking this arg
 
-  choice SetResidenceParking : ContractId ResidenceProperty
-    with
-      newResidenceParking : Parking
-    controller signatory this
-    do
-      setResidenceParking this arg
-  
   nonconsuming choice GetResidenceBuildDate : Date
     controller signatory this
     do
       getResidenceBuildDate this arg
-
-  choice SetResidenceBuildDate : ContractId ResidenceProperty
-    with
-      newResidenceBuildDate : Date
-    controller signatory this
-    do
-      setResidenceBuildDate this arg
   
   nonconsuming choice GetResidenceOrientation : Orientation
     controller signatory this
     do
       getResidenceOrientation this arg
 
-  choice SetResidenceOrientation : ContractId ResidenceProperty
-    with
-      newOrientation : Orientation
-    controller signatory this
-    do
-      setResidenceOrientation this arg
-
   nonconsuming choice GetResidenceInstalledEquipment : Text
     controller signatory this
     do
       getResidenceInstalledEquipment this arg
 
-  choice SetResidenceInstalledEquipment : ContractId ResidenceProperty
-    with
-      newResidenceInstalledEquipment : Text
-    controller signatory this
-    do
-      setResidenceInstalledEquipment this arg
-  
   nonconsuming choice GetResidenceAdditionalInformation : Text
     controller signatory this
     do
       getResidenceAdditionalInformation this arg
-
-  choice SetResidenceAdditionalInformation : ContractId ResidenceProperty
-    with
-      newResidenceAdditionalInformation : Text
-    controller signatory this
-    do
-      setResidenceAdditionalInformation this arg
 
   nonconsuming choice GetResidenceDescription : Text
     controller signatory this
     do
       getResidenceDescription this arg
 
-  choice SetResidenceDescription : ContractId ResidenceProperty
-    with
-      newResidenceDescription : Text
-    controller signatory this
-    do
-      setResidenceDescription this arg
-  
   nonconsuming choice GetResidencePhotoReferences : [Text]
     controller signatory this
     do
       getResidencePhotoReferences this arg
-
-  choice SetResidencePhotoReferences : ContractId ResidenceProperty
-    with
-      newPhotoReferences : [Text]
-    controller signatory this
-    do
-      setResidencePhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

@@ -48,44 +48,33 @@ interface GarageProperty requires Disclosure.I where
 
   getKey : PropertyKey
 
+  updateGarage : UpdateGarage -> Update(ContractId GarageProperty)
+
   getGarageInstrumentKey : GetGarageInstrumentKey -> Update(InstrumentKey)
-  setGarageInstrumentKey : SetGarageInstrumentKey -> Update(ContractId GarageProperty)
 
   getGaragePrice : GetGaragePrice -> Update(Decimal)
-  setGaragePrice : SetGaragePrice -> Update(ContractId GarageProperty)
 
   getGaragePropertyAddress : GetGaragePropertyAddress -> Update(Text)
-  setGaragePropertyAddress : SetGaragePropertyAddress -> Update(ContractId GarageProperty)
 
   getGaragePropertyPostalCode : GetGaragePropertyPostalCode -> Update(Text)
-  setGaragePropertyPostalCode : SetGaragePropertyPostalCode -> Update(ContractId GarageProperty)
 
   getGaragePropertyDistrict : GetGaragePropertyDistrict -> Update(Text)
-  setGaragePropertyDistrict : SetGaragePropertyDistrict -> Update(ContractId GarageProperty)
 
   getGaragePropertyCounty : GetGaragePropertyCounty -> Update(Text)
-  setGaragePropertyCounty : SetGaragePropertyCounty -> Update(ContractId GarageProperty)
 
   getGarageType : GetGarageType -> Update(GarageType)
-  setGarageType : SetGarageType -> Update(ContractId GarageProperty)
 
   getGarageArea : GetGarageArea -> Update(Decimal)
-  setGarageArea : SetGarageArea -> Update(ContractId GarageProperty)
 
   getVehicleCapacity : GetVehicleCapacity -> Update(Int)
-  setVehicleCapacity : SetVehicleCapacity -> Update(ContractId GarageProperty)
 
   getGarageInstalledEquipment : GetGarageInstalledEquipment -> Update(Text)
-  setGarageInstalledEquipment : SetGarageInstalledEquipment -> Update(ContractId GarageProperty)
 
   getGarageAdditionalInformation : GetGarageAdditionalInformation -> Update(Text)
-  setGarageAdditionalInformation : SetGarageAdditionalInformation -> Update(ContractId GarageProperty)
 
   getGarageDescription : GetGarageDescription -> Update(Text)
-  setGarageDescription : SetGarageDescription -> Update(ContractId GarageProperty)
 
   getGaragePhotoReferences : GetGaragePhotoReferences -> Update([Text])
-  setGaragePhotoReferences : SetGaragePhotoReferences -> Update(ContractId GarageProperty)
 
   nonconsuming choice GetView : View
     with
@@ -94,161 +83,88 @@ interface GarageProperty requires Disclosure.I where
     do
       pure $ view this
   
+  choice UpdateGarage: ContractId GarageProperty
+    with
+      newGaragePrice: Decimal
+      newGaragePropertyAddress: Text
+      newGaragePropertyPostalCode : Text
+      newGaragePropertyDistrict : Text
+      newGaragePropertyCounty : Text
+      newGarageArea: Decimal
+      newGarageType: GarageType
+      newGarageVehicleCapacity: Int
+      newGarageInstalledEquipment: Text
+      newGarageAdditionalInformation: Text 
+      newGarageDescription: Text
+      newGaragePhotoReferences: [Text]
+    controller signatory this
+    do
+      updateGarage this arg
+  
   nonconsuming choice GetGarageInstrumentKey : InstrumentKey
     controller signatory this
     do
       getGarageInstrumentKey this arg
 
-  choice SetGarageInstrumentKey: ContractId GarageProperty
-    with
-      newGarageInstrumentKey : InstrumentKey
-    controller signatory this
-    do
-      setGarageInstrumentKey this arg
-
   nonconsuming choice GetGaragePrice : Decimal
     controller signatory this
     do
       getGaragePrice this arg
-
-  choice SetGaragePrice: ContractId GarageProperty
-    with
-      newGaragePrice : Decimal
-    controller signatory this
-    do
-      setGaragePrice this arg
   
   nonconsuming choice GetGaragePropertyAddress : Text
     controller signatory this
     do
       getGaragePropertyAddress this arg
 
-  choice SetGaragePropertyAddress : ContractId GarageProperty
-    with
-      newGaragePropertyAddress : Text
-    controller signatory this
-    do
-      setGaragePropertyAddress this arg
-
   nonconsuming choice GetGaragePropertyPostalCode : Text
     controller signatory this
     do
       getGaragePropertyPostalCode this arg
-
-  choice SetGaragePropertyPostalCode : ContractId GarageProperty
-    with
-      newGaragePropertyPostalCode : Text
-    controller signatory this
-    do
-      setGaragePropertyPostalCode this arg
   
   nonconsuming choice GetGaragePropertyDistrict : Text
     controller signatory this
     do
       getGaragePropertyDistrict this arg
 
-  choice SetGaragePropertyDistrict : ContractId GarageProperty
-    with
-      newGaragePropertyDistrict : Text
-    controller signatory this
-    do
-      setGaragePropertyDistrict this arg
-
   nonconsuming choice GetGaragePropertyCounty : Text
     controller signatory this
     do
       getGaragePropertyCounty this arg
-
-  choice SetGaragePropertyCounty : ContractId GarageProperty
-    with
-      newGaragePropertyCounty : Text
-    controller signatory this
-    do
-      setGaragePropertyCounty this arg
 
   nonconsuming choice GetGarageType : GarageType
     controller signatory this
     do
       getGarageType this arg
 
-  choice SetGarageType : ContractId GarageProperty
-    with
-      newGarageType : GarageType
-    controller signatory this
-    do
-      setGarageType this arg
-
   nonconsuming choice GetGarageArea : Decimal
     controller signatory this
     do
       getGarageArea this arg
 
-  choice SetGarageArea : ContractId GarageProperty
-    with
-      newGarageArea : Decimal
-    controller signatory this
-    do
-      setGarageArea this arg
-
   nonconsuming choice GetVehicleCapacity : Int
     controller signatory this
     do
       getVehicleCapacity this arg
-
-  choice SetVehicleCapacity : ContractId GarageProperty
-    with
-      newVehicleCapacity : Int
-    controller signatory this
-    do
-      setVehicleCapacity this arg
   
   nonconsuming choice GetGarageInstalledEquipment : Text
     controller signatory this
     do
       getGarageInstalledEquipment this arg
-
-  choice SetGarageInstalledEquipment : ContractId GarageProperty
-    with
-      newGarageInstalledEquipment : Text
-    controller signatory this
-    do
-      setGarageInstalledEquipment this arg
   
   nonconsuming choice GetGarageAdditionalInformation : Text
     controller signatory this
     do
       getGarageAdditionalInformation this arg
 
-  choice SetGarageAdditionalInformation : ContractId GarageProperty
-    with
-      newGarageAdditionalInformation : Text
-    controller signatory this
-    do
-      setGarageAdditionalInformation this arg
-
   nonconsuming choice GetGarageDescription : Text
     controller signatory this
     do
       getGarageDescription this arg
-
-  choice SetGarageDescription : ContractId GarageProperty
-    with
-      newGarageDescription : Text
-    controller signatory this
-    do
-      setGarageDescription this arg
   
   nonconsuming choice GetGaragePhotoReferences : [Text]
     controller signatory this
     do
       getGaragePhotoReferences this arg
-
-  choice SetGaragePhotoReferences : ContractId GarageProperty
-    with
-      newPhotoReferences : [Text]
-    controller signatory this
-    do
-      setGaragePhotoReferences this arg
       
   choice Remove : ()
     controller signatory this

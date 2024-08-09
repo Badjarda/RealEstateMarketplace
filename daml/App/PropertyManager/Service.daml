@@ -1,6 +1,6 @@
 module App.PropertyManager.Service where
 
-import Interface.PropertyManager.Service qualified as Service(I, R, O, View(..), OView(..), RView(..), RequestCreateApartmentProperty(..), CreateApartmentProperty(..), UpdateApartmentInstrumentKey(..), UpdateApartmentPrice(..), UpdateApartmentPropertyAddress(..), UpdateApartmentPropertyPostalCode(..), UpdateApartmentPropertyDistrict(..), UpdateApartmentPropertyCounty(..), UpdateApartmentGrossArea(..), UpdateApartmentUsableArea(..), UpdateApartmentBedrooms(..), UpdateApartmentBathrooms(..), UpdateApartmentFloor(..), UpdateApartmentParkingSpaces(..), UpdateApartmentElevator(..), UpdateApartmentBuildDate(..), UpdateApartmentInstalledEquipment(..), UpdateApartmentAdditionalInformation(..), UpdateApartmentDescription(..), UpdateApartmentPhotoReferences(..), RequestCreateLandProperty(..), CreateLandProperty(..), UpdateLandInstrumentKey(..), UpdateLandPrice(..), UpdateLandPropertyAddress(..), UpdateLandPropertyPostalCode(..), UpdateLandPropertyDistrict(..), UpdateLandPropertyCounty(..), UpdateLandType(..), UpdateTotalLandArea(..), UpdateMinimumSurfaceForSale(..), UpdateLandBuildableArea(..), UpdateLandBuildableFloors(..), UpdateLandAccessByRoad(..), UpdateLandInstalledEquipment(..), UpdateLandViableConstructionTypes(..), UpdateLandAdditionalInformation(..), UpdateLandDescription(..), UpdateLandPhotoReferences(..), RequestCreateResidenceProperty(..), CreateResidenceProperty(..), UpdateResidenceInstrumentKey(..), UpdateResidencePrice(..), UpdateResidencePropertyAddress(..), UpdateResidencePropertyPostalCode(..), UpdateResidencePropertyDistrict(..), UpdateResidencePropertyCounty(..), UpdateResidenceGrossArea(..), UpdateResidenceUsableArea(..), UpdateResidenceBedrooms(..), UpdateResidenceBathrooms(..), UpdateResidenceFloors(..), UpdateResidenceType(..), UpdateResidenceBackyard(..), UpdateResidenceInstalledEquipment(..), UpdateResidenceParking(..), UpdateResidenceBuildDate(..), UpdateResidenceOrientation(..), UpdateResidenceAdditionalInformation(..), UpdateResidenceDescription(..), UpdateResidencePhotoReferences(..), RequestCreateGarageProperty(..), CreateGarageProperty(..), UpdateGarageInstrumentKey(..), UpdateGaragePrice(..),UpdateGaragePropertyAddress(..), UpdateGaragePropertyPostalCode(..), UpdateGaragePropertyDistrict(..), UpdateGaragePropertyCounty(..), UpdateGarageArea(..), UpdateGarageType(..), UpdateVehicleCapacity(..), UpdateGarageInstalledEquipment(..), UpdateGarageAdditionalInformation(..), UpdateGarageDescription(..), UpdateGaragePhotoReferences(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehouseInstrumentKey(..), UpdateWarehousePrice(..), UpdateWarehousePropertyAddress(..), UpdateWarehousePropertyPostalCode(..), UpdateWarehousePropertyDistrict(..), UpdateWarehousePropertyCounty(..), UpdateWarehouseType(..), UpdateWarehouseGrossArea(..), UpdateWarehouseUsableArea(..), UpdateWarehouseFloors(..), UpdateWarehouseBuildDate(..), UpdateWarehouseInstalledEquipment(..), UpdateWarehouseAdditionalInformation(..), UpdateWarehouseDescription(..), UpdateWarehousePhotoReferences(..), Accept(..), Decline(..), Withdraw(..), Approve(..), Reject(..), Cancel(..))
+import Interface.PropertyManager.Service qualified as Service(I, R, O, View(..), OView(..), RView(..), RequestCreateApartmentProperty(..), CreateApartmentProperty(..), UpdateApartment(..), RequestCreateLandProperty(..), CreateLandProperty(..), UpdateLand(..), RequestCreateResidenceProperty(..), CreateResidenceProperty(..), UpdateResidence(..), RequestCreateGarageProperty(..), CreateGarageProperty(..), UpdateGarage(..), RequestCreateWarehouseProperty(..), CreateWarehouseProperty(..), UpdateWarehouse(..), Accept(..), Decline(..), Withdraw(..), Approve(..), Reject(..), Cancel(..))
 
 import Interface.PropertyManager.Property.ApartmentProperty.Factory qualified as ApartmentProperty(Factory(..))
 import Interface.PropertyManager.Property.LandProperty.Factory qualified as LandProperty(Factory(..))
@@ -11,7 +11,7 @@ import Interface.PropertyManager.Property.WarehouseProperty.Factory qualified as
 import Interface.Base.Service qualified as Base (I, View(..))
 import Interface.RoleManager.UserRole.Permission
 
-import App.PropertyManager.Util (CreateApartmentPropertyRequest(..), CreateApartmentProperty(..), UpdateApartmentInstrumentKey(..), UpdateApartmentPrice(..),UpdateApartmentPropertyAddress(..), UpdateApartmentPropertyPostalCode(..), UpdateApartmentPropertyDistrict(..), UpdateApartmentPropertyCounty(..), UpdateApartmentGrossArea(..), UpdateApartmentUsableArea(..), UpdateApartmentBedrooms(..), UpdateApartmentBathrooms(..), UpdateApartmentFloor(..), UpdateApartmentParkingSpaces(..), UpdateApartmentElevator(..), UpdateApartmentBuildDate(..), UpdateApartmentInstalledEquipment(..), UpdateApartmentAdditionalInformation(..), UpdateApartmentDescription(..), UpdateApartmentPhotoReferences(..), requestCreateApartmentPropertyAux, createApartmentPropertyAux, updateApartmentInstrumentKeyAux, updateApartmentPriceAux,updateApartmentPropertyAdressAux, updateApartmentPropertyPostalCodeAux, updateApartmentPropertyDistrictAux, updateApartmentPropertyCountyAux, updateApartmentGrossAreaAux, updateApartmentUsableAreaAux, updateApartmentBedroomsAux, updateApartmentBathroomsAux, updateApartmentFloorAux, updateApartmentParkingSpacesAux, updateApartmentElevatorAux, updateApartmentBuildDateAux, updateApartmentInstalledEquipmentAux, updateApartmentAdditionalInformationAux, updateApartmentDescriptionAux, updateApartmentPhotoReferencesAux, CreateResidencePropertyRequest(..), CreateResidenceProperty(..), UpdateResidenceInstrumentKey(..), UpdateResidencePrice(..), UpdateResidencePropertyAddress(..), UpdateResidencePropertyPostalCode(..), UpdateResidencePropertyDistrict(..), UpdateResidencePropertyCounty(..), UpdateResidenceGrossArea(..), UpdateResidenceUsableArea(..), UpdateResidenceBedrooms(..), UpdateResidenceBathrooms(..), UpdateResidenceFloors(..), UpdateResidenceType(..), UpdateResidenceBackyard(..), UpdateResidenceParking(..), UpdateResidenceBuildDate(..), UpdateResidenceOrientation(..), UpdateResidenceInstalledEquipment(..), UpdateResidenceAdditionalInformation(..), UpdateResidenceDescription(..), UpdateResidencePhotoReferences(..), requestCreateResidencePropertyAux, createResidencePropertyAux, updateResidenceInstrumentKeyAux, updateResidencePriceAux, updateResidencePropertyAddressAux, updateResidencePropertyPostalCodeAux, updateResidencePropertyDistrictAux, updateResidencePropertyCountyAux, updateResidenceGrossAreaAux, updateResidenceUsableAreaAux, updateResidenceBedroomsAux, updateResidenceBathroomsAux, updateResidenceFloorsAux, updateResidenceTypeAux, updateResidenceBackyardAux, updateResidenceParkingAux, updateResidenceBuildDateAux, updateResidenceOrientationAux, updateResidenceInstalledEquipmentAux, updateResidenceAdditionalInformationAux, updateResidenceDescriptionAux, updateResidencePhotoReferencesAux, CreateLandPropertyRequest(..), CreateLandProperty(..), UpdateLandInstrumentKey(..), UpdateLandPrice(..), UpdateLandPropertyAddress(..), UpdateLandPropertyPostalCode(..), UpdateLandPropertyDistrict(..), UpdateLandPropertyCounty(..), UpdateLandType(..), UpdateTotalLandArea(..), UpdateLandMinimumSurfaceForSale(..), UpdateLandBuildableArea(..), UpdateLandBuildableFloors(..), UpdateLandAccessByRoad(..), UpdateLandViableConstructionTypes(..), UpdateLandInstalledEquipment(..), UpdateLandAdditionalInformation(..), UpdateLandDescription(..), UpdateLandPhotoReferences(..), requestCreateLandPropertyAux, createLandPropertyAux, updateLandInstrumentKeyAux, updateLandPriceAux, updateLandPropertyAdressAux, updateLandPropertyPostalCodeAux, updateLandPropertyDistrictAux, updateLandPropertyCountyAux, updateLandTypeAux, updateTotalLandAreaAux, updateLandMinimumSurfaceForSaleAux, updateLandBuildableAreaAux, updateLandBuildableFloorsAux, updateLandAccessByRoadAux, updateLandViableConstructionTypesAux, updateLandInstalledEquipmentAux, updateLandAdditionalInformationAux, updateLandDescriptionAux, updateLandPhotoReferencesAux, CreateGarageProperty(..), CreateGaragePropertyRequest(..), UpdateGarageInstrumentKey(..), UpdateGaragePrice(..), UpdateGaragePropertyAddress(..), UpdateGaragePropertyPostalCode(..), UpdateGaragePropertyDistrict(..), UpdateGaragePropertyCounty(..), UpdateGarageArea(..), UpdateGarageType(..), UpdateVehicleCapacity(..), UpdateGarageInstalledEquipment(..), UpdateGarageAdditionalInformation(..), UpdateGarageDescription(..), UpdateGaragePhotoReferences(..), requestCreateGaragePropertyAux, createGaragePropertyAux, updateGarageInstrumentKeyAux, updateGaragePriceAux, updateGaragePropertyAddressAux, updateGaragePropertyPostalCodeAux, updateGaragePropertyDistrictAux, updateGaragePropertyCountyAux, updateGarageAreaAux, updateGarageTypeAux, updateVehicleCapacityAux, updateGarageInstalledEquipmentAux, updateGarageAdditionalInformationAux, updateGarageDescriptionAux, updateGaragePhotoReferencesAux, CreateWarehouseProperty(..), CreateWarehousePropertyRequest(..), UpdateWarehouseInstrumentKey(..), UpdateWarehousePrice(..), UpdateWarehousePropertyAddress(..), UpdateWarehousePropertyPostalCode(..), UpdateWarehousePropertyDistrict(..), UpdateWarehousePropertyCounty(..), UpdateWarehouseType(..), UpdateWarehouseGrossArea(..), UpdateWarehouseUsableArea(..), UpdateWarehouseFloors(..), UpdateWarehouseBuildDate(..), UpdateWarehouseInstalledEquipment(..), UpdateWarehouseAdditionalInformation(..), UpdateWarehouseDescription(..), UpdateWarehousePhotoReferences(..), requestCreateWarehousePropertyAux, createWarehousePropertyAux, updateWarehouseInstrumentKeyAux, updateWarehousePriceAux, updateWarehousePropertyAddressAux, updateWarehousePropertyPostalCodeAux, updateWarehousePropertyDistrictAux, updateWarehousePropertyCountyAux, updateWarehouseTypeAux, updateWarehouseGrossAreaAux, updateWarehouseUsableAreaAux, updateWarehouseFloorsAux, updateWarehouseBuildDateAux, updateWarehouseInstalledEquipmentAux, updateWarehouseAdditionalInformationAux, updateWarehouseDescriptionAux, updateWarehousePhotoReferencesAux)
+import App.PropertyManager.Util (CreateApartmentPropertyRequest(..), CreateApartmentProperty(..), UpdateApartment(..), requestCreateApartmentPropertyAux, createApartmentPropertyAux, updateApartmentAux, CreateResidencePropertyRequest(..), CreateResidenceProperty(..), UpdateResidence(..), requestCreateResidencePropertyAux, createResidencePropertyAux, updateResidenceAux, CreateLandPropertyRequest(..), CreateLandProperty(..), UpdateLand(..), requestCreateLandPropertyAux, createLandPropertyAux, updateLandAux, CreateGarageProperty(..), CreateGaragePropertyRequest(..), UpdateGarage(..), requestCreateGaragePropertyAux, createGaragePropertyAux, updateGarageAux, CreateWarehouseProperty(..), CreateWarehousePropertyRequest(..), UpdateWarehouse(..), requestCreateWarehousePropertyAux, createWarehousePropertyAux, updateWarehouseAux)
 
 type T = Service
 
@@ -47,77 +47,9 @@ template Service
       let createApartmentPropertyParams = CreateApartmentProperty with ..
       createApartmentPropertyAux createApartmentPropertyParams
     
-    updateApartmentInstrumentKey Service.UpdateApartmentInstrumentKey{propertyKey, newApartmentInstrumentKey} = do
-      let requestUpdateApartmentInstrumentKeyParams = UpdateApartmentInstrumentKey with ..
-      updateApartmentInstrumentKeyAux requestUpdateApartmentInstrumentKeyParams
-    
-    updateApartmentPrice Service.UpdateApartmentPrice{propertyKey, newApartmentPrice} = do
-      let requestUpdateApartmentPriceParams = UpdateApartmentPrice with ..
-      updateApartmentPriceAux requestUpdateApartmentPriceParams
-
-    updateApartmentPropertyAddress Service.UpdateApartmentPropertyAddress{propertyKey, newApartmentPropertyAddress} = do
-      let requestUpdateApartmentPropertyAddressParams = UpdateApartmentPropertyAddress with ..
-      updateApartmentPropertyAdressAux requestUpdateApartmentPropertyAddressParams
-
-    updateApartmentPropertyPostalCode Service.UpdateApartmentPropertyPostalCode{propertyKey, newApartmentPropertyPostalCode} = do
-      let requestUpdateApartmentPropertyPostalCodeParams = UpdateApartmentPropertyPostalCode with ..
-      updateApartmentPropertyPostalCodeAux requestUpdateApartmentPropertyPostalCodeParams
-
-    updateApartmentPropertyDistrict Service.UpdateApartmentPropertyDistrict{propertyKey, newApartmentPropertyDistrict} = do
-      let requestUpdateApartmentPropertyDistrictParams = UpdateApartmentPropertyDistrict with ..
-      updateApartmentPropertyDistrictAux requestUpdateApartmentPropertyDistrictParams
-
-    updateApartmentPropertyCounty Service.UpdateApartmentPropertyCounty{propertyKey, newApartmentPropertyCounty} = do
-      let requestUpdateApartmentPropertyCountyParams = UpdateApartmentPropertyCounty with ..
-      updateApartmentPropertyCountyAux requestUpdateApartmentPropertyCountyParams
-
-    updateApartmentGrossArea Service.UpdateApartmentGrossArea{propertyKey, newApartmentGrossArea} = do
-      let requestUpdateApartmentGrossAreaParams = UpdateApartmentGrossArea with ..
-      updateApartmentGrossAreaAux requestUpdateApartmentGrossAreaParams
-
-    updateApartmentUsableArea Service.UpdateApartmentUsableArea{propertyKey, newApartmentUsableArea} = do
-      let requestUpdateApartmentUsableAreaParams = UpdateApartmentUsableArea with ..
-      updateApartmentUsableAreaAux requestUpdateApartmentUsableAreaParams
-
-    updateApartmentBedrooms Service.UpdateApartmentBedrooms{propertyKey, newApartmentBedrooms} = do
-      let requestUpdateApartmentBedroomsParams = UpdateApartmentBedrooms with ..
-      updateApartmentBedroomsAux requestUpdateApartmentBedroomsParams
-
-    updateApartmentBathrooms Service.UpdateApartmentBathrooms{propertyKey, newApartmentBathrooms} = do
-      let requestUpdateApartmentBathroomsParams = UpdateApartmentBathrooms with ..
-      updateApartmentBathroomsAux requestUpdateApartmentBathroomsParams
-
-    updateApartmentFloor Service.UpdateApartmentFloor{propertyKey, newApartmentFloor} = do
-      let requestUpdateApartmentFloorParams = UpdateApartmentFloor with ..
-      updateApartmentFloorAux requestUpdateApartmentFloorParams
-
-    updateApartmentParkingSpaces Service.UpdateApartmentParkingSpaces{propertyKey, newApartmentParkingSpaces} = do
-      let requestUpdateApartmentParkingSpacesParams = UpdateApartmentParkingSpaces with ..
-      updateApartmentParkingSpacesAux requestUpdateApartmentParkingSpacesParams
-
-    updateApartmentElevator Service.UpdateApartmentElevator{propertyKey, newApartmentElevator} = do
-      let requestUpdateApartmentElevatorParams = UpdateApartmentElevator with ..
-      updateApartmentElevatorAux requestUpdateApartmentElevatorParams
-
-    updateApartmentBuildDate Service.UpdateApartmentBuildDate{propertyKey, newApartmentBuildDate} = do
-      let requestUpdateApartmentBuildDateParams = UpdateApartmentBuildDate with ..
-      updateApartmentBuildDateAux requestUpdateApartmentBuildDateParams
-
-    updateApartmentInstalledEquipment Service.UpdateApartmentInstalledEquipment{propertyKey, newApartmentInstalledEquipment} = do
-      let requestUpdateApartmentInstalledEquipmentParams = UpdateApartmentInstalledEquipment with ..
-      updateApartmentInstalledEquipmentAux requestUpdateApartmentInstalledEquipmentParams
-
-    updateApartmentAdditionalInformation Service.UpdateApartmentAdditionalInformation{propertyKey, newApartmentAdditionalInformation} = do
-      let requestUpdateApartmentAdditionalInformationParams = UpdateApartmentAdditionalInformation with ..
-      updateApartmentAdditionalInformationAux requestUpdateApartmentAdditionalInformationParams
-
-    updateApartmentDescription Service.UpdateApartmentDescription{propertyKey, newApartmentDescription} = do
-      let requestUpdateApartmentDescriptionParams = UpdateApartmentDescription with ..
-      updateApartmentDescriptionAux requestUpdateApartmentDescriptionParams
-    
-    updateApartmentPhotoReferences Service.UpdateApartmentPhotoReferences{propertyKey, newApartmentPhotoReferences} = do
-      let requestUpdateApartmentPhotoReferencesParams = UpdateApartmentPhotoReferences with ..
-      updateApartmentPhotoReferencesAux requestUpdateApartmentPhotoReferencesParams
+    updateApartment Service.UpdateApartment{propertyKey, newApartmentPrice,newApartmentPropertyAddress,newApartmentPropertyPostalCode,newApartmentPropertyDistrict,newApartmentPropertyCounty,newApartmentGrossArea,newApartmentUsableArea,newApartmentBedrooms,newApartmentBathrooms,newApartmentFloor,newApartmentParkingSpaces,newApartmentElevator,newApartmentBuildDate,newApartmentInstalledEquipment,newApartmentAdditionalInformation,newApartmentDescription,newApartmentPhotoReferences} = do
+      let requestUpdateApartmentParams = UpdateApartment with ..
+      updateApartmentAux requestUpdateApartmentParams
 
 -------------------------------------------------------
 
@@ -129,73 +61,9 @@ template Service
       let createLandPropertyParams = CreateLandProperty with ..
       createLandPropertyAux createLandPropertyParams
     
-    updateLandInstrumentKey Service.UpdateLandInstrumentKey{propertyKey, newLandInstrumentKey} = do
-      let requestUpdateLandInstrumentKeyParams = UpdateLandInstrumentKey with ..
-      updateLandInstrumentKeyAux requestUpdateLandInstrumentKeyParams
-
-    updateLandPrice Service.UpdateLandPrice{propertyKey, newLandPrice} = do
-      let requestUpdateLandPriceParams = UpdateLandPrice with ..
-      updateLandPriceAux requestUpdateLandPriceParams
-
-    updateLandPropertyAddress Service.UpdateLandPropertyAddress{propertyKey, newLandPropertyAddress} = do
-      let requestUpdateLandPropertyAddressParams = UpdateLandPropertyAddress with ..
-      updateLandPropertyAdressAux requestUpdateLandPropertyAddressParams
-
-    updateLandPropertyPostalCode Service.UpdateLandPropertyPostalCode{propertyKey, newLandPropertyPostalCode} = do
-      let requestUpdateLandPropertyPostalCodeParams = UpdateLandPropertyPostalCode with ..
-      updateLandPropertyPostalCodeAux requestUpdateLandPropertyPostalCodeParams
-
-    updateLandPropertyDistrict Service.UpdateLandPropertyDistrict{propertyKey, newLandPropertyDistrict} = do
-      let requestUpdateLandPropertyDistrictParams = UpdateLandPropertyDistrict with ..
-      updateLandPropertyDistrictAux requestUpdateLandPropertyDistrictParams
-
-    updateLandPropertyCounty Service.UpdateLandPropertyCounty{propertyKey, newLandPropertyCounty} = do
-      let requestUpdateLandPropertyCountyParams = UpdateLandPropertyCounty with ..
-      updateLandPropertyCountyAux requestUpdateLandPropertyCountyParams
-
-    updateLandType Service.UpdateLandType{propertyKey, newLandType} = do
-      let requestUpdateLandTypeParams = UpdateLandType with ..
-      updateLandTypeAux requestUpdateLandTypeParams
-
-    updateTotalLandArea Service.UpdateTotalLandArea{propertyKey, newTotalLandArea} = do
-      let requestUpdateTotalLandAreaParams = UpdateTotalLandArea with ..
-      updateTotalLandAreaAux requestUpdateTotalLandAreaParams
-
-    updateMinimumSurfaceForSale Service.UpdateMinimumSurfaceForSale{propertyKey, newLandMinimumSurfaceForSale} = do
-      let requestUpdateLandMinimumSurfaceForSaleParams = UpdateLandMinimumSurfaceForSale with ..
-      updateLandMinimumSurfaceForSaleAux requestUpdateLandMinimumSurfaceForSaleParams
-
-    updateLandBuildableArea Service.UpdateLandBuildableArea{propertyKey, newLandBuildableArea} = do
-      let requestUpdateLandBuildableAreaParams = UpdateLandBuildableArea with ..
-      updateLandBuildableAreaAux requestUpdateLandBuildableAreaParams
-
-    updateLandBuildableFloors Service.UpdateLandBuildableFloors{propertyKey, newLandBuildableFloors} = do
-      let requestUpdateLandBuildableFloorsParams = UpdateLandBuildableFloors with ..
-      updateLandBuildableFloorsAux requestUpdateLandBuildableFloorsParams
-
-    updateLandAccessByRoad Service.UpdateLandAccessByRoad{propertyKey, newLandAccessByRoad} = do
-      let requestUpdateLandAccessByRoadParams = UpdateLandAccessByRoad with ..
-      updateLandAccessByRoadAux requestUpdateLandAccessByRoadParams
-
-    updateLandInstalledEquipment Service.UpdateLandInstalledEquipment{propertyKey, newLandInstalledEquipment} = do
-      let requestUpdateLandInstalledEquipmentParams = UpdateLandInstalledEquipment with ..
-      updateLandInstalledEquipmentAux requestUpdateLandInstalledEquipmentParams
-
-    updateLandViableConstructionTypes Service.UpdateLandViableConstructionTypes{propertyKey, newLandViableConstructionTypes} = do
-      let requestUpdateLandViableConstructionTypesParams = UpdateLandViableConstructionTypes with ..
-      updateLandViableConstructionTypesAux requestUpdateLandViableConstructionTypesParams
-
-    updateLandAdditionalInformation Service.UpdateLandAdditionalInformation{propertyKey, newLandAdditionalInformation} = do
-      let requestUpdateLandAdditionalInformationParams = UpdateLandAdditionalInformation with ..
-      updateLandAdditionalInformationAux requestUpdateLandAdditionalInformationParams
-
-    updateLandDescription Service.UpdateLandDescription{propertyKey, newLandDescription} = do
-      let requestUpdateLandDescriptionParams = UpdateLandDescription with ..
-      updateLandDescriptionAux requestUpdateLandDescriptionParams
-    
-    updateLandPhotoReferences Service.UpdateLandPhotoReferences{propertyKey, newLandPhotoReferences} = do
-      let requestUpdateLandPhotoReferencesParams = UpdateLandPhotoReferences with ..
-      updateLandPhotoReferencesAux requestUpdateLandPhotoReferencesParams
+    updateLand Service.UpdateLand{propertyKey, newLandPrice,newLandPropertyAddress,newLandPropertyPostalCode,newLandPropertyDistrict,newLandPropertyCounty,newLandType,newLandTotalArea,newLandMinimumSurfaceForSale,newLandBuildableArea,newLandBuildableFloors,newLandAccessByRoad,newLandInstalledEquipment,newLandViableConstructionTypes,newLandAdditionalInformation,newLandDescription,newLandPhotoReferences} = do
+      let requestUpdateLandParams = UpdateLand with ..
+      updateLandAux requestUpdateLandParams
 
 -------------------------------------------------------
     
@@ -207,85 +75,9 @@ template Service
       let createResidencePropertyParams = CreateResidenceProperty with ..
       createResidencePropertyAux createResidencePropertyParams
     
-    updateResidenceInstrumentKey Service.UpdateResidenceInstrumentKey{propertyKey, newResidenceInstrumentKey} = do
-      let requestUpdateResidenceInstrumentKeyParams = UpdateResidenceInstrumentKey with ..
-      updateResidenceInstrumentKeyAux requestUpdateResidenceInstrumentKeyParams
-
-    updateResidencePrice Service.UpdateResidencePrice{propertyKey, newResidencePrice} = do
-      let requestUpdateResidencePriceParams = UpdateResidencePrice with ..
-      updateResidencePriceAux requestUpdateResidencePriceParams
-
-    updateResidencePropertyAddress Service.UpdateResidencePropertyAddress{propertyKey, newResidencePropertyAddress} = do
-      let requestUpdateResidencePropertyAddressParams = UpdateResidencePropertyAddress with ..
-      updateResidencePropertyAddressAux requestUpdateResidencePropertyAddressParams
-
-    updateResidencePropertyPostalCode Service.UpdateResidencePropertyPostalCode{propertyKey, newResidencePropertyPostalCode} = do
-      let requestUpdateResidencePropertyPostalCodeParams = UpdateResidencePropertyPostalCode with ..
-      updateResidencePropertyPostalCodeAux requestUpdateResidencePropertyPostalCodeParams
-
-    updateResidencePropertyDistrict Service.UpdateResidencePropertyDistrict{propertyKey, newResidencePropertyDistrict} = do
-      let requestUpdateResidencePropertyDistrictParams = UpdateResidencePropertyDistrict with ..
-      updateResidencePropertyDistrictAux requestUpdateResidencePropertyDistrictParams
-
-    updateResidencePropertyCounty Service.UpdateResidencePropertyCounty{propertyKey, newResidencePropertyCounty} = do
-      let requestUpdateResidencePropertyCountyParams = UpdateResidencePropertyCounty with ..
-      updateResidencePropertyCountyAux requestUpdateResidencePropertyCountyParams
-
-    updateResidenceGrossArea Service.UpdateResidenceGrossArea{propertyKey, newResidenceGrossArea} = do
-      let requestUpdateResidenceGrossAreaParams = UpdateResidenceGrossArea with ..
-      updateResidenceGrossAreaAux requestUpdateResidenceGrossAreaParams
-
-    updateResidenceUsableArea Service.UpdateResidenceUsableArea{propertyKey, newResidenceUsableArea} = do
-      let requestUpdateResidenceUsableAreaParams = UpdateResidenceUsableArea with ..
-      updateResidenceUsableAreaAux requestUpdateResidenceUsableAreaParams
-
-    updateResidenceBedrooms Service.UpdateResidenceBedrooms{propertyKey, newResidenceBedrooms} = do
-      let requestUpdateResidenceBedroomsParams = UpdateResidenceBedrooms with ..
-      updateResidenceBedroomsAux requestUpdateResidenceBedroomsParams
-
-    updateResidenceBathrooms Service.UpdateResidenceBathrooms{propertyKey, newResidenceBathrooms} = do
-      let requestUpdateResidenceBathroomsParams = UpdateResidenceBathrooms with ..
-      updateResidenceBathroomsAux requestUpdateResidenceBathroomsParams
-
-    updateResidenceFloors Service.UpdateResidenceFloors{propertyKey, newResidenceFloors} = do
-      let requestUpdateResidenceFloorsParams = UpdateResidenceFloors with ..
-      updateResidenceFloorsAux requestUpdateResidenceFloorsParams
-
-    updateResidenceType Service.UpdateResidenceType{propertyKey, newResidenceType} = do
-      let requestUpdateResidenceTypeParams = UpdateResidenceType with ..
-      updateResidenceTypeAux requestUpdateResidenceTypeParams
-
-    updateResidenceBackyard Service.UpdateResidenceBackyard{propertyKey, newResidenceBackyardDescription} = do
-      let requestUpdateResidenceBackyardParams = UpdateResidenceBackyard with ..
-      updateResidenceBackyardAux requestUpdateResidenceBackyardParams
-
-    updateResidenceParking Service.UpdateResidenceParking{propertyKey, newResidenceParking} = do
-      let requestUpdateResidenceParkingParams = UpdateResidenceParking with ..
-      updateResidenceParkingAux requestUpdateResidenceParkingParams
-
-    updateResidenceBuildDate Service.UpdateResidenceBuildDate{propertyKey, newResidenceBuildDate} = do
-      let requestUpdateResidenceBuildDateParams = UpdateResidenceBuildDate with ..
-      updateResidenceBuildDateAux requestUpdateResidenceBuildDateParams
-
-    updateResidenceOrientation Service.UpdateResidenceOrientation{propertyKey, newResidenceOrientation} = do
-      let requestUpdateResidenceOrientationParams = UpdateResidenceOrientation with ..
-      updateResidenceOrientationAux requestUpdateResidenceOrientationParams
-
-    updateResidenceInstalledEquipment Service.UpdateResidenceInstalledEquipment{propertyKey, newResidenceInstalledEquipment} = do
-      let requestUpdateResidenceInstalledEquipmentParams = UpdateResidenceInstalledEquipment with ..
-      updateResidenceInstalledEquipmentAux requestUpdateResidenceInstalledEquipmentParams
-
-    updateResidenceAdditionalInformation Service.UpdateResidenceAdditionalInformation{propertyKey, newResidenceAdditionalInformation} = do
-      let requestUpdateResidenceAdditionalInformationParams = UpdateResidenceAdditionalInformation with ..
-      updateResidenceAdditionalInformationAux requestUpdateResidenceAdditionalInformationParams
-
-    updateResidenceDescription Service.UpdateResidenceDescription{propertyKey, newResidenceDescription} = do
-      let requestUpdateResidenceDescriptionParams = UpdateResidenceDescription with ..
-      updateResidenceDescriptionAux requestUpdateResidenceDescriptionParams
-    
-    updateResidencePhotoReferences Service.UpdateResidencePhotoReferences{propertyKey, newResidencePhotoReferences} = do
-      let requestUpdateResidencePhotoReferencesParams = UpdateResidencePhotoReferences with ..
-      updateResidencePhotoReferencesAux requestUpdateResidencePhotoReferencesParams
+    updateResidence Service.UpdateResidence{propertyKey, newResidencePrice,newResidencePropertyAddress,newResidencePropertyPostalCode,newResidencePropertyDistrict,newResidencePropertyCounty,newResidenceGrossArea,newResidenceUsableArea,newResidenceBedrooms,newResidenceBathrooms,newResidenceFloors,newResidenceType,newResidenceBackyard,newResidenceParking,newResidenceBuildDate,newResidenceOrientation,newResidenceInstalledEquipment,newResidenceAdditionalInformation,newResidenceDescription,newResidencePhotoReferences} = do
+      let requestUpdateResidenceParams = UpdateResidence with ..
+      updateResidenceAux requestUpdateResidenceParams
 
 ---------------------
 
@@ -297,57 +89,10 @@ template Service
       let createGaragePropertyParams = CreateGarageProperty with ..
       createGaragePropertyAux createGaragePropertyParams
     
-    updateGarageInstrumentKey Service.UpdateGarageInstrumentKey{propertyKey, newGarageInstrumentKey} = do
-      let requestUpdateGarageInstrumentKeyParams = UpdateGarageInstrumentKey with ..
-      updateGarageInstrumentKeyAux requestUpdateGarageInstrumentKeyParams
+    updateGarage Service.UpdateGarage{propertyKey, newGaragePrice,newGaragePropertyAddress,newGaragePropertyPostalCode,newGaragePropertyDistrict,newGaragePropertyCounty,newGarageArea,newGarageType,newGarageVehicleCapacity,newGarageInstalledEquipment,newGarageAdditionalInformation, newGarageDescription,newGaragePhotoReferences} = do
+      let requestUpdateGarageParams = UpdateGarage with ..
+      updateGarageAux requestUpdateGarageParams
     
-    updateGaragePrice Service.UpdateGaragePrice{propertyKey, newGaragePrice} = do
-      let requestUpdateGaragePriceParams = UpdateGaragePrice with ..
-      updateGaragePriceAux requestUpdateGaragePriceParams
-
-    updateGaragePropertyAddress Service.UpdateGaragePropertyAddress{propertyKey, newGaragePropertyAddress} = do
-      let requestUpdateGaragePropertyAddressParams = UpdateGaragePropertyAddress with ..
-      updateGaragePropertyAddressAux requestUpdateGaragePropertyAddressParams
-
-    updateGaragePropertyPostalCode Service.UpdateGaragePropertyPostalCode{propertyKey, newGaragePropertyPostalCode} = do
-      let requestUpdateGaragePropertyPostalCodeParams = UpdateGaragePropertyPostalCode with ..
-      updateGaragePropertyPostalCodeAux requestUpdateGaragePropertyPostalCodeParams
-
-    updateGaragePropertyDistrict Service.UpdateGaragePropertyDistrict{propertyKey, newGaragePropertyDistrict} = do
-      let requestUpdateGaragePropertyDistrictParams = UpdateGaragePropertyDistrict with ..
-      updateGaragePropertyDistrictAux requestUpdateGaragePropertyDistrictParams
-
-    updateGaragePropertyCounty Service.UpdateGaragePropertyCounty{propertyKey, newGaragePropertyCounty} = do
-      let requestUpdateGaragePropertyCountyParams = UpdateGaragePropertyCounty with ..
-      updateGaragePropertyCountyAux requestUpdateGaragePropertyCountyParams
-
-    updateGarageArea Service.UpdateGarageArea{propertyKey, newGarageArea} = do
-      let requestUpdateGarageAreaParams = UpdateGarageArea with ..
-      updateGarageAreaAux requestUpdateGarageAreaParams
-
-    updateGarageType Service.UpdateGarageType{propertyKey, newGarageType} = do
-      let requestUpdateGarageTypeParams = UpdateGarageType with ..
-      updateGarageTypeAux requestUpdateGarageTypeParams
-
-    updateVehicleCapacity Service.UpdateVehicleCapacity{propertyKey, newVehicleCapacity} = do
-      let requestUpdateVehicleCapacityParams = UpdateVehicleCapacity with ..
-      updateVehicleCapacityAux requestUpdateVehicleCapacityParams
-
-    updateGarageInstalledEquipment Service.UpdateGarageInstalledEquipment{propertyKey, newGarageInstalledEquipment} = do
-      let requestUpdateGarageInstalledEquipmentParams = UpdateGarageInstalledEquipment with ..
-      updateGarageInstalledEquipmentAux requestUpdateGarageInstalledEquipmentParams
-
-    updateGarageAdditionalInformation Service.UpdateGarageAdditionalInformation{propertyKey, newGarageAdditionalInformation} = do
-      let requestUpdateGarageAdditionalInformationParams = UpdateGarageAdditionalInformation with ..
-      updateGarageAdditionalInformationAux requestUpdateGarageAdditionalInformationParams
-
-    updateGarageDescription Service.UpdateGarageDescription{propertyKey, newGarageDescription} = do
-      let requestUpdateGarageDescriptionParams = UpdateGarageDescription with ..
-      updateGarageDescriptionAux requestUpdateGarageDescriptionParams
-    
-    updateGaragePhotoReferences Service.UpdateGaragePhotoReferences{propertyKey, newGaragePhotoReferences} = do
-      let requestUpdateGaragePhotoReferencesParams = UpdateGaragePhotoReferences with ..
-      updateGaragePhotoReferencesAux requestUpdateGaragePhotoReferencesParams
 
 -----------------------------------------------------------------------------------------
 
@@ -359,65 +104,10 @@ template Service
       let createWarehousePropertyParams = CreateWarehouseProperty with ..
       createWarehousePropertyAux createWarehousePropertyParams
     
-    updateWarehouseInstrumentKey Service.UpdateWarehouseInstrumentKey{propertyKey, newWarehouseInstrumentKey} = do
-      let requestUpdateWarehouseInstrumentKeyParams = UpdateWarehouseInstrumentKey with ..
-      updateWarehouseInstrumentKeyAux requestUpdateWarehouseInstrumentKeyParams
-    
-    updateWarehousePrice Service.UpdateWarehousePrice{propertyKey, newWarehousePrice} = do
-      let requestUpdateWarehousePriceParams = UpdateWarehousePrice with ..
-      updateWarehousePriceAux requestUpdateWarehousePriceParams
+    updateWarehouse Service.UpdateWarehouse{propertyKey, newWarehousePrice,newWarehousePropertyAddress,newWarehousePropertyPostalCode,newWarehousePropertyDistrict,newWarehousePropertyCounty,newWarehouseType,newWarehouseGrossArea,newWarehouseUsableArea,newWarehouseFloors,newWarehouseBuildDate,newWarehouseInstalledEquipment,newWarehouseAdditionalInformation,newWarehouseDescription,newWarehousePhotoReferences} = do
+      let requestUpdateWarehouseParams = UpdateWarehouse with ..
+      updateWarehouseAux requestUpdateWarehouseParams
 
-    updateWarehousePropertyAddress Service.UpdateWarehousePropertyAddress{propertyKey, newWarehousePropertyAddress} = do
-      let requestUpdateWarehousePropertyAddressParams = UpdateWarehousePropertyAddress with ..
-      updateWarehousePropertyAddressAux requestUpdateWarehousePropertyAddressParams
-
-    updateWarehousePropertyPostalCode Service.UpdateWarehousePropertyPostalCode{propertyKey, newWarehousePropertyPostalCode} = do
-      let requestUpdateWarehousePropertyPostalCodeParams = UpdateWarehousePropertyPostalCode with ..
-      updateWarehousePropertyPostalCodeAux requestUpdateWarehousePropertyPostalCodeParams
-
-    updateWarehousePropertyDistrict Service.UpdateWarehousePropertyDistrict{propertyKey, newWarehousePropertyDistrict} = do
-      let requestUpdateWarehousePropertyDistrictParams = UpdateWarehousePropertyDistrict with ..
-      updateWarehousePropertyDistrictAux requestUpdateWarehousePropertyDistrictParams
-
-    updateWarehousePropertyCounty Service.UpdateWarehousePropertyCounty{propertyKey, newWarehousePropertyCounty} = do
-      let requestUpdateWarehousePropertyCountyParams = UpdateWarehousePropertyCounty with ..
-      updateWarehousePropertyCountyAux requestUpdateWarehousePropertyCountyParams
-
-    updateWarehouseType Service.UpdateWarehouseType{propertyKey, newWarehouseType} = do
-      let requestUpdateWarehouseTypeParams = UpdateWarehouseType with ..
-      updateWarehouseTypeAux requestUpdateWarehouseTypeParams
-
-    updateWarehouseGrossArea Service.UpdateWarehouseGrossArea{propertyKey, newWarehouseGrossArea} = do
-      let requestUpdateWarehouseGrossAreaParams = UpdateWarehouseGrossArea with ..
-      updateWarehouseGrossAreaAux requestUpdateWarehouseGrossAreaParams
-
-    updateWarehouseUsableArea Service.UpdateWarehouseUsableArea{propertyKey, newWarehouseUsableArea} = do
-      let requestUpdateWarehouseUsableAreaParams = UpdateWarehouseUsableArea with ..
-      updateWarehouseUsableAreaAux requestUpdateWarehouseUsableAreaParams
-
-    updateWarehouseFloors Service.UpdateWarehouseFloors{propertyKey, newWarehouseFloors} = do
-      let requestUpdateWarehouseFloorsParams = UpdateWarehouseFloors with ..
-      updateWarehouseFloorsAux requestUpdateWarehouseFloorsParams
-
-    updateWarehouseBuildDate Service.UpdateWarehouseBuildDate{propertyKey, newWarehouseBuildDate} = do
-      let requestUpdateWarehouseBuildDateParams = UpdateWarehouseBuildDate with ..
-      updateWarehouseBuildDateAux requestUpdateWarehouseBuildDateParams
-
-    updateWarehouseInstalledEquipment Service.UpdateWarehouseInstalledEquipment{propertyKey, newWarehouseInstalledEquipment} = do
-      let requestUpdateWarehouseInstalledEquipmentParams = UpdateWarehouseInstalledEquipment with ..
-      updateWarehouseInstalledEquipmentAux requestUpdateWarehouseInstalledEquipmentParams
-
-    updateWarehouseAdditionalInformation Service.UpdateWarehouseAdditionalInformation{propertyKey, newWarehouseAdditionalInformation} = do
-      let requestUpdateWarehouseAdditionalInformationParams = UpdateWarehouseAdditionalInformation with ..
-      updateWarehouseAdditionalInformationAux requestUpdateWarehouseAdditionalInformationParams
-
-    updateWarehouseDescription Service.UpdateWarehouseDescription{propertyKey, newWarehouseDescription} = do
-      let requestUpdateWarehouseDescriptionParams = UpdateWarehouseDescription with ..
-      updateWarehouseDescriptionAux requestUpdateWarehouseDescriptionParams
-    
-    updateWarehousePhotoReferences Service.UpdateWarehousePhotoReferences{propertyKey, newWarehousePhotoReferences} = do
-      let requestUpdateWarehousePhotoReferencesParams = UpdateWarehousePhotoReferences with ..
-      updateWarehousePhotoReferencesAux requestUpdateWarehousePhotoReferencesParams
 
 template Offer
   with
