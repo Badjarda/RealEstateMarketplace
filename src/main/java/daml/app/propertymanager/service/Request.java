@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class Request extends Template {
-  public static final Identifier TEMPLATE_ID = new Identifier("f8883c36e16696951f0e9312ee45dacca92b05226daf215a5159b95d1b1c4079", "App.PropertyManager.Service", "Request");
+  public static final Identifier TEMPLATE_ID = new Identifier("8b6e58552ef878dbcd4586daf541e0ca6dd1b0d75795e7f9ece68259cb3242b1", "App.PropertyManager.Service", "Request");
 
   public static final Choice<Request, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->

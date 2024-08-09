@@ -45,7 +45,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class Reference extends Template {
-  public static final Identifier TEMPLATE_ID = new Identifier("f8883c36e16696951f0e9312ee45dacca92b05226daf215a5159b95d1b1c4079", "Interface.RoleManager.UserRole.UserRole", "Reference");
+  public static final Identifier TEMPLATE_ID = new Identifier("8b6e58552ef878dbcd4586daf541e0ca6dd1b0d75795e7f9ece68259cb3242b1", "Interface.RoleManager.UserRole.UserRole", "Reference");
 
   public static final Choice<Reference, SetCid, ContractId> CHOICE_SetCid = 
       Choice.create("SetCid", value$ -> value$.toValue(), value$ -> SetCid.valueDecoder()

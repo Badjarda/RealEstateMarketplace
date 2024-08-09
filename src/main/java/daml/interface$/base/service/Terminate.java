@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Terminate extends DamlRecord<Terminate> {
-  public static final String _packageId = "f8883c36e16696951f0e9312ee45dacca92b05226daf215a5159b95d1b1c4079";
+  public static final String _packageId = "8b6e58552ef878dbcd4586daf541e0ca6dd1b0d75795e7f9ece68259cb3242b1";
 
   public final String actor;
 

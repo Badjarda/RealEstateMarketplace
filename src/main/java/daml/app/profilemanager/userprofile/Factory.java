@@ -43,7 +43,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class Factory extends Template {
-  public static final Identifier TEMPLATE_ID = new Identifier("f8883c36e16696951f0e9312ee45dacca92b05226daf215a5159b95d1b1c4079", "App.ProfileManager.UserProfile", "Factory");
+  public static final Identifier TEMPLATE_ID = new Identifier("8b6e58552ef878dbcd4586daf541e0ca6dd1b0d75795e7f9ece68259cb3242b1", "App.ProfileManager.UserProfile", "Factory");
 
   public static final Choice<Factory, daml.da.internal.template.Archive, Unit> CHOICE_Archive = 
       Choice.create("Archive", value$ -> value$.toValue(), value$ ->
