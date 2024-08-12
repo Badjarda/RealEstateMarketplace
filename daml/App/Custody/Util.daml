@@ -175,9 +175,6 @@ data SwapRequest = SwapRequest
 
 requestSwapAux : SwapRequest -> Update (ContractId SwapRequest.I)
 requestSwapAux request = do
-  (_, credential) <-  fetchByKey @Credential (request.operator, request.buyer)
-  permission <- UserUtil.hasPermission credential.roles request.permission
-  assertMsg "You do not have permission to request the transfer between two accounts" permission
   toInterfaceContractId <$> create CustodyModel.SwapRequest with
     operator = request.operator
     buyer = request.buyer
@@ -200,10 +197,7 @@ data AtomicSwapApartment = AtomicSwapApartment
 
 atomicSwapApartmentAux : AtomicSwapApartment -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapApartmentAux request = do
-  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
-  permission <- UserUtil.hasPermission credential.roles request.permission
-  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
-  SwapRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -245,10 +239,7 @@ data AtomicSwapLand = AtomicSwapLand
 
 atomicSwapLandAux : AtomicSwapLand -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapLandAux request = do
-  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
-  permission <- UserUtil.hasPermission credential.roles request.permission
-  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
-  SwapRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -290,10 +281,7 @@ data AtomicSwapGarage = AtomicSwapGarage
 
 atomicSwapGarageAux : AtomicSwapGarage -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapGarageAux request = do
-  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
-  permission <- UserUtil.hasPermission credential.roles request.permission
-  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
-  SwapRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -334,11 +322,8 @@ data AtomicSwapResidence = AtomicSwapResidence
     permission : Permission
 
 atomicSwapResidenceAux : AtomicSwapResidence -> Update (ContractId Transferable.I, ContractId Transferable.I)
-atomicSwapResidenceAux request = do
-  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
-  permission <- UserUtil.hasPermission credential.roles request.permission
-  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
-  SwapRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+atomicSwapResidenceAux request = do 
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -381,10 +366,7 @@ data AtomicSwapWarehouse = AtomicSwapWarehouse
 
 atomicSwapWarehouseAux : AtomicSwapWarehouse -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapWarehouseAux request = do
-  (_, credential) <-  fetchByKey @Credential (request.operator, request.seller)
-  permission <- UserUtil.hasPermission credential.roles request.permission
-  assertMsg "You do not have permission to atomic swap assets between two accounts" permission 
-  SwapRequest.View{buyer, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
