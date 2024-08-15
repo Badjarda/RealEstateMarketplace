@@ -117,6 +117,7 @@ template SwapRequest
     buyerAccount : AccountKey
     fungibleHoldingCid : ContractId Transferable.I
     fungibleAmount: Decimal
+    transferableHoldingCid : ContractId Transferable.I
   where
     signatory operator, buyer
 
@@ -132,5 +133,6 @@ template SwapRequest
         buyerAccount
         fungibleHoldingCid
         fungibleAmount
+        transferableHoldingCid
 
       asRemovable = toInterface @Removable.I this

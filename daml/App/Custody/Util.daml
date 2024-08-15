@@ -171,6 +171,7 @@ data SwapRequest = SwapRequest
     buyerAccount : AccountKey
     fungibleHoldingCid : ContractId Transferable.I
     fungibleAmount: Decimal
+    transferableHoldingCid: ContractId Transferable.I
     permission: Permission
 
 requestSwapAux : SwapRequest -> Update (ContractId SwapRequest.I)
@@ -183,6 +184,7 @@ requestSwapAux request = do
     buyerAccount = request.buyerAccount
     fungibleHoldingCid = request.fungibleHoldingCid
     fungibleAmount = request.fungibleAmount
+    transferableHoldingCid = request.transferableHoldingCid
 
 data AtomicSwapApartment = AtomicSwapApartment
   with
@@ -190,14 +192,13 @@ data AtomicSwapApartment = AtomicSwapApartment
     seller : Party
     buyer : Party
     sellerAccount : AccountKey
-    transferableHoldingCid : ContractId Transferable.I
     propertyKey: PropertyKey
     transferRequestCid : ContractId SwapRequest.I
     permission : Permission
 
 atomicSwapApartmentAux : AtomicSwapApartment -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapApartmentAux request = do
-  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -205,7 +206,7 @@ atomicSwapApartmentAux request = do
   accountBuyer.owner === request.buyer
   (_, ref) <- fetchByKey @Account.R accountBuyer
 
-  holdingTransferable <- fetch request.transferableHoldingCid
+  holdingTransferable <- fetch transferableHoldingCid
   let accountSeller = getAccount holdingTransferable
   accountSeller.custodian === request.operator
   accountSeller.owner === request.seller
@@ -220,7 +221,7 @@ atomicSwapApartmentAux request = do
     with actors = fromList [request.buyer, request.seller]; 
           newOwnerAccount = accountSeller
 
-  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+  transfer2 <- exercise transferableHoldingCid Transferable.Transfer 
     with actors = fromList [request.seller, request.buyer]; 
           newOwnerAccount = accountBuyer
 
@@ -232,14 +233,13 @@ data AtomicSwapLand = AtomicSwapLand
     seller : Party
     buyer : Party
     sellerAccount : AccountKey
-    transferableHoldingCid : ContractId Transferable.I
     propertyKey: PropertyKey
     transferRequestCid : ContractId SwapRequest.I
     permission : Permission
 
 atomicSwapLandAux : AtomicSwapLand -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapLandAux request = do
-  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -247,7 +247,7 @@ atomicSwapLandAux request = do
   accountBuyer.owner === request.buyer
   (_, ref) <- fetchByKey @Account.R accountBuyer
 
-  holdingTransferable <- fetch request.transferableHoldingCid
+  holdingTransferable <- fetch transferableHoldingCid
   let accountSeller = getAccount holdingTransferable
   accountSeller.custodian === request.operator
   accountSeller.owner === request.seller
@@ -262,7 +262,7 @@ atomicSwapLandAux request = do
     with actors = fromList [request.buyer, request.seller]; 
           newOwnerAccount = accountSeller
 
-  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+  transfer2 <- exercise transferableHoldingCid Transferable.Transfer 
     with actors = fromList [request.seller, request.buyer]; 
           newOwnerAccount = accountBuyer
 
@@ -274,14 +274,13 @@ data AtomicSwapGarage = AtomicSwapGarage
     seller : Party
     buyer : Party
     sellerAccount : AccountKey
-    transferableHoldingCid : ContractId Transferable.I
     propertyKey: PropertyKey
     transferRequestCid : ContractId SwapRequest.I
     permission : Permission
 
 atomicSwapGarageAux : AtomicSwapGarage -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapGarageAux request = do
-  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -289,7 +288,7 @@ atomicSwapGarageAux request = do
   accountBuyer.owner === request.buyer
   (_, ref) <- fetchByKey @Account.R accountBuyer
 
-  holdingTransferable <- fetch request.transferableHoldingCid
+  holdingTransferable <- fetch transferableHoldingCid
   let accountSeller = getAccount holdingTransferable
   accountSeller.custodian === request.operator
   accountSeller.owner === request.seller
@@ -304,7 +303,7 @@ atomicSwapGarageAux request = do
     with actors = fromList [request.buyer, request.seller]; 
           newOwnerAccount = accountSeller
 
-  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+  transfer2 <- exercise transferableHoldingCid Transferable.Transfer 
     with actors = fromList [request.seller, request.buyer]; 
           newOwnerAccount = accountBuyer
 
@@ -316,14 +315,13 @@ data AtomicSwapResidence = AtomicSwapResidence
     seller : Party
     buyer : Party
     sellerAccount : AccountKey
-    transferableHoldingCid : ContractId Transferable.I
     propertyKey: PropertyKey
     transferRequestCid : ContractId SwapRequest.I
     permission : Permission
 
 atomicSwapResidenceAux : AtomicSwapResidence -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapResidenceAux request = do 
-  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -331,7 +329,7 @@ atomicSwapResidenceAux request = do
   accountBuyer.owner === request.buyer
   (_, ref) <- fetchByKey @Account.R accountBuyer
 
-  holdingTransferable <- fetch request.transferableHoldingCid
+  holdingTransferable <- fetch transferableHoldingCid
   let accountSeller = getAccount holdingTransferable
   accountSeller.custodian === request.operator
   accountSeller.owner === request.seller
@@ -346,7 +344,7 @@ atomicSwapResidenceAux request = do
     with actors = fromList [request.buyer, request.seller]; 
           newOwnerAccount = accountSeller
 
-  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+  transfer2 <- exercise transferableHoldingCid Transferable.Transfer 
     with actors = fromList [request.seller, request.buyer]; 
           newOwnerAccount = accountBuyer
 
@@ -359,14 +357,13 @@ data AtomicSwapWarehouse = AtomicSwapWarehouse
     seller : Party
     buyer : Party
     sellerAccount : AccountKey
-    transferableHoldingCid : ContractId Transferable.I
     propertyKey: PropertyKey
     transferRequestCid : ContractId SwapRequest.I
     permission : Permission
 
 atomicSwapWarehouseAux : AtomicSwapWarehouse -> Update (ContractId Transferable.I, ContractId Transferable.I)
 atomicSwapWarehouseAux request = do
-  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} <- view <$> fetchAndRemove request.transferRequestCid
+  SwapRequest.View{sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid} <- view <$> fetchAndRemove request.transferRequestCid
   
   holdingFungible <- fetch fungibleHoldingCid
   let accountBuyer = getAccount holdingFungible
@@ -374,7 +371,7 @@ atomicSwapWarehouseAux request = do
   accountBuyer.owner === request.buyer
   (_, ref) <- fetchByKey @Account.R accountBuyer
 
-  holdingTransferable <- fetch request.transferableHoldingCid
+  holdingTransferable <- fetch transferableHoldingCid
   let accountSeller = getAccount holdingTransferable
   accountSeller.custodian === request.operator
   accountSeller.owner === request.seller
@@ -389,7 +386,7 @@ atomicSwapWarehouseAux request = do
     with actors = fromList [request.buyer, request.seller]; 
           newOwnerAccount = accountSeller
 
-  transfer2 <- exercise request.transferableHoldingCid Transferable.Transfer 
+  transfer2 <- exercise transferableHoldingCid Transferable.Transfer 
     with actors = fromList [request.seller, request.buyer]; 
           newOwnerAccount = accountBuyer
 

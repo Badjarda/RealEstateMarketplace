@@ -96,40 +96,40 @@ atomicSwapApartment : Party -> Party -> Party -> Party -> AccountKey -> Contract
 atomicSwapApartment operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
   sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
   buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
-  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
-  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapApartment with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapApartment with seller, buyer, sellerAccount, propertyKey, transferRequestCid
   pure()
 
 atomicSwapLand : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
 atomicSwapLand operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
   sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
   buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
-  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
-  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapLand with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapLand with seller, buyer, sellerAccount, propertyKey, transferRequestCid
   pure()
 
 atomicSwapGarage : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
 atomicSwapGarage operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
   sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
   buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
-  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
-  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapGarage with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapGarage with seller, buyer, sellerAccount, propertyKey, transferRequestCid
   pure()
 
 atomicSwapResidence : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
 atomicSwapResidence operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
   sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
   buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
-  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
-  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapResidence with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapResidence with seller, buyer, sellerAccount, propertyKey, transferRequestCid
   pure()
 
 atomicSwapWarehouse : Party -> Party -> Party -> Party -> AccountKey -> ContractId Transferable.I -> PropertyKey -> AccountKey -> ContractId Transferable.I -> Decimal -> Script ()
 atomicSwapWarehouse operator seller buyer public sellerAccount transferableHoldingCid propertyKey buyerAccount fungibleHoldingCid fungibleAmount = do
   sellerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T seller (operator, seller)
   buyerServiceCid <- toInterfaceContractId @CustodyService.I . fst . fromSome <$> queryContractKey @CustodyService.T buyer (operator, buyer)
-  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount
-  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapWarehouse with seller, buyer, sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid
+  transferRequestCid <- submitMulti [buyer,seller] [public] do exerciseCmd buyerServiceCid CustodyService.RequestSwap with seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid
+  submitMulti [seller,buyer] [public] do exerciseCmd sellerServiceCid CustodyService.AtomicSwapWarehouse with seller, buyer, sellerAccount, propertyKey, transferRequestCid
   pure()
 
 -- UserRoleManager Service

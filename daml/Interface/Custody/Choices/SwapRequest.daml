@@ -17,6 +17,7 @@ data View = View
     buyerAccount : AccountKey
     fungibleHoldingCid : ContractId Transferable.I
     fungibleAmount: Decimal
+    transferableHoldingCid : ContractId Transferable.I
   deriving (Eq, Show)
 
 interface SwapRequest where

@@ -69,27 +69,27 @@ template Service
         let withdrawParams = Withdraw with ..
         withdrawAux withdrawParams
       
-      requestSwap Service.RequestSwap{seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount} = do
+      requestSwap Service.RequestSwap{seller, sellerAccount, buyerAccount, fungibleHoldingCid, fungibleAmount, transferableHoldingCid} = do
         let requestSwapParams = SwapRequest with buyer = user, permission = MANAGE_TRANSACTION, ..
         requestSwapAux requestSwapParams
 
-      atomicSwapApartment Service.AtomicSwapApartment{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+      atomicSwapApartment Service.AtomicSwapApartment{seller, buyer,sellerAccount, propertyKey, transferRequestCid} = do
         let atomicSwapParams = AtomicSwapApartment with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
         atomicSwapApartmentAux atomicSwapParams
 
-      atomicSwapLand Service.AtomicSwapLand{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+      atomicSwapLand Service.AtomicSwapLand{seller, buyer,sellerAccount, propertyKey, transferRequestCid} = do
         let atomicSwapParams = AtomicSwapLand with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
         atomicSwapLandAux atomicSwapParams
 
-      atomicSwapGarage Service.AtomicSwapGarage{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+      atomicSwapGarage Service.AtomicSwapGarage{seller, buyer,sellerAccount, propertyKey, transferRequestCid} = do
         let atomicSwapParams = AtomicSwapGarage with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
         atomicSwapGarageAux atomicSwapParams
 
-      atomicSwapResidence Service.AtomicSwapResidence{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+      atomicSwapResidence Service.AtomicSwapResidence{seller, buyer,sellerAccount, propertyKey, transferRequestCid} = do
         let atomicSwapParams = AtomicSwapResidence with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
         atomicSwapResidenceAux atomicSwapParams
 
-      atomicSwapWarehouse Service.AtomicSwapWarehouse{seller, buyer,sellerAccount, transferableHoldingCid, propertyKey, transferRequestCid} = do
+      atomicSwapWarehouse Service.AtomicSwapWarehouse{seller, buyer,sellerAccount, propertyKey, transferRequestCid} = do
         let atomicSwapParams = AtomicSwapWarehouse with operator = operator, seller = seller, buyer = buyer, permission = MANAGE_TRANSACTION, ..
         atomicSwapWarehouseAux atomicSwapParams
 

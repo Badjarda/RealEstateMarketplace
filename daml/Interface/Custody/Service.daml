@@ -134,6 +134,7 @@ interface Service where
       buyerAccount : AccountKey
       fungibleHoldingCid : ContractId Transferable.I
       fungibleAmount: Decimal
+      transferableHoldingCid : ContractId Transferable.I
     controller (view $ asBase this).user
     do
      requestSwap this arg
@@ -143,7 +144,6 @@ interface Service where
       seller: Party
       buyer: Party
       sellerAccount : AccountKey
-      transferableHoldingCid : ContractId Transferable.I
       transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
@@ -155,7 +155,6 @@ interface Service where
       seller: Party
       buyer: Party
       sellerAccount : AccountKey
-      transferableHoldingCid : ContractId Transferable.I
       transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
@@ -167,7 +166,6 @@ interface Service where
       seller: Party
       buyer: Party
       sellerAccount : AccountKey
-      transferableHoldingCid : ContractId Transferable.I
       transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
@@ -179,7 +177,6 @@ interface Service where
       seller: Party
       buyer: Party
       sellerAccount : AccountKey
-      transferableHoldingCid : ContractId Transferable.I
       transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
@@ -191,7 +188,6 @@ interface Service where
       seller: Party
       buyer: Party
       sellerAccount : AccountKey
-      transferableHoldingCid : ContractId Transferable.I
       transferRequestCid : ContractId SwapRequest.I
       propertyKey: PropertyKey
     controller (view $ asBase this).user, buyer 
