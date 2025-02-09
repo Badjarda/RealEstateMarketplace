@@ -43,39 +43,37 @@ Ensure you have the following installed:
 
 ### **Setup Instructions**
 1. Clone the repository:
-   ```sh
-   git clone git@github.com:Badjarda/RealEstateMarketplace.git
-   ```
+```sh
+git clone git@github.com:Badjarda/RealEstateMarketplace.git
+```
 2. Install the dependencies (for that run the following command in the root directory):
-  ```
-  ./scripts/get-dependencies.sh
-  ```
-  If you are running it on WSL, do these commands
-  ```
-  > dos2unix ./scripts/get-dependencies.sh
-  > sed -i 's/\r$//' ./scripts/get-dependencies.sh
-  > ./scripts/get-dependencies.sh
-  ```
-  This procedure will download the required Daml packages.
-
-  This project supports the multi-package building functionality of DAML. This means that it is possible to build all the necessary project packages at once simultaneously. In order to do so one should run the following command in the root directory:
+```
+./scripts/get-dependencies.sh
+```
+If you are running it on WSL, do these commands
+```
+> dos2unix ./scripts/get-dependencies.sh
+> sed -i 's/\r$//' ./scripts/get-dependencies.sh
+> ./scripts/get-dependencies.sh
+```
+This procedure will download the required Daml packages.
 
 3. Compile and run the project:
-  ```
-  daml build --all
-  
-  
-  You need to have [Node.js] and [Daml] installed.
-  
-  [Node.js]: https://nodejs.dev
-  [Daml]: https://docs.daml.com
-  
-  First, start the Daml components:
-  
-  ```bash
-  daml start
-  ```
-  This starts a server on `http://localhost:3000`.
+```
+daml build --all
+
+
+You need to have [Node.js] and [Daml] installed.
+
+[Node.js]: https://nodejs.dev
+[Daml]: https://docs.daml.com
+
+First, start the Daml components:
+
+```bash
+daml start
+```
+This starts a server on `http://localhost:3000`.
 
 See [documentation] for details.
 
