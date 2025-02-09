@@ -1,97 +1,85 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/digital-asset/daml/blob/main/LICENSE)
 
-# RealEstateMarketplace
+# Decentralized Marketplace for Tokenized Real Estate
+
+## Overview
+This repository contains the source code for a **Decentralized Marketplace** designed to facilitate real estate token transactions between authenticated users. The marketplace supports various real estate assets, including:
+
+- Residences
+- Garages
+- Apartments
+- Warehouses
+- Lands
+
+Each asset type includes the necessary fields to store detailed information about the property.
+
+## Technology Stack
+### **Distributed Ledger Technology (DLT)**
+The marketplace is built on **Canton**, a scalable and privacy-enabled distributed ledger technology (DLT). Canton is responsible for:
+- Handling **all business logic** securely.
+- Maintaining an immutable and **tamper-proof history** of records and transactions.
+- Ensuring **data privacy and access control** in a decentralized environment.
+
+### **Smart Contracts and Execution**
+The **Daml** smart contract language is used to implement the business logic. These smart contracts execute on **Canton**, ensuring secure and auditable transactions. Daml provides:
+- A **safe and expressive** way to define real estate ownership and transactions.
+- Built-in **privacy** and **fine-grained permissions**.
+- Automatic **consistency and integrity enforcement** in transactions.
+
+## Features
+- **Tokenized real estate** transactions between authenticated users.
+- **Immutable and auditable** transaction history.
+- **Smart contract-driven** asset management.
+- **Fine-grained access control** and **privacy** mechanisms.
+- **Support for multiple real estate asset types** with structured metadata.
+
+## Installation & Setup
+### **Prerequisites**
+Ensure you have the following installed:
+- [Daml SDK](https://docs.daml.com/getting-started/installation.html)
+- [Canton](https://www.canton.io/getting-started/)
+- Java (for Canton runtime)
+- Docker (for deployment, optional)
+
+### **Setup Instructions**
+1. Clone the repository:
+   ```sh
+   git clone git@github.com:Badjarda/RealEstateMarketplace.git
+   ```
+2. Install the dependencies (for that run the following command in the root directory):
+  ```
+  ./scripts/get-dependencies.sh
+  ```
+  If you are running it on WSL, do these commands
+  ```
+  > dos2unix ./scripts/get-dependencies.sh
+  > sed -i 's/\r$//' ./scripts/get-dependencies.sh
+  > ./scripts/get-dependencies.sh
+  ```
+  This procedure will download the required Daml packages.
+
+  This project supports the multi-package building functionality of DAML. This means that it is possible to build all the necessary project packages at once simultaneously. In order to do so one should run the following command in the root directory:
+
+3. Compile and run the project:
+  ```
+  daml build --all
+  
+  
+  You need to have [Node.js] and [Daml] installed.
+  
+  [Node.js]: https://nodejs.dev
+  [Daml]: https://docs.daml.com
+  
+  First, start the Daml components:
+  
+  ```bash
+  daml start
+  ```
+  This starts a server on `http://localhost:3000`.
 
 See [documentation] for details.
 
-[documentation]: https://docs.daml.com/getting-started/installation.html
+---
+### Notes
+For more details, visit the official documentation of [Daml](https://docs.daml.com/) and [Canton](https://www.canton.io/).
 
-Please ask for help on [the Daml forum] if you encounter any issue!
-
-[the Daml forum]: https://discuss.daml.com
-
-## Development Quick Start
-
-## Run the Project
-
-To run the project you must install the dependencies. For that run the following command in the root directory:
-```
-./scripts/get-dependencies.sh
-```
-If you are running it on WSL, do these commands
-```
-> dos2unix ./scripts/get-dependencies.sh
-> sed -i 's/\r$//' ./scripts/get-dependencies.sh
-> ./scripts/get-dependencies.sh
-```
-
-- **note:** make sure the script is set as an executable.
-
-This procedure will download the required Daml packages.
-
-This project supports the multi-package building functionality of DAML. This means that it is possible to build all the necessary project packages at once simultaneously. In order to do so one should run the following command in the root directory:
-
-```
-daml build --all
-
-
-You need to have [Node.js] and [Daml] installed.
-
-[Node.js]: https://nodejs.dev
-[Daml]: https://docs.daml.com
-
-First, start the Daml components:
-
-```bash
-daml start
-```
-
-This will:
-
-- Build you Daml code once.
-- Generate JavaScript code (and TypeScript definitions) for your Daml types.
-- Start a Daml sandbox gRPC server (on 6865).
-- Start a Daml HTTP JSON API server (on 7575).
-- Watch for the `r` key press (`r` + Enter on Windows); when pressed, rebuild
-  all of the Daml code, push the new DAR to the ledger, and rerun the JS/TS
-  code generation.
-
-Next, start the JS dev server:
-
-```bash
-cd ui
-npm install
-npm start
-```
-
-This starts a server on `http://localhost:3000` which:
-
-- Builds all of your TypeScript (or JavaScript) code (including type
-  definitions from the codegen).
-- Serves the result on :3000, redirecting `/v1` to the JSON API server (on
-  `127.0.0.1:7575`) so API calls are on the same origin as far as your browser
-  is concerned.
-- Watch for changes in TS/JS code (including codegen), and immediately rebuild.
-
-## Deploying to Daml Hub
-
-To build everything from scratch:
-
-```bash
-daml build
-daml codegen js .daml/dist/RealEstateMarketplace-0.1.0.dar -o ui/daml.js
-cd ui
-npm install
-npm run-script build
-zip -r ../RealEstateMarketplace-ui.zip build
-```
-
-Next you need to create a ledger on [Daml Hub], upload the files
-`.daml/dist/RealEstateMarketplace-0.1.0.dar` (created by the `daml build` command)
-and `RealEstateMarketplace-ui.zip` (created by the `zip` command based on the result
-of `npm run-script build`).
-
-[Daml Hub]: https://hub.daml.com
-
-Once both files are uploaded, you need to tell Daml Hub to deploy them. A few
-seconds later, your website should be up and running.
